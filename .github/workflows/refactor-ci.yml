@@ -1,0 +1,50 @@
+﻿name: refactor-ci
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+
+jobs:
+  android-shell:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Grant gradlew permission
+        run: chmod +x gradlew
+      - name: Build app-shell
+        run: ./gradlew :app-shell:assembleDebug :app-shell:testDebugUnitTest --no-daemon
+
+  cloud-next:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cloud-next
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: cloud-next/package-lock.json
+      - name: Install
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
+
+  ml-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run ML smoke pipeline
+        run: python ml/pipeline/smoke.py

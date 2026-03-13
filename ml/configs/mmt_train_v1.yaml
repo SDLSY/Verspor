@@ -1,0 +1,36 @@
+experiment:
+  name: mmt_train_v1
+  model_version: mmt-v1
+  feature_schema_version: v1
+  label_schema_version: aasm5-v1
+
+data:
+  manifests_dir: ./data/manifests
+  train_manifest: train_manifest.jsonl
+  val_manifest: val_manifest.jsonl
+  test_manifest: test_manifest.jsonl
+  unlabeled_manifest: unlabeled_manifest.jsonl
+  split_strategy: subject-wise
+  epoch_seconds: 30
+  stages: [WAKE, N1, N2, N3, REM]
+
+model:
+  ppg_seq_len: 1500
+  motion_seq_len: 750
+  num_stages: 5
+  hidden_dim: 256
+  num_heads: 8
+  num_layers: 6
+
+training:
+  batch_size: 64
+  epochs: 100
+  learning_rate: 0.0001
+  weight_decay: 0.01
+  class_imbalance_loss: focal
+  focal_gamma: 2.0
+  missing_modality_mask: true
+
+evaluation:
+  metrics: [macro_f1, accuracy, cohen_kappa, n3_recall]
+  confidence_calibration: temperature_scaling

@@ -1,0 +1,24 @@
+{
+  "zones": [
+    {
+      "zoneCode": "HEAD",
+      "labelKey": "relax_zone_head",
+      "meshNames": ["Head", "Neck", "Cesium_Man_Head"]
+    },
+    {
+      "zoneCode": "CHEST",
+      "labelKey": "relax_zone_chest",
+      "meshNames": ["Chest", "Spine2", "Cesium_Man_Torso"]
+    },
+    {
+      "zoneCode": "ABDOMEN",
+      "labelKey": "relax_zone_abdomen",
+      "meshNames": ["Spine", "Hips", "Cesium_Man_Hips"]
+    },
+    {
+      "zoneCode": "LIMB",
+      "labelKey": "relax_zone_limb",
+      "meshNames": ["Arm", "Leg", "Hand", "Foot", "Cesium_Man_Leg"]
+    }
+  ]
+}

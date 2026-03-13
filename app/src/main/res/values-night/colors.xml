@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material3 Dark -->
+    <color name="md_theme_dark_primary">#64D3EA</color>
+    <color name="md_theme_dark_onPrimary">#003641</color>
+    <color name="md_theme_dark_primaryContainer">#005060</color>
+    <color name="md_theme_dark_onPrimaryContainer">#C7F1FA</color>
+
+    <color name="md_theme_dark_secondary">#8FD5E1</color>
+    <color name="md_theme_dark_onSecondary">#00363D</color>
+    <color name="md_theme_dark_secondaryContainer">#1B5660</color>
+    <color name="md_theme_dark_onSecondaryContainer">#C9EEF3</color>
+
+    <color name="md_theme_dark_tertiary">#AFC9FF</color>
+    <color name="md_theme_dark_onTertiary">#12345D</color>
+    <color name="md_theme_dark_tertiaryContainer">#2B4A73</color>
+    <color name="md_theme_dark_onTertiaryContainer">#D6E6FF</color>
+
+    <color name="md_theme_dark_background">#07151B</color>
+    <color name="md_theme_dark_onBackground">#D9ECF1</color>
+    <color name="md_theme_dark_surface">#0D2028</color>
+    <color name="md_theme_dark_onSurface">#D9ECF1</color>
+    <color name="md_theme_dark_surfaceVariant">#203740</color>
+    <color name="md_theme_dark_onSurfaceVariant">#A5BCC4</color>
+    <color name="md_theme_dark_outline">#6F8892</color>
+
+    <!-- App semantic tokens (dark) -->
+    <color name="background">@color/md_theme_dark_background</color>
+    <color name="text_primary">@color/md_theme_dark_onSurface</color>
+    <color name="text_secondary">@color/md_theme_dark_onSurfaceVariant</color>
+
+    <color name="app_gradient_start">#07161E</color>
+    <color name="app_gradient_end">#0B222B</color>
+    <color name="bottom_nav_bg">#0F242D</color>
+    <color name="card_stroke">#2A444E</color>
+    <color name="card_surface_tint">#122B35</color>
+    <color name="surface_card">#0D2028</color>
+    <color name="surface_card_subtle">#122B35</color>
+    <color name="chip_bg">#1E3A44</color>
+    <color name="nav_active_indicator">#1F4D5A</color>
+
+    <color name="recovery_gradient_start">#13A7C7</color>
+    <color name="recovery_gradient_end">#087A99</color>
+
+    <color name="sleep_stage_deep">#7CAEFF</color>
+    <color name="sleep_stage_rem">#AA93FF</color>
+    <color name="sleep_stage_light">#60C5EC</color>
+    <color name="sleep_stage_awake">#8EA2AA</color>
+
+    <color name="chart_sleep">#7CAEFF</color>
+    <color name="chart_heart">#FF8383</color>
+    <color name="chart_oxygen">#2BD0A3</color>
+    <color name="chart_temperature">#57C3F0</color>
+    <color name="chart_recovery">#FFC063</color>
+    <color name="chart_steps">#6DC7F7</color>
+    <color name="chart_motion">#C39BFF</color>
+
+    <color name="status_positive">#2FD09A</color>
+    <color name="status_warning">#F4B24D</color>
+    <color name="status_negative">#FF7D7D</color>
+
+    <color name="status_connected">#2FD09A</color>
+    <color name="status_connecting">#F4B24D</color>
+    <color name="status_disconnected">#6B8590</color>
+    <color name="status_scanning">#57C3F0</color>
+
+    <color name="nav_item_active">@color/md_theme_dark_primary</color>
+    <color name="nav_item_inactive">#8AA4AE</color>
+
+    <color name="badge_purple">#7D8EFF</color>
+    <color name="badge_orange">#FFB063</color>
+</resources>

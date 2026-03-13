@@ -1,0 +1,37 @@
+{
+  "model": {
+    "assetPath": "3d_avatar/guide_avatar_vroid_hq.glb",
+    "name": "Relax Avatar Normal View",
+    "version": "avatar-v1",
+    "license": "demo",
+    "source": "5422721126842864302.vrm -> guide_avatar_vroid_hq.glb",
+    "unitCubeOffset": [0.0, -0.14, -2.62],
+    "defaultScale": 0.98,
+    "defaultYawDeg": 166.0,
+    "autoPlayAnimation": true,
+    "defaultAnimationName": "Waving Gesture_2",
+    "autoPlayAnimationNames": [
+      "Waving Gesture_2",
+      "Friendly Wave_4",
+      "Idle Sway_5",
+      "Cheer Pose_6",
+      "Guide Left_7"
+    ],
+    "autoPlaySwitchMs": 2600,
+    "visualTheme": {
+      "clearColor": "#EAF7FF",
+      "directLight": 76000,
+      "emissiveStrength": 1.02,
+      "preserveMaterial": true
+    },
+    "cameraDefaults": {
+      "baseFocalLength": 36.0,
+      "focusDurationMs": 420,
+      "returnDurationMs": 380
+    },
+    "camera": {
+      "orbitHome": [0.0, -0.02, 4.02],
+      "lookAt": [0.0, -0.12, 0.0]
+    }
+  }
+}

@@ -1,0 +1,4 @@
+1、使用Android studio打开此项目，即选择打开sample文件夹下的AIUISimpleDemo
+2、待android studio加载项目完成后，将project选择为project file模式
+3、最上面的assets路径下找到cfg文件夹，找到aiui_phone.cfg文件，修改登录参数，填入自己的appid、api_secret和key
+4、运行demo

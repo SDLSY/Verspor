@@ -1,0 +1,37 @@
+{
+  "model": {
+    "assetPath": "3d_avatar/guide_avatar_vroid_hq.glb",
+    "name": "Global Avatar Overlay View",
+    "version": "avatar-global-v1",
+    "license": "demo",
+    "source": "5422721126842864302.vrm -> guide_avatar_vroid_hq.glb",
+    "unitCubeOffset": [0.0, -0.08, -2.70],
+    "defaultScale": 0.88,
+    "defaultYawDeg": 166.0,
+    "autoPlayAnimation": true,
+    "defaultAnimationName": "Idle Sway_5",
+    "autoPlayAnimationNames": [
+      "Idle Sway_5",
+      "Friendly Wave_4",
+      "Waving Gesture_2",
+      "Cheer Pose_6",
+      "Guide Left_7"
+    ],
+    "autoPlaySwitchMs": 2200,
+    "visualTheme": {
+      "clearColor": "#00000000",
+      "directLight": 74000,
+      "emissiveStrength": 0.96,
+      "preserveMaterial": true
+    },
+    "cameraDefaults": {
+      "baseFocalLength": 34.0,
+      "focusDurationMs": 420,
+      "returnDurationMs": 380
+    },
+    "camera": {
+      "orbitHome": [0.0, 0.10, 4.22],
+      "lookAt": [0.0, -0.02, 0.0]
+    }
+  }
+}

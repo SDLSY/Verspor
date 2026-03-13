@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "intervention-task.schema.json",
+  "title": "InterventionTask",
+  "type": "object",
+  "required": [
+    "taskId",
+    "sourceType",
+    "bodyZone",
+    "protocolType",
+    "durationSec"
+  ],
+  "properties": {
+    "taskId": {
+      "type": "string"
+    },
+    "sourceType": {
+      "type": "string",
+      "enum": [
+        "AI_COACH",
+        "MEDICAL_REPORT",
+        "RULE_ENGINE"
+      ]
+    },
+    "bodyZone": {
+      "type": "string"
+    },
+    "protocolType": {
+      "type": "string"
+    },
+    "durationSec": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "additionalProperties": false
+}

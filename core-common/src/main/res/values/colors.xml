@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Material3 Light -->
+    <color name="md_theme_light_primary">#0E8AA8</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_primaryContainer">#C7F1FA</color>
+    <color name="md_theme_light_onPrimaryContainer">#003640</color>
+
+    <color name="md_theme_light_secondary">#0A6E77</color>
+    <color name="md_theme_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_light_secondaryContainer">#C9EEF3</color>
+    <color name="md_theme_light_onSecondaryContainer">#002C31</color>
+
+    <color name="md_theme_light_tertiary">#2D5C8A</color>
+    <color name="md_theme_light_onTertiary">#FFFFFF</color>
+    <color name="md_theme_light_tertiaryContainer">#D6E6FF</color>
+    <color name="md_theme_light_onTertiaryContainer">#001D3B</color>
+
+    <color name="md_theme_light_background">#F4FBFC</color>
+    <color name="md_theme_light_onBackground">#0F2A33</color>
+    <color name="md_theme_light_surface">#FFFFFF</color>
+    <color name="md_theme_light_onSurface">#12313B</color>
+    <color name="md_theme_light_surfaceVariant">#E2F0F3</color>
+    <color name="md_theme_light_onSurfaceVariant">#47656E</color>
+    <color name="md_theme_light_outline">#8AA8B2</color>
+    <color name="md_theme_light_outlineVariant">#C8DFE5</color>
+
+    <!-- App semantic tokens -->
+    <color name="background">@color/md_theme_light_background</color>
+    <color name="text_primary">@color/md_theme_light_onSurface</color>
+    <color name="text_secondary">@color/md_theme_light_onSurfaceVariant</color>
+
+    <color name="app_gradient_start">#F3FCFF</color>
+    <color name="app_gradient_end">#E5F5FA</color>
+    <color name="bottom_nav_bg">#FCFFFF</color>
+    <color name="card_stroke">#C8DFE5</color>
+    <color name="card_surface_tint">#F4FBFD</color>
+    <color name="surface_card">#FFFFFF</color>
+    <color name="surface_card_subtle">#F2FAFC</color>
+    <color name="chip_bg">#DDF1F6</color>
+    <color name="nav_active_indicator">#C6F0F8</color>
+
+    <color name="recovery_gradient_start">#0BA4C4</color>
+    <color name="recovery_gradient_end">#047F9F</color>
+
+    <color name="sleep_stage_deep">#2F6FD2</color>
+    <color name="sleep_stage_rem">#6C56D8</color>
+    <color name="sleep_stage_light">#21A8D8</color>
+    <color name="sleep_stage_awake">#9AA9B3</color>
+
+    <color name="chart_sleep">#2E74E8</color>
+    <color name="chart_heart">#EB5757</color>
+    <color name="chart_oxygen">#0FA87E</color>
+    <color name="chart_temperature">#1293C6</color>
+    <color name="chart_recovery">#F29D38</color>
+    <color name="chart_steps">#2D9CDB</color>
+    <color name="chart_motion">#8E56D8</color>
+    <color name="chart_ppg">#2A6FD9</color>
+
+    <color name="status_positive">#169A68</color>
+    <color name="status_warning">#D07B12</color>
+    <color name="status_negative">#D64545</color>
+
+    <color name="status_connected">#169A68</color>
+    <color name="status_connecting">#D07B12</color>
+    <color name="status_disconnected">#8BA1AA</color>
+    <color name="status_scanning">#1293C6</color>
+
+    <color name="nav_item_active">@color/md_theme_light_primary</color>
+    <color name="nav_item_inactive">#6A808A</color>
+
+    <color name="badge_purple">#5969E8</color>
+    <color name="badge_orange">#FF8A42</color>
+</resources>

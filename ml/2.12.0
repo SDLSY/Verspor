@@ -1,0 +1,77 @@
+Looking in indexes: https://pypi.tuna.tsinghua.edu.cn/simple
+Collecting tensorflow
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/e3/f8/9246d3c7e185a29d7359d8b12b3d70bf2c3150ecf1427ec1382290e71a56/tensorflow-2.20.0-cp311-cp311-win_amd64.whl (331.8 MB)
+     ------------------------------------- 331.8/331.8 MB 18.5 MB/s eta 0:00:00
+Requirement already satisfied: absl-py>=1.0.0 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (2.3.1)
+Requirement already satisfied: astunparse>=1.6.0 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (1.6.3)
+Requirement already satisfied: flatbuffers>=24.3.25 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (25.12.19)
+Requirement already satisfied: gast!=0.5.0,!=0.5.1,!=0.5.2,>=0.2.1 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (0.7.0)
+Requirement already satisfied: google_pasta>=0.1.1 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (0.2.0)
+Requirement already satisfied: libclang>=13.0.0 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (18.1.1)
+Requirement already satisfied: opt_einsum>=2.3.2 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (3.4.0)
+Requirement already satisfied: packaging in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (24.1)
+Collecting protobuf>=5.28.0 (from tensorflow)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/55/75/bb9bc917d10e9ee13dee8607eb9ab963b7cf8be607c46e7862c748aa2af7/protobuf-6.33.5-cp310-abi3-win_amd64.whl (437 kB)
+Requirement already satisfied: requests<3,>=2.21.0 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (2.31.0)
+Requirement already satisfied: setuptools in c:\program files\windowsapps\pythonsoftwarefoundation.python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\lib\site-packages (from tensorflow) (65.5.0)
+Requirement already satisfied: six>=1.12.0 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (1.16.0)
+Requirement already satisfied: termcolor>=1.1.0 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (3.3.0)
+Requirement already satisfied: typing_extensions>=3.6.6 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (4.15.0)
+Requirement already satisfied: wrapt>=1.11.0 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (1.14.2)
+Requirement already satisfied: grpcio<2.0,>=1.24.3 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (1.76.0)
+Collecting tensorboard~=2.20.0 (from tensorflow)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/9c/d9/a5db55f88f258ac669a92858b70a714bbbd5acd993820b41ec4a96a4d77f/tensorboard-2.20.0-py3-none-any.whl (5.5 MB)
+     ---------------------------------------- 5.5/5.5 MB 28.1 MB/s eta 0:00:00
+Collecting keras>=3.10.0 (from tensorflow)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/28/b5/ea85873abc99dc64a7a27ff1a8dbfdc7dbb57d4e5d1a423abc11217af4f1/keras-3.13.2-py3-none-any.whl (1.5 MB)
+     ---------------------------------------- 1.5/1.5 MB 26.6 MB/s eta 0:00:00
+Collecting numpy>=1.26.0 (from tensorflow)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/76/ae/e0265e0163cf127c24c3969d29f1c4c64551a1e375d95a13d32eab25d364/numpy-2.4.2-cp311-cp311-win_amd64.whl (12.6 MB)
+     --------------------------------------- 12.6/12.6 MB 24.0 MB/s eta 0:00:00
+Requirement already satisfied: h5py>=3.11.0 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorflow) (3.15.1)
+Collecting ml_dtypes<1.0.0,>=0.5.1 (from tensorflow)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/b4/24/70bd59276883fdd91600ca20040b41efd4902a923283c4d6edcb1de128d2/ml_dtypes-0.5.4-cp311-cp311-win_amd64.whl (210 kB)
+Requirement already satisfied: wheel<1.0,>=0.23.0 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from astunparse>=1.6.0->tensorflow) (0.45.1)
+Collecting rich (from keras>=3.10.0->tensorflow)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/87/2a/a1810c8627b9ec8c57ec5ec325d306701ae7be50235e8fd81266e002a3cc/rich-14.3.1-py3-none-any.whl (309 kB)
+Collecting namex (from keras>=3.10.0->tensorflow)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/b2/bc/465daf1de06409cdd4532082806770ee0d8d7df434da79c76564d0f69741/namex-0.1.0-py3-none-any.whl (5.9 kB)
+Collecting optree (from keras>=3.10.0->tensorflow)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/d5/a3/91942b7e6e365f4e05d196dbbb52909aae11f1e2f4b4c8aee5b506f93877/optree-0.18.0-cp311-cp311-win_amd64.whl (312 kB)
+Requirement already satisfied: charset-normalizer<4,>=2 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from requests<3,>=2.21.0->tensorflow) (3.3.2)
+Requirement already satisfied: idna<4,>=2.5 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from requests<3,>=2.21.0->tensorflow) (3.6)
+Requirement already satisfied: urllib3<3,>=1.21.1 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from requests<3,>=2.21.0->tensorflow) (2.2.1)
+Requirement already satisfied: certifi>=2017.4.17 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from requests<3,>=2.21.0->tensorflow) (2024.2.2)
+Requirement already satisfied: markdown>=2.6.8 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorboard~=2.20.0->tensorflow) (3.10)
+Requirement already satisfied: pillow in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorboard~=2.20.0->tensorflow) (10.1.0)
+Requirement already satisfied: tensorboard-data-server<0.8.0,>=0.7.0 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorboard~=2.20.0->tensorflow) (0.7.2)
+Requirement already satisfied: werkzeug>=1.0.1 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from tensorboard~=2.20.0->tensorflow) (3.0.1)
+Requirement already satisfied: MarkupSafe>=2.1.1 in c:\users\30672\appdata\local\packages\pythonsoftwarefoundation.python.3.11_qbz5n2kfra8p0\localcache\local-packages\python311\site-packages (from werkzeug>=1.0.1->tensorboard~=2.20.0->tensorflow) (2.1.5)
+Collecting markdown-it-py>=2.2.0 (from rich->keras>=3.10.0->tensorflow)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/94/54/e7d793b573f298e1c9013b8c4dade17d481164aa517d1d7148619c2cedbf/markdown_it_py-4.0.0-py3-none-any.whl (87 kB)
+Collecting pygments<3.0.0,>=2.13.0 (from rich->keras>=3.10.0->tensorflow)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/c7/21/705964c7812476f378728bdf590ca4b771ec72385c533964653c68e86bdc/pygments-2.19.2-py3-none-any.whl (1.2 MB)
+     ---------------------------------------- 1.2/1.2 MB 20.5 MB/s eta 0:00:00
+Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich->keras>=3.10.0->tensorflow)
+  Downloading https://pypi.tuna.tsinghua.edu.cn/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+Installing collected packages: namex, pygments, protobuf, optree, numpy, mdurl, tensorboard, ml_dtypes, markdown-it-py, rich, keras, tensorflow
+  Attempting uninstall: protobuf
+    Found existing installation: protobuf 3.20.3
+    Uninstalling protobuf-3.20.3:
+      Successfully uninstalled protobuf-3.20.3
+  Attempting uninstall: numpy
+    Found existing installation: numpy 1.24.3
+    Uninstalling numpy-1.24.3:
+      Successfully uninstalled numpy-1.24.3
+  Attempting uninstall: tensorboard
+    Found existing installation: tensorboard 2.15.2
+    Uninstalling tensorboard-2.15.2:
+      Successfully uninstalled tensorboard-2.15.2
+  Attempting uninstall: ml_dtypes
+    Found existing installation: ml-dtypes 0.2.0
+    Uninstalling ml-dtypes-0.2.0:
+      Successfully uninstalled ml-dtypes-0.2.0
+  Attempting uninstall: keras
+    Found existing installation: keras 2.15.0
+    Uninstalling keras-2.15.0:
+      Successfully uninstalled keras-2.15.0

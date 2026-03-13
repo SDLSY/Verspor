@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.facebook.shimmer.ShimmerFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/shimmerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:shimmer_auto_start="true"
+    app:shimmer_duration="1200"
+    app:shimmer_base_alpha="0.7"
+    app:shimmer_highlight_alpha="1.0">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Hero Card 骨架 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="@drawable/skeleton_rounded_rect" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+
+        <!-- 睡眠数据卡片骨架 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:background="@drawable/skeleton_rounded_rect" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+
+        <!-- 健康指标行骨架 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+                android:background="@drawable/skeleton_rounded_rect" />
+
+            <Space
+                android:layout_width="12dp"
+                android:layout_height="match_parent" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+                android:background="@drawable/skeleton_rounded_rect" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp" />
+
+        <!-- 建议卡片骨架 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="@drawable/skeleton_rounded_rect" />
+
+    </LinearLayout>
+</com.facebook.shimmer.ShimmerFrameLayout>

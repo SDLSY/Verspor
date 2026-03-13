@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- 深邃夜空渐变背景 -->
+    <path android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor" xmlns:aapt="http://schemas.android.com/aapt">
+            <gradient
+                android:startX="0"
+                android:startY="0"
+                android:endX="108"
+                android:endY="108"
+                android:type="linear">
+                <item
+                    android:color="#0A0E27" 
+                    android:offset="0.0" />
+                <item
+                    android:color="#1A1F3A"
+                    android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    
+    <!-- 星空点缀 -->
+    <path
+        android:fillColor="#40FFFFFF"
+        android:pathData="M20,25 L20.5,26 L21.5,26 L20.8,26.5 L21,27.5 L20,27 L19,27.5 L19.2,26.5 L18.5,26 L19.5,26 Z"/>
+    <path
+        android:fillColor="#30FFFFFF"
+        android:pathData="M85,35 L85.3,35.7 L86,35.7 L85.5,36.1 L85.7,36.8 L85,36.4 L84.3,36.8 L84.5,36.1 L84,35.7 L84.7,35.7 Z"/>
+    <path
+        android:fillColor="#35FFFFFF"
+        android:pathData="M75,85 L75.4,86 L76.5,86 L75.7,86.6 L76,87.5 L75,87 L74,87.5 L74.3,86.6 L73.5,86 L74.6,86 Z"/>
+</vector>

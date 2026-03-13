@@ -1,0 +1,10 @@
+﻿{
+  "pageKey": "home",
+  "pageTitle": "今日",
+  "pageSubtitle": "查看恢复分与建议",
+  "visibleHighlights": ["75%", "中等可信", "主导因子：无明显异常"],
+  "userStateSummary": "恢复分稳定；近 7 天平均睡眠 7 小时 30 分",
+  "riskSummary": "暂无明显高风险提示",
+  "actionHint": "提醒用户先看今日重点，再决定下一步",
+  "trigger": "tap"
+}

@@ -1,0 +1,66 @@
+# 多模态Transformer睡眠分析模型 - Python依赖
+
+# ===== 核心深度学习框架 =====
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# ===== 数据处理 =====
+numpy>=1.23.0
+pandas>=1.5.0
+scipy>=1.10.0
+
+# ===== 可视化 =====
+matplotlib>=3.6.0
+seaborn>=0.12.0
+plotly>=5.13.0
+
+# ===== 进度条 =====
+tqdm>=4.64.0
+
+# ===== 模型导出 =====
+onnx>=1.13.0
+onnx-simplifier>=0.4.0
+onnxruntime>=1.14.0
+
+# ===== TensorFlow (用于TFLite转换) =====
+tensorflow>=2.12.0
+# tensorflow-gpu>=2.12.0  # 如果使用GPU
+
+# ===== ONNX到TensorFlow转换 =====
+onnx-tf>=1.10.0
+
+# ===== 科学计算 =====
+scikit-learn>=1.2.0
+scikit-image>=0.20.0
+
+# ===== 信号处理 =====
+pywavelets>=1.4.0
+neurokit2>=0.2.0  # 用于生理信号处理
+
+# ===== 数据增强 =====
+# tsaug>=0.2.1  # 时间序列数据增强（可选）
+
+# ===== 超参数优化（可选）=====
+# optuna>=3.0.0
+# ray[tune]>=2.2.0
+
+# ===== 日志和监控 =====
+tensorboard>=2.12.0
+# wandb>=0.13.0  # Weights & Biases实验跟踪（可选）
+
+# ===== 配置管理 =====
+pyyaml>=6.0
+python-dotenv>=0.21.0
+
+# ===== 其他工具 =====
+h5py>=3.8.0  # 用于保存大型数组
+pillow>=9.4.0
+opencv-python>=4.7.0  # 可选，用于可视化
+
+# ===== 开发工具（可选）=====
+# jupyter>=1.0.0
+# ipython>=8.10.0
+# pytest>=7.2.0
+# black>=23.0.0  # 代码格式化
+# flake8>=6.0.0  # 代码检查

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextAppearance.NewStart.PageTitle" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">28sp</item>
+    </style>
+
+    <style name="TextAppearance.NewStart.PageSubtitle" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextAppearance.NewStart.SectionTitle" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="TextAppearance.NewStart.MetricValue" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="TextAppearance.NewStart.BodyLabel" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextAppearance.NewStart.StatusPill" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <style name="Widget.NewStart.Card.Inline" parent="Widget.NewStart.Card">
+        <item name="cardCornerRadius">@dimen/card_corner_inline</item>
+        <item name="cardElevation">0dp</item>
+    </style>
+
+    <style name="Widget.NewStart.Card.HeroSoft" parent="Widget.NewStart.HeroCard">
+        <item name="cardCornerRadius">@dimen/hero_corner</item>
+        <item name="cardElevation">4dp</item>
+    </style>
+
+    <style name="Widget.NewStart.Button.Header" parent="Widget.NewStart.Button.Outlined">
+        <item name="android:minHeight">@dimen/button_height_secondary</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingStart">14dp</item>
+        <item name="android:paddingEnd">14dp</item>
+    </style>
+</resources>

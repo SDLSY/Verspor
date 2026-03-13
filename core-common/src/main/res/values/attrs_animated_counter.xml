@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AnimatedCounterView">
+        <attr name="acv_format" format="string" />
+        <attr name="acv_prefix" format="string" />
+        <attr name="acv_suffix" format="string" />
+        <attr name="acv_duration" format="integer" />
+    </declare-styleable>
+</resources>

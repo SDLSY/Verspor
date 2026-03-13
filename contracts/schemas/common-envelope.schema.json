@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "common-envelope.schema.json",
+  "title": "ApiEnvelope",
+  "type": "object",
+  "required": [
+    "code",
+    "message",
+    "traceId"
+  ],
+  "properties": {
+    "code": {
+      "type": "integer"
+    },
+    "message": {
+      "type": "string"
+    },
+    "data": {},
+    "traceId": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

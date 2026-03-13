@@ -1,0 +1,37 @@
+{
+    "source":  "D:/newstart/5422721126842864302.vrm",
+    "method":  "procedural_actions",
+    "sourceActions":  "d:/newstart/merged-model.glb",
+    "requestedActions":  [
+                             "Pointing Forward_1",
+                             "Waving Gesture_2",
+                             "Jumping Down_3",
+                             "Friendly Wave_4",
+                             "Idle Sway_5",
+                             "Cheer Pose_6",
+                             "Guide Left_7",
+                             "Head Pain_8",
+                             "Chest Pain_9",
+                             "Abdominal Pain_10",
+                             "Limb Pain_11"
+                         ],
+    "bakedActions":  [
+                         "Pointing Forward_1",
+                         "Waving Gesture_2",
+                         "Jumping Down_3",
+                         "Friendly Wave_4",
+                         "Idle Sway_5",
+                         "Cheer Pose_6",
+                         "Guide Left_7",
+                         "Head Pain_8",
+                         "Chest Pain_9",
+                         "Abdominal Pain_10",
+                         "Limb Pain_11"
+                     ],
+    "output":  "d:/newstart/app/src/main/assets/3d_avatar/guide_avatar_vroid_hq.glb",
+    "retargetSuccess":  true,
+    "target":  "d:/newstart/tmp/avatar_vroid_converted.glb",
+    "boneCoverage":  100,
+    "mappedPairs":  52,
+    "totalPairs":  52
+}

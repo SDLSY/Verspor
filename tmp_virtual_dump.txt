@@ -1,0 +1,123 @@
+﻿package com.example.newstart.xfyun.virtual
+
+import android.util.Log
+import android.view.ViewGroup
+import com.example.newstart.xfyun.XfyunConfig
+import com.iflytek.aiui.AIUIAgent
+import com.iflytek.aiui.AIUIConstant
+import com.iflytek.aiui.AIUIEvent
+import com.iflytek.aiui.AIUIListener
+import com.iflytek.aiui.AIUIMessage
+import com.iflytek.aiui.AIUISetting
+import org.json.JSONObject
+
+class XfyunVirtualHumanController(
+    private val host: DoctorLiveAvatarActivity,
+    private val container: ViewGroup,
+    private val onTranscript: (String) -> Unit,
+    private val onStatus: (String) -> Unit
+) {
+
+    companion object {
+        private const val TAG = "XfyunVirtualHuman"
+        private const val CFG_PATH = "cfg/aiui_phone.cfg"
+    }
+
+    private var agent: AIUIAgent? = null
+
+    fun createIfNeeded() {
+        if (agent != null) return
+        val credentials = XfyunConfig.aiuiCredentials
+        require(credentials.isReady) { "讯飞数字人凭证未配置" }
+        AIUISetting.setNetLogLevel(AIUISetting.LogLevel.info)
+        AIUISetting.setSystemInfo(AIUIConstant.KEY_SERIAL_NUM, android.os.Build.MODEL ?: "vespero")
+        val params = buildAiuiParams()
+        agent = AIUIAgent.createAgent(host, params, listener)
+        require(agent != null) { "创建讯飞数字人 Agent 失败" }
+        onStatus("数字人已就绪")
+    }
+
+    fun startInteraction() {
+        createIfNeeded()
+        agent?.sendMessage(AIUIMessage(AIUIConstant.CMD_START_RECORD, 0, 0, "data_type=audio", null))
+        onStatus("数字人正在聆听")
+    }
+
+    fun stopInteraction() {
+        agent?.sendMessage(AIUIMessage(AIUIConstant.CMD_STOP_RECORD, 0, 0, "data_type=audio", null))
+        agent?.sendMessage(AIUIMessage(AIUIConstant.CMD_TTS, AIUIConstant.PAUSE, 0, null, null))
+        onStatus("数字人已停止")
+    }
+
+    fun destroy() {
+        runCatching { stopInteraction() }
+        agent?.destroy()
+        agent = null
+    }
+
+    private fun buildAiuiParams(): String {
+        val params = host.assets.open(CFG_PATH).bufferedReader(Charsets.UTF_8).use { it.readText() }
+        val json = JSONObject(params)
+        val login = json.getJSONObject("login")
+        login.put("appid", XfyunConfig.aiuiCredentials.appId)
+        login.put("key", XfyunConfig.aiuiCredentials.apiKey)
+        login.put("api_secret", XfyunConfig.aiuiCredentials.apiSecret)
+        json.getJSONObject("global").put("scene", XfyunConfig.aiuiScene).put("aiui_ver", "3")
+        json.getJSONObject("tts")
+            .put("voice_name", XfyunConfig.defaultVoiceName)
+            .put("audio_encoding", "raw")
+            .put("data_encoding", "raw")
+            .put("buffer_time", 0)
+            .put("sample_rate", "16000")
+            .put("play_mode", "sdk")
+        json.getJSONObject("iat").put("data_encoding", "raw")
+        val avatarId = XfyunConfig.defaultAvatarId
+        if (avatarId.isNotBlank()) {
+            json.getJSONObject("cbmparams").put(
+                "avatar",
+                JSONObject().apply {
+                    put("width", 512)
+                    put("height", 512)
+                    put("avatar_id", avatarId)
+                }
+            )
+        }
+        val vad = json.getJSONObject("vad")
+        vad.put("vad_enable", "0")
+        vad.remove("cloud_vad_eos")
+        vad.remove("cloud_vad_gap")
+        return json.toString()
+    }
+
+    private val listener = AIUIListener { event ->
+        when (event.eventType) {
+            AIUIConstant.EVENT_CONNECTED_TO_SERVER -> onStatus("数字人已连接")
+            AIUIConstant.EVENT_SERVER_DISCONNECTED -> onStatus("数字人连接已断开")
+            AIUIConstant.EVENT_WAKEUP -> onStatus("数字人正在识别")
+            AIUIConstant.EVENT_SLEEP -> onStatus("数字人已休眠")
+            AIUIConstant.EVENT_ERROR -> onStatus("数字人错误: ${event.info}")
+            AIUIConstant.EVENT_RESULT -> handleResult(event)
+        }
+    }
+
+    private fun handleResult(event: AIUIEvent) {
+        runCatching {
+            val info = JSONObject(event.info)
+            val data = info.getJSONArray("data").getJSONObject(0)
+            val params = data.getJSONObject("params")
+            val sub = params.optString("sub")
+            val content = data.getJSONArray("content").getJSONObject(0)
+            val cntId = content.optString("cnt_id")
+            if (cntId.isBlank()) return
+            val rawBytes = event.data.getByteArray(cntId) ?: return
+            val raw = String(rawBytes, Charsets.UTF_8)
+            when (sub) {
+                "iat", "nlp" -> onTranscript(raw)
+                "tts" -> onStatus("数字人正在回答")
+                "cbm_vms", "sos_vms" -> onStatus("数字人渲染已更新")
+            }
+        }.onFailure {
+            Log.e(TAG, "handleResult failed", it)
+        }
+    }
+}

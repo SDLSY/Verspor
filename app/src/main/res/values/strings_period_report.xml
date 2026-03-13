@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="trend_period_source_cloud">云端%1$s</string>
+    <string name="trend_period_source_local">本地基础%1$s</string>
+    <string name="trend_period_sample_sufficient">样本充足，结论可用于下阶段干预调整</string>
+    <string name="trend_period_sample_insufficient">样本不足，建议继续记录设备数据与干预执行</string>
+    <string name="trend_period_confidence_low">报告可信度低</string>
+    <string name="trend_period_confidence_medium">报告可信度中</string>
+    <string name="trend_period_confidence_high">报告可信度高</string>
+    <string name="trend_period_risk_low">低风险</string>
+    <string name="trend_period_risk_medium">中风险</string>
+    <string name="trend_period_risk_high">高风险</string>
+    <string name="trend_period_highlights_title">本周期重点</string>
+    <string name="trend_period_metrics_title">关键变化</string>
+    <string name="trend_period_intervention_title">干预执行与效果</string>
+    <string name="trend_period_next_focus_section">下周期重点</string>
+    <string name="trend_period_primary_action">开始主建议</string>
+    <string name="trend_period_secondary_action">查看辅助建议</string>
+    <string name="trend_period_view_weekly">查看本周报告</string>
+    <string name="trend_period_route_doctor">前往医生页</string>
+    <string name="trend_period_route_report">前往医检页</string>
+    <string name="trend_avg_sleep_format">平均：%1$.1fh</string>
+    <string name="trend_avg_heart_rate_format">平均：%1$d bpm</string>
+    <string name="trend_avg_blood_oxygen_format">平均：%1$d%%</string>
+    <string name="trend_avg_temperature_format">平均：%1$.1f ℃</string>
+    <string name="trend_avg_recovery_format">平均：%1$d分</string>
+    <string name="trend_avg_motion_format">平均：%1$.2f</string>
+    <string name="trend_avg_placeholder">平均：--</string>
+    <string name="trend_avg_heart_rate_placeholder">平均：-- bpm</string>
+    <string name="trend_avg_blood_oxygen_placeholder">平均：-- %%</string>
+    <string name="trend_avg_temperature_placeholder">平均：-- ℃</string>
+    <string name="trend_avg_recovery_placeholder">平均：--分</string>
+    <string name="trend_period_highlights_empty">• 暂无足够数据，请继续记录睡眠、恢复与干预执行</string>
+    <string name="trend_period_metric_line">• %1$s：%2$s · %3$s</string>
+    <string name="trend_period_bullet_line">• %1$s</string>
+</resources>

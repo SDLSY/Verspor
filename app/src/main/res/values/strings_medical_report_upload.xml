@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="medical_report_pick_file">上传文件识别（支持 PDF）</string>
+    <string name="medical_report_reading_file">正在读取文件并识别...</string>
+    <string name="medical_report_processing_pdf">正在解析 PDF 并识别文字...</string>
+    <string name="medical_report_processing_image">正在识别上传图片中的文字...</string>
+    <string name="medical_report_file_empty">文件中未识别到有效文字，请更换更清晰的文件。</string>
+    <string name="medical_report_file_unsupported">暂不支持该文件类型，请上传 PDF 或图片。</string>
+    <string name="medical_report_file_open_failed">文件读取失败，请重新选择。</string>
+</resources>

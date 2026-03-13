@@ -1,0 +1,74 @@
+[
+  {
+    "id": "sleep_wind_down",
+    "title": "睡前减刺激流程",
+    "tags": ["sleep", "before_sleep", "stress", "isi_high"],
+    "summary": "适用于睡前高唤醒、入睡困难、晚间思绪停不下来的用户。优先建议固定上床时间、减少强光与屏幕刺激、避免晚间咖啡因和高强度训练。",
+    "contraindications": ["夜间出现明显胸痛或呼吸困难时，不可仅做放松流程，应优先就医。"],
+    "priorityProtocols": ["SLEEP_WIND_DOWN_15M", "BODY_SCAN_NSDR_10M"],
+    "evidenceTemplate": "若近 7 天睡眠时长不足、ISI 偏高或晚间压力高，可优先安排睡前减刺激流程。"
+  },
+  {
+    "id": "body_scan_nsdr",
+    "title": "身体扫描 NSDR",
+    "tags": ["sleep", "stress", "recovery", "anxiety"],
+    "summary": "适用于身心高唤醒、恢复能力下降、午后或睡前需要快速降负荷的场景。重点是非睡眠深度休息和身体扫描，不要求立刻睡着。",
+    "contraindications": ["若出现晕厥、急性疼痛或急性呼吸困难，应停止并转向线下评估。"],
+    "priorityProtocols": ["BODY_SCAN_NSDR_10M", "COGNITIVE_OFFLOAD_8M"],
+    "evidenceTemplate": "当压力高、焦虑高或恢复分下降时，可将身体扫描作为主干预或辅助干预。"
+  },
+  {
+    "id": "paced_breathing",
+    "title": "节律呼吸训练",
+    "tags": ["stress", "blood_pressure", "anxiety", "flexible"],
+    "summary": "适用于白天压力高、情绪紧张或轻度血压波动的场景。优先选择低门槛节律呼吸，避免过长或过高频重复。",
+    "contraindications": ["呼吸练习连续多次未完成时，不宜继续高频推荐同类协议。"],
+    "priorityProtocols": ["BREATH_4_6_5M", "PMR_10M"],
+    "evidenceTemplate": "若压力负荷高、焦虑风险偏高或出现血压管理需求，节律呼吸可作为快速降唤醒入口。"
+  },
+  {
+    "id": "pmr",
+    "title": "渐进式肌肉放松",
+    "tags": ["stress", "anxiety", "fatigue", "evening"],
+    "summary": "适用于身体紧绷、精神疲劳伴随高唤醒、白天长期紧张的用户。通过逐步紧张-放松肌群，帮助降低身体警觉。",
+    "contraindications": ["急性肌肉拉伤、术后或明显疼痛时，避免强行收缩肌群。"],
+    "priorityProtocols": ["PMR_10M", "BODY_SCAN_NSDR_10M"],
+    "evidenceTemplate": "若压力和焦虑都偏高，同时伴随明显身体紧张，可优先选择 PMR。"
+  },
+  {
+    "id": "guided_stretch_mobility",
+    "title": "引导拉伸与活动度恢复",
+    "tags": ["fatigue", "recovery", "mobility", "afternoon"],
+    "summary": "适用于疲劳高、恢复能力低、久坐或活动不足导致的恢复差。重点是低强度、易完成、可在家执行的拉伸恢复。",
+    "contraindications": ["急性扭伤、剧烈疼痛、发热或明显胸闷时，避免运动恢复类协议。"],
+    "priorityProtocols": ["GUIDED_STRETCH_MOBILITY_8M", "RECOVERY_WALK_10M"],
+    "evidenceTemplate": "若疲劳负荷高、恢复能力低或连续久坐，优先安排拉伸恢复而非继续静息型协议。"
+  },
+  {
+    "id": "recovery_walk",
+    "title": "恢复步行",
+    "tags": ["fatigue", "recovery", "blood_pressure", "daytime"],
+    "summary": "适用于低恢复、低活动、血压管理或医检提示需要温和活动干预的场景。强调轻强度、可坚持、白天完成。",
+    "contraindications": ["明显胸痛、头晕、严重呼吸困难时，不建议仅靠步行处理。"],
+    "priorityProtocols": ["RECOVERY_WALK_10M", "GUIDED_STRETCH_MOBILITY_8M"],
+    "evidenceTemplate": "当恢复差但不适合高强度训练时，恢复步行是低门槛主干预。"
+  },
+  {
+    "id": "soundscape_sleep_audio",
+    "title": "助眠音景",
+    "tags": ["sleep", "before_sleep", "low_adherence"],
+    "summary": "适用于依从性低、习惯听音频入睡或不愿意立刻做结构化练习的用户。作为低门槛辅助干预使用。",
+    "contraindications": ["不应替代高风险场景下的就医建议。"],
+    "priorityProtocols": ["SOUNDSCAPE_SLEEP_AUDIO_15M", "SLEEP_WIND_DOWN_15M"],
+    "evidenceTemplate": "若依从性准备度低，可先从助眠音景这类低门槛内容切入。"
+  },
+  {
+    "id": "cognitive_offload",
+    "title": "思绪卸载",
+    "tags": ["stress", "anxiety", "before_sleep", "rumination"],
+    "summary": "适用于睡前反刍、担忧清单过多、思绪停不下来的用户。通过担忧外化与短时表达性书写减轻认知负荷。",
+    "contraindications": ["明显自伤风险或重度情绪危机时，不应只停留在思绪卸载。"],
+    "priorityProtocols": ["COGNITIVE_OFFLOAD_8M", "BODY_SCAN_NSDR_10M"],
+    "evidenceTemplate": "若睡前思绪停不下、焦虑风险上升，可将思绪卸载作为辅助干预。"
+  }
+]

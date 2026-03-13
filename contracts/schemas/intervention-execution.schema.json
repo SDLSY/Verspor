@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "intervention-execution.schema.json",
+  "title": "InterventionExecution",
+  "type": "object",
+  "required": [
+    "executionId",
+    "taskId",
+    "elapsedSec"
+  ],
+  "properties": {
+    "executionId": {
+      "type": "string"
+    },
+    "taskId": {
+      "type": "string"
+    },
+    "elapsedSec": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "effectScore": {
+      "type": [
+        "number",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

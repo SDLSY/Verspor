@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SleepStagesProgressView">
+        <attr name="sspv_height" format="dimension" />
+        <attr name="sspv_cornerRadius" format="dimension" />
+        <attr name="sspv_segmentGap" format="dimension" />
+        <attr name="sspv_animDuration" format="integer" />
+        <attr name="sspv_deepSleepColor" format="color" />
+        <attr name="sspv_remSleepColor" format="color" />
+        <attr name="sspv_lightSleepColor" format="color" />
+        <attr name="sspv_awakeColor" format="color" />
+    </declare-styleable>
+</resources>

@@ -1,0 +1,341 @@
+{
+  "model": {
+    "assetPath": "3d/human_body_layered_cartoon.glb",
+    "name": "Layered Cartoon Medical Body",
+    "version": "layered-cartoon-v1",
+    "license": "Demo only",
+    "source": "local blended human_body + human_body_cartoon",
+    "defaultScale": 1.28,
+    "defaultYawDeg": 0.0,
+    "autoPlayAnimation": false,
+    "stageTheme": "medical_cartoon_bright",
+    "visualTheme": {
+      "clearColor": "#EAF6FF",
+      "directLight": 62000,
+      "emissiveStrength": 0.92,
+      "preserveMaterial": false
+    },
+    "cameraDefaults": {
+      "baseFocalLength": 48.0,
+      "focusDurationMs": 420,
+      "returnDurationMs": 380
+    },
+    "camera": {
+      "orbitHome": [
+        0.0,
+        -0.03,
+        2.88
+      ],
+      "lookAt": [
+        0.0,
+        -0.05,
+        0.0
+      ]
+    }
+  },
+  "organLayers": [
+    {
+      "layerCode": "layer_shell",
+      "displayName": "人体外层",
+      "meshTokens": [
+        "layer_shell"
+      ],
+      "highlightColor": "#8ED8FF",
+      "passiveAlpha": 0.24,
+      "activeEmissive": 0.9,
+      "anchorNodes": [
+        "layer_shell_main"
+      ]
+    },
+    {
+      "layerCode": "layer_head_neck",
+      "displayName": "头颈",
+      "meshTokens": [
+        "layer_head_neck"
+      ],
+      "highlightColor": "#69D4FF",
+      "passiveAlpha": 0.3,
+      "activeEmissive": 1.34,
+      "anchorNodes": [
+        "layer_head_neck_Frontal bone",
+        "layer_head_neck_Atlas (C1)"
+      ]
+    },
+    {
+      "layerCode": "layer_thorax",
+      "displayName": "胸腔",
+      "meshTokens": [
+        "layer_thorax",
+        "layer_heart",
+        "layer_lung"
+      ],
+      "highlightColor": "#4FC3F7",
+      "passiveAlpha": 0.32,
+      "activeEmissive": 1.36,
+      "anchorNodes": [
+        "layer_thorax_Body of sternum",
+        "layer_thorax_Thoracic vertebrae (T4)"
+      ]
+    },
+    {
+      "layerCode": "layer_abdomen",
+      "displayName": "腹腔",
+      "meshTokens": [
+        "layer_abdomen",
+        "layer_liver",
+        "layer_stomach",
+        "layer_intestine"
+      ],
+      "highlightColor": "#45D7C5",
+      "passiveAlpha": 0.34,
+      "activeEmissive": 1.28,
+      "anchorNodes": [
+        "layer_abdomen_Lumbar vertebrae (L3)"
+      ]
+    },
+    {
+      "layerCode": "layer_pelvis",
+      "displayName": "盆腔",
+      "meshTokens": [
+        "layer_pelvis"
+      ],
+      "highlightColor": "#79B8FF",
+      "passiveAlpha": 0.34,
+      "activeEmissive": 1.24,
+      "anchorNodes": [
+        "layer_pelvis_Sacrum",
+        "layer_pelvis_Hip bone.l"
+      ]
+    },
+    {
+      "layerCode": "layer_limbs",
+      "displayName": "四肢",
+      "meshTokens": [
+        "layer_limbs"
+      ],
+      "highlightColor": "#8FC7FF",
+      "passiveAlpha": 0.3,
+      "activeEmissive": 1.22,
+      "anchorNodes": [
+        "layer_limbs_Humerus.r",
+        "layer_limbs_Femur.r"
+      ]
+    }
+  ],
+  "zones": [
+    {
+      "zoneCode": "HEAD",
+      "displayName": "头部",
+      "layerCode": "layer_head_neck",
+      "meshNames": [
+        "layer_head_neck",
+        "frontal",
+        "mandible",
+        "parietal",
+        "occipital",
+        "sphenoid"
+      ],
+      "anchorNodes": [
+        "layer_head_neck_Frontal bone"
+      ],
+      "highlightColor": "#69D4FF",
+      "focusPreset": {
+        "scale": 1.70,
+        "offsetX": 0.0,
+        "offsetY": -0.16,
+        "holdMs": 1200
+      }
+    },
+    {
+      "zoneCode": "NECK",
+      "displayName": "颈部",
+      "layerCode": "layer_head_neck",
+      "meshNames": [
+        "layer_head_neck",
+        "cervical",
+        "atlas",
+        "axis"
+      ],
+      "anchorNodes": [
+        "layer_head_neck_Atlas (C1)"
+      ],
+      "highlightColor": "#63CFF9",
+      "focusPreset": {
+        "scale": 1.50,
+        "offsetX": 0.0,
+        "offsetY": -0.10,
+        "holdMs": 1160
+      }
+    },
+    {
+      "zoneCode": "CHEST",
+      "displayName": "胸部",
+      "layerCode": "layer_thorax",
+      "meshNames": [
+        "layer_thorax",
+        "sternum",
+        "rib",
+        "clavicle",
+        "costal"
+      ],
+      "anchorNodes": [
+        "layer_thorax_Body of sternum"
+      ],
+      "highlightColor": "#4FC3F7",
+      "focusPreset": {
+        "scale": 1.16,
+        "offsetX": 0.0,
+        "offsetY": 0.02,
+        "holdMs": 1200
+      }
+    },
+    {
+      "zoneCode": "UPPER_BACK",
+      "displayName": "上背部",
+      "layerCode": "layer_thorax",
+      "meshNames": [
+        "layer_thorax",
+        "thoracic vertebrae",
+        "scapula"
+      ],
+      "anchorNodes": [
+        "layer_thorax_Thoracic vertebrae (T4)"
+      ],
+      "highlightColor": "#57C8FB",
+      "focusPreset": {
+        "scale": 1.14,
+        "offsetX": 0.0,
+        "offsetY": 0.02,
+        "holdMs": 1200
+      }
+    },
+    {
+      "zoneCode": "ABDOMEN",
+      "displayName": "腹部",
+      "layerCode": "layer_abdomen",
+      "meshNames": [
+        "layer_abdomen",
+        "lumbar vertebrae"
+      ],
+      "anchorNodes": [
+        "layer_abdomen_Lumbar vertebrae (L3)"
+      ],
+      "highlightColor": "#45D7C5",
+      "focusPreset": {
+        "scale": 1.14,
+        "offsetX": 0.0,
+        "offsetY": -0.04,
+        "holdMs": 1200
+      }
+    },
+    {
+      "zoneCode": "LOWER_BACK",
+      "displayName": "下背部",
+      "layerCode": "layer_pelvis",
+      "meshNames": [
+        "layer_pelvis",
+        "sacrum",
+        "coccyx",
+        "hip bone"
+      ],
+      "anchorNodes": [
+        "layer_pelvis_Sacrum"
+      ],
+      "highlightColor": "#79B8FF",
+      "focusPreset": {
+        "scale": 1.14,
+        "offsetX": 0.0,
+        "offsetY": -0.08,
+        "holdMs": 1200
+      }
+    },
+    {
+      "zoneCode": "LEFT_ARM",
+      "displayName": "左臂",
+      "layerCode": "layer_limbs",
+      "meshNames": [
+        "layer_limbs",
+        "humerus.l",
+        "radius.l",
+        "ulna.l",
+        "left"
+      ],
+      "anchorNodes": [
+        "layer_limbs_Humerus.l"
+      ],
+      "highlightColor": "#8FC7FF",
+      "focusPreset": {
+        "scale": 1.14,
+        "offsetX": 0.16,
+        "offsetY": 0.00,
+        "holdMs": 1200
+      }
+    },
+    {
+      "zoneCode": "RIGHT_ARM",
+      "displayName": "右臂",
+      "layerCode": "layer_limbs",
+      "meshNames": [
+        "layer_limbs",
+        "humerus.r",
+        "radius.r",
+        "ulna.r",
+        "right"
+      ],
+      "anchorNodes": [
+        "layer_limbs_Humerus.r"
+      ],
+      "highlightColor": "#8FC7FF",
+      "focusPreset": {
+        "scale": 1.14,
+        "offsetX": -0.16,
+        "offsetY": 0.00,
+        "holdMs": 1200
+      }
+    },
+    {
+      "zoneCode": "LEFT_LEG",
+      "displayName": "左腿",
+      "layerCode": "layer_limbs",
+      "meshNames": [
+        "layer_limbs",
+        "femur.l",
+        "tibia.l",
+        "fibula.l",
+        "left"
+      ],
+      "anchorNodes": [
+        "layer_limbs_Femur.l"
+      ],
+      "highlightColor": "#8FC7FF",
+      "focusPreset": {
+        "scale": 1.12,
+        "offsetX": 0.10,
+        "offsetY": -0.18,
+        "holdMs": 1200
+      }
+    },
+    {
+      "zoneCode": "RIGHT_LEG",
+      "displayName": "右腿",
+      "layerCode": "layer_limbs",
+      "meshNames": [
+        "layer_limbs",
+        "femur.r",
+        "tibia.r",
+        "fibula.r",
+        "right"
+      ],
+      "anchorNodes": [
+        "layer_limbs_Femur.r"
+      ],
+      "highlightColor": "#8FC7FF",
+      "focusPreset": {
+        "scale": 1.12,
+        "offsetX": -0.10,
+        "offsetY": -0.18,
+        "holdMs": 1200
+      }
+    }
+  ]
+}

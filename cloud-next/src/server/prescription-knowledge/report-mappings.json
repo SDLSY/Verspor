@@ -1,0 +1,51 @@
+[
+  {
+    "metricCode": "BP",
+    "tags": ["blood_pressure", "medical"],
+    "summary": "血压异常时，优先考虑低门槛的降唤醒和轻活动组合。",
+    "preferredProtocols": ["BREATH_4_6_5M", "RECOVERY_WALK_10M"],
+    "avoidProtocols": []
+  },
+  {
+    "metricCode": "GLU",
+    "tags": ["glucose", "medical", "metabolic"],
+    "summary": "血糖或 HbA1c 异常时，优先安排可持续的作息管理与轻活动恢复，不宜只给静息内容。",
+    "preferredProtocols": ["RECOVERY_WALK_10M", "SLEEP_WIND_DOWN_15M"],
+    "avoidProtocols": []
+  },
+  {
+    "metricCode": "HBA1C",
+    "tags": ["glucose", "medical", "metabolic"],
+    "summary": "糖代谢异常人群更适合生活节律类和轻活动类组合干预。",
+    "preferredProtocols": ["RECOVERY_WALK_10M", "GUIDED_STRETCH_MOBILITY_8M"],
+    "avoidProtocols": []
+  },
+  {
+    "metricCode": "TC",
+    "tags": ["lipid", "medical"],
+    "summary": "血脂异常时优先鼓励白天轻活动与睡前减刺激，降低长期恢复负担。",
+    "preferredProtocols": ["RECOVERY_WALK_10M", "SLEEP_WIND_DOWN_15M"],
+    "avoidProtocols": []
+  },
+  {
+    "metricCode": "TG",
+    "tags": ["lipid", "medical"],
+    "summary": "甘油三酯异常时，避免只给静态放松建议，优先安排白天可执行的轻活动。",
+    "preferredProtocols": ["RECOVERY_WALK_10M", "GUIDED_STRETCH_MOBILITY_8M"],
+    "avoidProtocols": []
+  },
+  {
+    "metricCode": "LDL",
+    "tags": ["lipid", "medical"],
+    "summary": "LDL 异常提示长期生活方式管理需求，可配合睡前流程改善整体恢复。",
+    "preferredProtocols": ["RECOVERY_WALK_10M", "SLEEP_WIND_DOWN_15M"],
+    "avoidProtocols": []
+  },
+  {
+    "metricCode": "UA",
+    "tags": ["uric", "medical"],
+    "summary": "尿酸异常时可优先轻活动与恢复内容，同时提醒补水和饮食管理。",
+    "preferredProtocols": ["GUIDED_STRETCH_MOBILITY_8M", "RECOVERY_WALK_10M"],
+    "avoidProtocols": []
+  }
+]

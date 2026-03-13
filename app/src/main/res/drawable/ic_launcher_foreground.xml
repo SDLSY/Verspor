@@ -1,0 +1,53 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 新月 (Crescent Moon) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M35,54 C35,43 40,33 48,27 C46,26.5 44,26 42,26 C30,26 20,36 20,48 C20,60 30,70 42,70 C44,70 46,69.5 48,69 C40,63 35,57 35,54 Z"/>
+    
+    <!-- 主要行星环 (Main Planetary Ring) - 倾斜效果 -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3.5"
+        android:fillColor="#00000000"
+        android:pathData="M20,54 Q30,45 54,45 Q78,45 88,54 Q78,63 54,63 Q30,63 20,54 Z"/>
+    
+    <!-- 次要行星环 -->
+    <path
+        android:strokeColor="#E0E0E0"
+        android:strokeWidth="2.5"
+        android:fillColor="#00000000"
+        android:pathData="M18,54 Q28,43 54,43 Q80,43 90,54 Q80,65 54,65 Q28,65 18,54 Z"/>
+    
+    <!-- 第三层环 -->
+    <path
+        android:strokeColor="#C0C0C0"
+        android:strokeWidth="1.8"
+        android:fillColor="#00000000"
+        android:pathData="M16,54 Q26,41 54,41 Q82,41 92,54 Q82,67 54,67 Q26,67 16,54 Z"/>
+
+    <!-- 装饰星光 1 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M70,30 L71,33 L74,33 L71.5,35 L72.5,38 L70,36 L67.5,38 L68.5,35 L66,33 L69,33 Z"/>
+    
+    <!-- 装饰星光 2 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M76,38 L76.7,39.5 L78.5,39.5 L77,40.5 L77.5,42 L76,41 L74.5,42 L75,40.5 L73.5,39.5 L75.3,39.5 Z"/>
+    
+    <!-- 装饰星光 3 -->
+    <path
+        android:fillColor="#E8E8E8"
+        android:pathData="M25,38 L25.5,39 L26.5,39 L25.8,39.5 L26,40.5 L25,40 L24,40.5 L24.2,39.5 L23.5,39 L24.5,39 Z"/>
+    
+    <!-- 装饰星光 4 -->
+    <path
+        android:fillColor="#D0D0D0"
+        android:pathData="M60,22 L60.4,23 L61.5,23 L60.7,23.6 L61,24.5 L60,24 L59,24.5 L59.3,23.6 L58.5,23 L59.6,23 Z"/>
+
+</vector>

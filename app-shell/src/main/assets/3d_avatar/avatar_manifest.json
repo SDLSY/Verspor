@@ -1,0 +1,29 @@
+{
+  "profiles": {
+    "hq": {
+      "assetPath": "3d_avatar/guide_avatar_vroid_hq.glb",
+      "retargetBoneCoverage": 100
+    },
+    "lite": {
+      "assetPath": "3d_avatar/guide_avatar_vroid_lite.glb",
+      "retargetBoneCoverage": 100
+    }
+  },
+  "selectionPolicy": {
+    "ramThresholdGb": 6,
+    "firstFrameTimeoutMs": 1200
+  },
+  "animations": {
+    "idleName": "Idle Sway_5",
+    "idleVariants": [
+      "Idle Sway_5",
+      "Friendly Wave_4",
+      "Cheer Pose_6",
+      "Guide Left_7",
+      "Waving Gesture_2"
+    ],
+    "idleCycleMs": 1700,
+    "speakName": "Pointing Forward_1",
+    "emphasisName": "Jumping Down_3"
+  }
+}

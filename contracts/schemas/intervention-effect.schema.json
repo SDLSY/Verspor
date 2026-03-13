@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "intervention-effect.schema.json",
+  "title": "InterventionEffect",
+  "type": "object",
+  "required": [
+    "date",
+    "avgEffectScore",
+    "executionCount"
+  ],
+  "properties": {
+    "date": {
+      "type": "integer"
+    },
+    "avgEffectScore": {
+      "type": "number"
+    },
+    "executionCount": {
+      "type": "integer",
+      "minimum": 0
+    }
+  },
+  "additionalProperties": false
+}

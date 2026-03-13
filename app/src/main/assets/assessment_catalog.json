@@ -1,0 +1,139 @@
+﻿{
+  "scales": [
+    {
+      "code": "ISI",
+      "title": "失眠严重程度指数（ISI）",
+      "description": "用于评估近两周入睡、维持睡眠和早醒困扰。",
+      "freshnessDays": 30,
+      "baseline": true,
+      "questions": [
+        {"code": "ISI_1", "prompt": "入睡困难程度", "options": [{"label": "无", "value": 0}, {"label": "轻度", "value": 1}, {"label": "中度", "value": 2}, {"label": "重度", "value": 3}, {"label": "极重度", "value": 4}]},
+        {"code": "ISI_2", "prompt": "维持睡眠困难程度", "options": [{"label": "无", "value": 0}, {"label": "轻度", "value": 1}, {"label": "中度", "value": 2}, {"label": "重度", "value": 3}, {"label": "极重度", "value": 4}]},
+        {"code": "ISI_3", "prompt": "过早醒来问题", "options": [{"label": "无", "value": 0}, {"label": "轻度", "value": 1}, {"label": "中度", "value": 2}, {"label": "重度", "value": 3}, {"label": "极重度", "value": 4}]},
+        {"code": "ISI_4", "prompt": "你对目前睡眠问题的满意度", "options": [{"label": "非常满意", "value": 0}, {"label": "较满意", "value": 1}, {"label": "一般", "value": 2}, {"label": "不满意", "value": 3}, {"label": "非常不满意", "value": 4}]},
+        {"code": "ISI_5", "prompt": "睡眠问题对日间功能的影响", "options": [{"label": "无影响", "value": 0}, {"label": "轻微", "value": 1}, {"label": "中等", "value": 2}, {"label": "明显", "value": 3}, {"label": "严重", "value": 4}]},
+        {"code": "ISI_6", "prompt": "他人是否注意到你的睡眠问题影响了生活质量", "options": [{"label": "没有", "value": 0}, {"label": "轻微", "value": 1}, {"label": "中等", "value": 2}, {"label": "明显", "value": 3}, {"label": "严重", "value": 4}]},
+        {"code": "ISI_7", "prompt": "你对睡眠问题的担心程度", "options": [{"label": "不担心", "value": 0}, {"label": "轻微", "value": 1}, {"label": "中等", "value": 2}, {"label": "明显", "value": 3}, {"label": "非常明显", "value": 4}]}
+      ],
+      "severityBands": [
+        {"min": 0, "max": 7, "label": "无临床意义"},
+        {"min": 8, "max": 14, "label": "轻度失眠"},
+        {"min": 15, "max": 21, "label": "中度失眠"},
+        {"min": 22, "max": 28, "label": "重度失眠"}
+      ]
+    },
+    {
+      "code": "ESS",
+      "title": "Epworth 日间嗜睡量表（ESS）",
+      "description": "用于评估你在日间场景中的嗜睡倾向。",
+      "freshnessDays": 30,
+      "baseline": true,
+      "questions": [
+        {"code": "ESS_1", "prompt": "坐着阅读时打瞌睡的可能性", "options": [{"label": "从不", "value": 0}, {"label": "偶尔", "value": 1}, {"label": "经常", "value": 2}, {"label": "很可能", "value": 3}]},
+        {"code": "ESS_2", "prompt": "看电视时打瞌睡的可能性", "options": [{"label": "从不", "value": 0}, {"label": "偶尔", "value": 1}, {"label": "经常", "value": 2}, {"label": "很可能", "value": 3}]},
+        {"code": "ESS_3", "prompt": "在公共场所安静坐着时打瞌睡的可能性", "options": [{"label": "从不", "value": 0}, {"label": "偶尔", "value": 1}, {"label": "经常", "value": 2}, {"label": "很可能", "value": 3}]},
+        {"code": "ESS_4", "prompt": "乘车持续 1 小时时打瞌睡的可能性", "options": [{"label": "从不", "value": 0}, {"label": "偶尔", "value": 1}, {"label": "经常", "value": 2}, {"label": "很可能", "value": 3}]},
+        {"code": "ESS_5", "prompt": "下午躺下休息时打瞌睡的可能性", "options": [{"label": "从不", "value": 0}, {"label": "偶尔", "value": 1}, {"label": "经常", "value": 2}, {"label": "很可能", "value": 3}]},
+        {"code": "ESS_6", "prompt": "与人交谈时打瞌睡的可能性", "options": [{"label": "从不", "value": 0}, {"label": "偶尔", "value": 1}, {"label": "经常", "value": 2}, {"label": "很可能", "value": 3}]},
+        {"code": "ESS_7", "prompt": "饭后安静坐着时打瞌睡的可能性", "options": [{"label": "从不", "value": 0}, {"label": "偶尔", "value": 1}, {"label": "经常", "value": 2}, {"label": "很可能", "value": 3}]},
+        {"code": "ESS_8", "prompt": "开车等红灯时打瞌睡的可能性", "options": [{"label": "从不", "value": 0}, {"label": "偶尔", "value": 1}, {"label": "经常", "value": 2}, {"label": "很可能", "value": 3}]}
+      ],
+      "severityBands": [
+        {"min": 0, "max": 10, "label": "正常"},
+        {"min": 11, "max": 12, "label": "轻度嗜睡"},
+        {"min": 13, "max": 15, "label": "中度嗜睡"},
+        {"min": 16, "max": 24, "label": "重度嗜睡"}
+      ]
+    },
+    {
+      "code": "PSS10",
+      "title": "感知压力量表（PSS-10）",
+      "description": "用于评估近一个月主观压力负荷。",
+      "freshnessDays": 30,
+      "baseline": true,
+      "questions": [
+        {"code": "PSS10_1", "prompt": "近一个月里，你因为意外事情而心烦意乱的频率", "options": [{"label": "从不", "value": 0}, {"label": "几乎不", "value": 1}, {"label": "有时", "value": 2}, {"label": "经常", "value": 3}, {"label": "总是", "value": 4}]},
+        {"code": "PSS10_2", "prompt": "近一个月里，你感到无法控制生活中重要事情的频率", "options": [{"label": "从不", "value": 0}, {"label": "几乎不", "value": 1}, {"label": "有时", "value": 2}, {"label": "经常", "value": 3}, {"label": "总是", "value": 4}]},
+        {"code": "PSS10_3", "prompt": "近一个月里，你感到紧张和压力大的频率", "options": [{"label": "从不", "value": 0}, {"label": "几乎不", "value": 1}, {"label": "有时", "value": 2}, {"label": "经常", "value": 3}, {"label": "总是", "value": 4}]},
+        {"code": "PSS10_4", "prompt": "近一个月里，你有把握处理个人问题的频率", "reverseScore": true, "options": [{"label": "从不", "value": 0}, {"label": "几乎不", "value": 1}, {"label": "有时", "value": 2}, {"label": "经常", "value": 3}, {"label": "总是", "value": 4}]},
+        {"code": "PSS10_5", "prompt": "近一个月里，你觉得事情按自己的方向发展的频率", "reverseScore": true, "options": [{"label": "从不", "value": 0}, {"label": "几乎不", "value": 1}, {"label": "有时", "value": 2}, {"label": "经常", "value": 3}, {"label": "总是", "value": 4}]},
+        {"code": "PSS10_6", "prompt": "近一个月里，你发现无法应付所有必须完成事情的频率", "options": [{"label": "从不", "value": 0}, {"label": "几乎不", "value": 1}, {"label": "有时", "value": 2}, {"label": "经常", "value": 3}, {"label": "总是", "value": 4}]},
+        {"code": "PSS10_7", "prompt": "近一个月里，你能控制生活中恼人事情的频率", "reverseScore": true, "options": [{"label": "从不", "value": 0}, {"label": "几乎不", "value": 1}, {"label": "有时", "value": 2}, {"label": "经常", "value": 3}, {"label": "总是", "value": 4}]},
+        {"code": "PSS10_8", "prompt": "近一个月里，你感觉一切都在掌控中的频率", "reverseScore": true, "options": [{"label": "从不", "value": 0}, {"label": "几乎不", "value": 1}, {"label": "有时", "value": 2}, {"label": "经常", "value": 3}, {"label": "总是", "value": 4}]},
+        {"code": "PSS10_9", "prompt": "近一个月里，你因为无法控制的事情而生气的频率", "options": [{"label": "从不", "value": 0}, {"label": "几乎不", "value": 1}, {"label": "有时", "value": 2}, {"label": "经常", "value": 3}, {"label": "总是", "value": 4}]},
+        {"code": "PSS10_10", "prompt": "近一个月里，你觉得困难堆积得无法克服的频率", "options": [{"label": "从不", "value": 0}, {"label": "几乎不", "value": 1}, {"label": "有时", "value": 2}, {"label": "经常", "value": 3}, {"label": "总是", "value": 4}]}
+      ],
+      "severityBands": [
+        {"min": 0, "max": 13, "label": "低压力"},
+        {"min": 14, "max": 26, "label": "中等压力"},
+        {"min": 27, "max": 40, "label": "高压力"}
+      ]
+    },
+    {
+      "code": "GAD7",
+      "title": "广泛性焦虑筛查（GAD-7）",
+      "description": "用于评估近两周焦虑相关症状。",
+      "freshnessDays": 30,
+      "baseline": true,
+      "questions": [
+        {"code": "GAD7_1", "prompt": "感到紧张、焦虑或坐立不安", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "GAD7_2", "prompt": "无法停止或控制担忧", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "GAD7_3", "prompt": "对各种事情担忧过多", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "GAD7_4", "prompt": "难以放松下来", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "GAD7_5", "prompt": "过于坐立不安，以至于很难静坐", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "GAD7_6", "prompt": "容易烦躁或易怒", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "GAD7_7", "prompt": "感觉好像会发生可怕的事情", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]}
+      ],
+      "severityBands": [
+        {"min": 0, "max": 4, "label": "无明显焦虑"},
+        {"min": 5, "max": 9, "label": "轻度焦虑"},
+        {"min": 10, "max": 14, "label": "中度焦虑"},
+        {"min": 15, "max": 21, "label": "重度焦虑"}
+      ]
+    },
+    {
+      "code": "PHQ9",
+      "title": "抑郁筛查（PHQ-9）",
+      "description": "用于评估近两周抑郁相关症状。",
+      "freshnessDays": 30,
+      "baseline": true,
+      "questions": [
+        {"code": "PHQ9_1", "prompt": "做事缺乏兴趣或乐趣", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "PHQ9_2", "prompt": "感到情绪低落、沮丧或绝望", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "PHQ9_3", "prompt": "入睡困难、睡不安稳或睡得过多", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "PHQ9_4", "prompt": "感到疲倦或精力不足", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "PHQ9_5", "prompt": "食欲不振或进食过多", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "PHQ9_6", "prompt": "觉得自己很糟，或觉得自己让家人失望", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "PHQ9_7", "prompt": "注意力不集中，例如看报纸或看电视时", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "PHQ9_8", "prompt": "动作或说话明显变慢，或烦躁不安", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]},
+        {"code": "PHQ9_9", "prompt": "有不如死掉或以某种方式伤害自己的念头", "options": [{"label": "完全没有", "value": 0}, {"label": "几天", "value": 1}, {"label": "一半以上天数", "value": 2}, {"label": "几乎每天", "value": 3}]}
+      ],
+      "severityBands": [
+        {"min": 0, "max": 4, "label": "无明显抑郁"},
+        {"min": 5, "max": 9, "label": "轻度抑郁"},
+        {"min": 10, "max": 14, "label": "中度抑郁"},
+        {"min": 15, "max": 19, "label": "中重度抑郁"},
+        {"min": 20, "max": 27, "label": "重度抑郁"}
+      ]
+    },
+    {
+      "code": "WHO5",
+      "title": "主观幸福感量表（WHO-5）",
+      "description": "用于评估近两周整体心理状态与积极体验。",
+      "freshnessDays": 30,
+      "baseline": true,
+      "questions": [
+        {"code": "WHO5_1", "prompt": "我感到精神愉快、心情良好", "options": [{"label": "从无", "value": 0}, {"label": "少部分时间", "value": 1}, {"label": "不到一半时间", "value": 2}, {"label": "超过一半时间", "value": 3}, {"label": "大部分时间", "value": 4}, {"label": "所有时间", "value": 5}]},
+        {"code": "WHO5_2", "prompt": "我感到平静和放松", "options": [{"label": "从无", "value": 0}, {"label": "少部分时间", "value": 1}, {"label": "不到一半时间", "value": 2}, {"label": "超过一半时间", "value": 3}, {"label": "大部分时间", "value": 4}, {"label": "所有时间", "value": 5}]},
+        {"code": "WHO5_3", "prompt": "我感到精力充沛、富有活力", "options": [{"label": "从无", "value": 0}, {"label": "少部分时间", "value": 1}, {"label": "不到一半时间", "value": 2}, {"label": "超过一半时间", "value": 3}, {"label": "大部分时间", "value": 4}, {"label": "所有时间", "value": 5}]},
+        {"code": "WHO5_4", "prompt": "醒来时我感到神清气爽、休息充分", "options": [{"label": "从无", "value": 0}, {"label": "少部分时间", "value": 1}, {"label": "不到一半时间", "value": 2}, {"label": "超过一半时间", "value": 3}, {"label": "大部分时间", "value": 4}, {"label": "所有时间", "value": 5}]},
+        {"code": "WHO5_5", "prompt": "我的日常生活充满感兴趣的事情", "options": [{"label": "从无", "value": 0}, {"label": "少部分时间", "value": 1}, {"label": "不到一半时间", "value": 2}, {"label": "超过一半时间", "value": 3}, {"label": "大部分时间", "value": 4}, {"label": "所有时间", "value": 5}]}
+      ],
+      "severityBands": [
+        {"min": 0, "max": 12, "label": "幸福感偏低"},
+        {"min": 13, "max": 18, "label": "幸福感一般"},
+        {"min": 19, "max": 25, "label": "幸福感良好"}
+      ]
+    }
+  ]
+}

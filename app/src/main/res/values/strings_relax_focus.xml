@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="relax_zone_detail_action">细分10区</string>
+    <string name="relax_zone_detail_title">选择细分干预区</string>
+    <string name="relax_zone_detail_subtitle">点击具体部位后会自动聚焦并生成干预处方</string>
+
+    <string name="relax_zone_neck">颈部</string>
+    <string name="relax_zone_upper_back">上背部</string>
+    <string name="relax_zone_lower_back">下背部</string>
+    <string name="relax_zone_left_arm">左臂</string>
+    <string name="relax_zone_right_arm">右臂</string>
+    <string name="relax_zone_left_leg">左腿</string>
+    <string name="relax_zone_right_leg">右腿</string>
+
+    <string name="relax_3d_stage_focus_start">聚焦中：%1$s</string>
+    <string name="relax_3d_stage_focus_end">已返回全身：%1$s</string>
+    <string name="relax_stage_focus_panel_title_default">点击人体部位</string>
+    <string name="relax_stage_focus_panel_desc_default">可进入更精细的干预建议</string>
+</resources>

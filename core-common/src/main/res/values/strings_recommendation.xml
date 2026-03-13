@@ -1,0 +1,27 @@
+<resources>
+    <string name="doctor_explanation_title">建议依据</string>
+    <string name="doctor_explanation_reasons_empty">当前还没有可展开的依据条目。</string>
+    <string name="doctor_explanation_next_step_empty">下一步建议将在生成后显示。</string>
+    <string name="doctor_explanation_next_step_format">下一步：%1$s</string>
+
+    <string name="morning_recommendation_explanation_title">今日建议依据</string>
+    <string name="morning_recommendation_explanation_loading">正在同步今日建议依据…</string>
+    <string name="morning_recommendation_explanation_empty">当前还没有可展示的解释摘要。</string>
+    <string name="morning_recommendation_explanation_login_required">登录云端后可查看完整建议依据，当前先显示本地处方摘要。</string>
+    <string name="morning_recommendation_explanation_meta_default">建议引擎说明</string>
+    <string name="morning_recommendation_explanation_meta_local">本地摘要 | 未读取云端 trace</string>
+    <string name="morning_recommendation_explanation_reasons_empty">当前没有额外依据条目。</string>
+    <string name="morning_recommendation_effects_title">近 30 天效果回看</string>
+    <string name="morning_recommendation_effects_empty">当前还没有可归因的执行数据。</string>
+    <string name="morning_recommendation_effects_login_required">登录云端后可查看建议执行效果。</string>
+    <string name="morning_recommendation_effects_detail">已归因 %1$d / %2$d 次执行，平均效果分 %3$.1f，平均减压 %4$.1f。</string>
+
+    <string name="prescription_support_title">建议依据与效果回看</string>
+    <string name="prescription_support_empty">当前还没有可展示的建议依据。</string>
+    <string name="prescription_support_login_required">登录云端后可查看这条建议的详细依据。</string>
+    <string name="prescription_support_meta_local">本地摘要 | 未读取云端 trace</string>
+    <string name="prescription_support_reasons_empty">当前没有额外依据条目。</string>
+    <string name="prescription_support_effects_empty">当前还没有可归因的执行数据。</string>
+    <string name="prescription_support_effects_login_required">登录云端后可查看建议执行效果。</string>
+    <string name="prescription_support_effects_detail">近 30 天已归因 %1$d / %2$d 次执行，平均效果分 %3$.1f，平均减压 %4$.1f。</string>
+</resources>

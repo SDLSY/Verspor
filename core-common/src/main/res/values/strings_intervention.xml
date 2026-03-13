@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="relax_intervention_3d_title">3D 干预中心</string>
+    <string name="relax_intervention_3d_subtitle">点击不同部位，生成结构化干预处方并立即执行。</string>
+    <string name="relax_zone_head">头部</string>
+    <string name="relax_zone_chest">胸部</string>
+    <string name="relax_zone_abdomen">腹部</string>
+    <string name="relax_zone_limb">四肢</string>
+    <string name="relax_zone_pick_hint">请选择一个区域，系统会生成对应的干预处方。</string>
+    <string name="relax_plan_generated_prefix">处方：%1$s</string>
+    <string name="relax_plan_reason_prefix">依据：%1$s</string>
+    <string name="relax_plan_rule_prefix">完成标准：%1$s</string>
+    <string name="relax_plan_fallback_badge">规则兜底</string>
+    <string name="relax_plan_execute_now">立即执行</string>
+    <string name="relax_report_analyze_action">分析体检报告</string>
+    <string name="relax_task_created">已创建干预任务并进入执行页。</string>
+    <string name="relax_3d_unavailable">当前设备 3D 渲染不可用，已自动切换为 2D 兼容模式。</string>
+    <string name="relax_3d_stage_title">3D 人体交互舞台</string>
+    <string name="relax_3d_stage_loading">正在加载 3D 模型...</string>
+    <string name="relax_3d_stage_fallback_ready">当前处于 2D 兼容模式，仍可继续选择干预区域。</string>
+    <string name="relax_stage_mode_fallback">3D 兼容模式</string>
+
+    <string name="medical_report_title">医检报告分析</string>
+    <string name="medical_report_subtitle">拍照或上传文件，识别关键指标并更新干预依据。</string>
+    <string name="medical_report_capture">拍照识别</string>
+    <string name="medical_report_reparse">重新解析</string>
+    <string name="medical_report_confirm_commit">确认入库并建任务</string>
+    <string name="medical_report_permission_required">需要相机权限才能进行拍照识别。</string>
+    <string name="medical_report_ocr_empty">未识别到有效文本，请重试。</string>
+    <string name="medical_report_analyzing">正在识别并解析...</string>
+    <string name="medical_report_ocr_text_title">订正草稿（可选）</string>
+    <string name="medical_report_edit_title">如需修正，再按每行一个指标进行编辑</string>
+    <string name="medical_report_ocr_raw_title">原始识别文本</string>
+    <string name="medical_report_ocr_draft_hint">默认展示 AI 整理后的可读报告。只有在 OCR 错漏较多时，再展开这里修正。</string>
+    <string name="medical_report_metric_title">结构化指标</string>
+    <string name="medical_report_metric_empty">暂无可识别指标。</string>
+    <string name="medical_report_metric_hint">如需核对具体数值和参考范围，再展开这里查看结构化指标。</string>
+    <string name="medical_report_result_prefix">风险等级：%1$s，异常指标：%2$d 项</string>
+    <string name="medical_report_task_created_prefix">已生成医检触发任务：%1$d 项</string>
+    <string name="medical_report_back_to_intervention">返回干预中心</string>
+    <string name="medical_report_confirm_required">请先完成识别并确认解析结果。</string>
+    <string name="medical_report_commit_done">医检结果已入库，并已更新干预任务。</string>
+    <string name="medical_report_readable_title">AI 整理后的可读报告</string>
+    <string name="medical_report_readable_empty">识别完成后，这里会显示 AI 整理后的报告说明、关键指标和需要关注的内容。</string>
+    <string name="medical_report_show_metrics">展开结构化指标</string>
+    <string name="medical_report_hide_metrics">收起结构化指标</string>
+    <string name="medical_report_show_editor">展开订正区</string>
+    <string name="medical_report_hide_editor">收起订正区</string>
+
+    <string name="morning_intervention_summary_title">干预总览</string>
+    <string name="morning_intervention_summary_empty">昨日没有干预任务，今日处方将根据最新画像生成。</string>
+    <string name="morning_intervention_summary_format">昨日完成 %1$d/%2$d，平均压力下降 %3$.1f 分</string>
+    <string name="morning_intervention_today_empty">今日还没有主处方，请先完善基线量表或重新计算处方。</string>
+    <string name="morning_intervention_today_prefix">今日主处方：%1$s</string>
+    <string name="morning_intervention_reason_prefix">处方依据：%1$s</string>
+    <string name="morning_intervention_evidence_prefix">关键证据：%1$s</string>
+    <string name="morning_intervention_cta">下一步：进入放松中心开始执行。</string>
+
+    <string name="relax_export_perf_action">导出性能报告</string>
+    <string name="relax_export_perf_done">性能报告已导出：%1$s</string>
+</resources>

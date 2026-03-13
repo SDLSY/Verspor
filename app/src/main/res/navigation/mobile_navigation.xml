@@ -1,0 +1,286 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.example.newstart.ui.home.MorningReportFragment"
+        android:label="@string/nav_home"
+        tools:layout="@layout/fragment_morning_report">
+        <action
+            android:id="@+id/action_home_to_relax_hub"
+            app:destination="@id/navigation_relax_hub"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_doctor"
+        android:name="com.example.newstart.ui.doctor.DoctorChatFragment"
+        android:label="@string/nav_doctor"
+        tools:layout="@layout/fragment_doctor_chat">
+        <action
+            android:id="@+id/action_doctor_to_intervention_center"
+            app:destination="@id/navigation_intervention_center"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_trend"
+        android:name="com.example.newstart.ui.trend.SleepTrendFragment"
+        android:label="@string/nav_trend"
+        tools:layout="@layout/fragment_sleep_trend" />
+
+    <fragment
+        android:id="@+id/navigation_device"
+        android:name="com.example.newstart.ui.device.DeviceFragment"
+        android:label="@string/nav_device"
+        tools:layout="@layout/fragment_device" />
+
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.example.newstart.ui.profile.ProfileFragment"
+        android:label="@string/nav_profile"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profile_to_cloud_auth"
+            app:destination="@id/navigation_cloud_auth"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+        <action
+            android:id="@+id/action_profile_to_relax_hub"
+            app:destination="@id/navigation_relax_hub"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+        <action
+            android:id="@+id/action_profile_to_intervention_center"
+            app:destination="@id/navigation_intervention_center"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+        <action
+            android:id="@+id/action_profile_to_personal_info"
+            app:destination="@id/navigation_profile_personal_info"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+        <action
+            android:id="@+id/action_profile_to_notification_settings"
+            app:destination="@id/navigation_profile_notifications"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+        <action
+            android:id="@+id/action_profile_to_data_privacy"
+            app:destination="@id/navigation_profile_privacy"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+        <action
+            android:id="@+id/action_profile_to_about_project"
+            app:destination="@id/navigation_profile_about"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_cloud_auth"
+        android:name="com.example.newstart.ui.profile.CloudAuthFragment"
+        android:label="@string/cloud_auth_page_title"
+        tools:layout="@layout/fragment_cloud_auth">
+        <argument
+            android:name="mode"
+            android:defaultValue="login"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_profile_personal_info"
+        android:name="com.example.newstart.ui.profile.PersonalInfoFragment"
+        android:label="@string/profile_personal_info_title"
+        tools:layout="@layout/fragment_personal_info" />
+
+    <fragment
+        android:id="@+id/navigation_profile_notifications"
+        android:name="com.example.newstart.ui.profile.NotificationSettingsFragment"
+        android:label="@string/profile_notification_settings_title"
+        tools:layout="@layout/fragment_notification_settings" />
+
+    <fragment
+        android:id="@+id/navigation_profile_privacy"
+        android:name="com.example.newstart.ui.profile.DataPrivacyFragment"
+        android:label="@string/profile_privacy_settings_title"
+        tools:layout="@layout/fragment_data_privacy" />
+
+    <fragment
+        android:id="@+id/navigation_profile_about"
+        android:name="com.example.newstart.ui.profile.AboutProjectFragment"
+        android:label="@string/profile_about_project_title"
+        tools:layout="@layout/fragment_about_project" />
+
+    <fragment
+        android:id="@+id/navigation_relax_hub"
+        android:name="com.example.newstart.ui.relax.SymptomGuideFragment"
+        android:label="@string/symptom_guide_title"
+        tools:layout="@layout/fragment_symptom_guide">
+        <action
+            android:id="@+id/action_relax_hub_to_home"
+            app:destination="@id/navigation_home"
+            app:enterAnim="@anim/nav_slide_in_left"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_right"
+            app:popExitAnim="@anim/nav_fade_out" />
+        <action
+            android:id="@+id/action_relax_hub_to_breathing_coach"
+            app:destination="@id/navigation_breathing_coach"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+        <action
+            android:id="@+id/action_relax_hub_to_relax_review"
+            app:destination="@id/navigation_relax_review"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+        <action
+            android:id="@+id/action_relax_hub_to_medical_report_analyze"
+            app:destination="@id/navigation_medical_report_analyze"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+        <action
+            android:id="@+id/action_relax_hub_to_relax_center_legacy"
+            app:destination="@id/navigation_relax_center_legacy"
+            app:enterAnim="@anim/nav_slide_in_right"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_left"
+            app:popExitAnim="@anim/nav_fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_intervention_center"
+        android:name="com.example.newstart.ui.intervention.InterventionCenterFragment"
+        android:label="@string/intervention_center_title"
+        tools:layout="@layout/fragment_intervention_center" />
+
+    <fragment
+        android:id="@+id/navigation_relax_center_legacy"
+        android:name="com.example.newstart.ui.relax.RelaxHubFragment"
+        android:label="@string/relax_hub_title"
+        tools:layout="@layout/fragment_relax_hub" />
+
+    <fragment
+        android:id="@+id/navigation_breathing_coach"
+        android:name="com.example.newstart.ui.relax.BreathingCoachFragment"
+        android:label="@string/relax_breathing_title"
+        tools:layout="@layout/fragment_breathing_coach">
+        <argument
+            android:name="protocolType"
+            android:defaultValue="BREATH_4_6"
+            app:argType="string" />
+        <argument
+            android:name="durationSec"
+            android:defaultValue="60"
+            app:argType="integer" />
+        <argument
+            android:name="taskId"
+            android:defaultValue=""
+            app:argType="string" />
+        <action
+            android:id="@+id/action_breathing_coach_to_relax_hub"
+            app:destination="@id/navigation_relax_hub"
+            app:enterAnim="@anim/nav_slide_in_left"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_right"
+            app:popExitAnim="@anim/nav_fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_relax_review"
+        android:name="com.example.newstart.ui.relax.RelaxReviewFragment"
+        android:label="@string/relax_review_title"
+        tools:layout="@layout/fragment_relax_review">
+        <action
+            android:id="@+id/action_relax_review_to_relax_hub"
+            app:destination="@id/navigation_relax_hub"
+            app:enterAnim="@anim/nav_slide_in_left"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_right"
+            app:popExitAnim="@anim/nav_fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_medical_report_analyze"
+        android:name="com.example.newstart.ui.relax.MedicalReportAnalyzeFragment"
+        android:label="@string/medical_report_title"
+        tools:layout="@layout/fragment_medical_report_analyze">
+        <action
+            android:id="@+id/action_medical_report_to_relax_hub"
+            app:destination="@id/navigation_relax_hub"
+            app:enterAnim="@anim/nav_slide_in_left"
+            app:exitAnim="@anim/nav_fade_out"
+            app:popEnterAnim="@anim/nav_slide_in_right"
+            app:popExitAnim="@anim/nav_fade_out" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_assessment_baseline"
+        android:name="com.example.newstart.ui.intervention.AssessmentBaselineFragment"
+        android:label="@string/assessment_baseline_title"
+        tools:layout="@layout/fragment_assessment_baseline" />
+
+    <fragment
+        android:id="@+id/navigation_intervention_profile"
+        android:name="com.example.newstart.ui.intervention.InterventionProfileFragment"
+        android:label="@string/intervention_profile_title"
+        tools:layout="@layout/fragment_intervention_profile" />
+
+    <fragment
+        android:id="@+id/navigation_intervention_session"
+        android:name="com.example.newstart.ui.intervention.InterventionSessionFragment"
+        android:label="@string/intervention_today_execute"
+        tools:layout="@layout/fragment_intervention_session">
+        <argument
+            android:name="protocolCode"
+            android:defaultValue=""
+            app:argType="string" />
+        <argument
+            android:name="protocolTitle"
+            android:defaultValue=""
+            app:argType="string" />
+        <argument
+            android:name="itemType"
+            android:defaultValue=""
+            app:argType="string" />
+        <argument
+            android:name="durationSec"
+            android:defaultValue="300"
+            app:argType="integer" />
+        <argument
+            android:name="rationale"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
+
+</navigation>

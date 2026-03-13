@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_app_gradient"
+    tools:context=".MainActivity">
+
+    <fragment
+        android:id="@+id/nav_host_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navGraph="@navigation/mobile_navigation" />
+
+    <View
+        android:id="@+id/globalAvatarHalo"
+        android:layout_width="148dp"
+        android:layout_height="148dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="92dp"
+        android:background="@drawable/bg_avatar_halo"
+        android:elevation="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Avatar Guide View (Persistent Overlay) -->
+    <com.example.newstart.ui.relax.HumanBody3DView
+        android:id="@+id/globalAvatarView"
+        android:layout_width="176dp"
+        android:layout_height="242dp"
+        android:layout_marginEnd="-6dp"
+        android:layout_marginBottom="68dp"
+        android:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Avatar Speech Bubble -->
+    <TextView
+        android:id="@+id/globalAvatarSpeechBubble"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="176dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_pill"
+        android:backgroundTint="#FFFFFF"
+        android:elevation="8dp"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="8dp"
+        android:singleLine="false"
+        android:text="@string/avatar_guide_default"
+        android:textColor="#005C99"
+        android:textSize="13sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/globalAvatarView"
+        app:layout_constraintEnd_toEndOf="@id/globalAvatarView" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_global_avatar_voice"
+        style="@style/Widget.NewStart.Button.Header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="14dp"
+        android:text="@string/avatar_voice_entry"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        style="@style/Widget.NewStart.BottomNavigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="10dp"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

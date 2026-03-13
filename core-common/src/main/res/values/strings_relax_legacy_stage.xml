@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="relax_legacy_stage_badge">白发助手动作演绎</string>
+    <string name="relax_legacy_stage_image_label">完整参考图</string>
+    <string name="relax_legacy_stage_avatar_label">3D 动作联动</string>
+    <string name="relax_legacy_stage_avatar_hint">点击下方部位按钮后同步播放疼痛动作</string>
+    <string name="relax_legacy_stage_default_title">选择一个不适区域</string>
+    <string name="relax_legacy_stage_default_hint">左侧完整展示参考图，右侧由白发助手演绎对应的疼痛姿态。</string>
+    <string name="relax_legacy_stage_head_title">头部疼痛定位</string>
+    <string name="relax_legacy_stage_head_hint">参考图与头痛动作已同步，可继续执行头颈减压处方。</string>
+    <string name="relax_legacy_stage_chest_title">胸部疼痛定位</string>
+    <string name="relax_legacy_stage_chest_hint">参考图与胸闷动作已同步，可继续执行胸腔节律干预。</string>
+    <string name="relax_legacy_stage_abdomen_title">腹部疼痛定位</string>
+    <string name="relax_legacy_stage_abdomen_hint">参考图与腹部不适动作已同步，可继续执行核心放松方案。</string>
+    <string name="relax_legacy_stage_limb_title">四肢疼痛定位</string>
+    <string name="relax_legacy_stage_limb_hint">参考图与四肢不适动作已同步，可继续执行肢体舒展方案。</string>
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="page_padding_horizontal">18dp</dimen>
+    <dimen name="page_padding_top">16dp</dimen>
+    <dimen name="page_padding_bottom">24dp</dimen>
+    <dimen name="section_gap">10dp</dimen>
+    <dimen name="section_gap_large">14dp</dimen>
+    <dimen name="card_padding">14dp</dimen>
+    <dimen name="hero_padding">18dp</dimen>
+    <dimen name="hero_corner">26dp</dimen>
+    <dimen name="card_corner_standard">20dp</dimen>
+    <dimen name="card_corner_inline">16dp</dimen>
+    <dimen name="button_height_primary">50dp</dimen>
+    <dimen name="button_height_secondary">44dp</dimen>
+    <dimen name="status_pill_radius">13dp</dimen>
+</resources>

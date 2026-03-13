@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="relax_plan_ai_enhanced_badge">AI 增强版</string>
+    <string name="relax_3d_stage_zone_selected">已选中：%1$s</string>
+    <string name="relax_plan_reason_ai_enhancing">正在优化建议...</string>
+    <string name="relax_plan_generation_failed">AI 优化失败，已保留规则建议</string>
+    <string name="relax_3d_stage_ready">点击人体部位开始干预</string>
+    <string name="relax_3d_stage_avatar_ready">当前是人物视角，点击部位后切换到骨骼聚焦</string>
+</resources>

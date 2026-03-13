@@ -1,0 +1,25 @@
+{
+  "model": {
+    "assetPath": "3d/human_body_layered_cartoon.glb",
+    "name": "Abdomen Closeup",
+    "version": "closeup-abdomen-v1",
+    "defaultScale": 1.64,
+    "defaultYawDeg": 0.0,
+    "autoPlayAnimation": false,
+    "visualTheme": {
+      "clearColor": "#EAF6FF",
+      "directLight": 62000,
+      "emissiveStrength": 0.92,
+      "preserveMaterial": false
+    },
+    "cameraDefaults": {
+      "baseFocalLength": 52.0,
+      "focusDurationMs": 320,
+      "returnDurationMs": 260
+    },
+    "camera": {
+      "orbitHome": [0.0, -0.12, 1.76],
+      "lookAt": [0.0, -0.22, 0.0]
+    }
+  }
+}

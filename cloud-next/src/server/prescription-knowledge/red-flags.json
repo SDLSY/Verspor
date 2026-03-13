@@ -1,0 +1,23 @@
+[
+  {
+    "id": "doctor_priority",
+    "tags": ["high_risk", "doctor_priority", "phq9_q9_positive"],
+    "summary": "若存在明显高风险、医生优先标记或心理危机提示，放松建议只能作为辅助，必须前置线下医生或急诊提醒。",
+    "requiredTasks": ["TASK_DOCTOR_PRIORITY"],
+    "contraindications": ["不得将放松干预表述为替代医疗处理方案。"]
+  },
+  {
+    "id": "cardiorespiratory_red_flags",
+    "tags": ["chest_pain", "breathing_difficulty", "syncope", "high_risk"],
+    "summary": "胸痛、严重呼吸困难、晕厥、意识异常等心肺或神经系统红旗场景，应中止常规干预推荐并提示紧急线下评估。",
+    "requiredTasks": ["TASK_DOCTOR_PRIORITY"],
+    "contraindications": ["不可仅推荐呼吸训练、步行或助眠内容。"]
+  },
+  {
+    "id": "medical_risk_high",
+    "tags": ["medical_high_risk", "blood_pressure", "glucose", "uric"],
+    "summary": "医检结果提示高风险时，可保留低强度健康管理建议，但必须同步提示医学复核和规范就医。",
+    "requiredTasks": ["TASK_DOCTOR_PRIORITY"],
+    "contraindications": ["不得给出夸大疗效的处方解释。"]
+  }
+]
