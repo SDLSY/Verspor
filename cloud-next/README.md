@@ -51,6 +51,8 @@ Supported provider ids:
 
 Vector Engine:
 - `VECTOR_ENGINE_API_KEY`
+- `VECTOR_ENGINE_STRUCTURED_VISION_API_KEY` (optional override key for medication/food image analysis)
+- `VECTOR_ENGINE_STRUCTURED_VISION_CHAT_COMPLETIONS_URL` (optional)
 - `VECTOR_ENGINE_CHAT_COMPLETIONS_URL` (optional)
 - `VECTOR_ENGINE_TEXT_FAST_MODEL`
 - `VECTOR_ENGINE_TEXT_STRUCTURED_MODEL`
@@ -67,6 +69,11 @@ Vector Engine:
 OpenRouter fallback:
 - `OPENROUTER_API_KEY`
 - `OPENROUTER_MODEL`
+
+Structured vision note:
+- `POST /api/medication/analyze` and `POST /api/food/analyze` prefer `qwen3-vl-235b-a22b-instruct`.
+- `VECTOR_ENGINE_STRUCTURED_VISION_API_KEY` is optional and only overrides the key used for structured image analysis.
+- If `qwen3-vl-235b-a22b-instruct` is unavailable for your shared key, verify the token can see that model in `GET /v1/models` before changing fallback order.
 
 ## AI routes
 

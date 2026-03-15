@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { readDemoMetadata } from "@/lib/demo/bootstrap";
 import { fail, ok, parseJsonBody } from "@/lib/http";
 import { createPublicClient } from "@/lib/supabase";
 
@@ -28,6 +29,7 @@ export async function POST(req: Request) {
     const metadataName = metadata?.username;
     const email = data.user.email?.trim().toLowerCase() ?? "";
     const username = typeof metadataName === "string" ? metadataName : email.split("@")[0];
+    const demoMetadata = readDemoMetadata(metadata);
 
     return NextResponse.json(
       ok("ok", {
@@ -37,6 +39,10 @@ export async function POST(req: Request) {
         refreshToken: data.session.refresh_token ?? "",
         userId: data.user.id,
         username,
+        demoRole: demoMetadata.demoRole || null,
+        demoScenario: demoMetadata.demoScenario || null,
+        demoSeedVersion: demoMetadata.demoSeedVersion || null,
+        displayName: demoMetadata.displayName || null,
         canResendConfirmation: false,
       })
     );

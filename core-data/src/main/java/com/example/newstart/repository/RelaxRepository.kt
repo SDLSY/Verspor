@@ -23,6 +23,8 @@ class RelaxRepository(
 
     suspend fun saveSession(session: RelaxSessionEntity): Long = relaxSessionDao.insert(session)
 
+    suspend fun getRecentSessions(limit: Int): List<RelaxSessionEntity> = relaxSessionDao.getRecent(limit)
+
     fun getTodaySummary(startTime: Long, endTime: Long): Flow<RelaxDailySummary> {
         return relaxSessionDao.getDailySummary(startTime, endTime)
     }

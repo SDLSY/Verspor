@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { writeAuditEvent } from "@/lib/audit";
+import { readDemoMetadata } from "@/lib/demo/bootstrap";
 import { fail, ok, parseJsonBody } from "@/lib/http";
 import { createPublicClient, createServiceClient } from "@/lib/supabase";
 import { buildAppRedirectUrl, findConfirmationState, type AuthPayload } from "@/lib/auth-state";
@@ -90,6 +91,8 @@ export async function POST(req: Request) {
       resourceId: userId,
     }).catch(() => null);
 
+    const demoMetadata = readDemoMetadata(signUp.data.user?.user_metadata as Record<string, unknown> | null);
+
     return NextResponse.json(
       ok("ok", {
         authState: "SIGNED_IN",
@@ -98,6 +101,10 @@ export async function POST(req: Request) {
         refreshToken: session.refresh_token ?? "",
         userId,
         username,
+        demoRole: demoMetadata.demoRole || null,
+        demoScenario: demoMetadata.demoScenario || null,
+        demoSeedVersion: demoMetadata.demoSeedVersion || null,
+        displayName: demoMetadata.displayName || null,
         canResendConfirmation: false,
       })
     );

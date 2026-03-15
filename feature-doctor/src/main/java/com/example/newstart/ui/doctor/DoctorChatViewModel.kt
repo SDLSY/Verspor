@@ -210,7 +210,7 @@ class DoctorChatViewModel(application: Application) : AndroidViewModel(applicati
                         messages = it.messages.removePending(pendingId) + fallbackMessage,
                         isSending = false,
                         suggestionSourceText = app.getString(R.string.doctor_source_local),
-                        modelStatusText = app.getString(R.string.doctor_model_status_local_active),
+                        modelStatusText = defaultModelStatusText(),
                         recommendationExplanation = DoctorRecommendationExplanationUiState()
                     )
                 }
@@ -409,33 +409,50 @@ class DoctorChatViewModel(application: Application) : AndroidViewModel(applicati
             .take(2)
             .map { mapRecommendation(it) }
 
-        val ragContext = buildRagContext(latestUserMessage)
+        val stage = parseStage(session.status)
+        val effectiveConversation = if (stage == DoctorInquiryStage.ASSESSING) {
+            conversation
+        } else {
+            conversation + DoctorChatMessage.user(latestUserMessage)
+        }
+        val retrievalQuery = if (stage == DoctorInquiryStage.ASSESSING) {
+            conversation
+                .asReversed()
+                .firstOrNull { it.role == DoctorRole.USER }
+                ?.content
+                ?.takeIf(String::isNotBlank)
+                ?: latestUserMessage
+        } else {
+            latestUserMessage
+        }
+        val ragContext = buildRagContext(retrievalQuery)
         val contextBlock = buildContextBlock(snapshotBundle.snapshot)
         val followUpCount = conversation.count { it.messageType == DoctorMessageType.FOLLOW_UP }
-
-        val stage = parseStage(session.status)
-        val conversationBlock = DoctorInferenceEngine.buildConversationBlock(
-            conversation + DoctorChatMessage.user(latestUserMessage)
+        val conversationBlock = DoctorInferenceEngine.buildConversationBlock(effectiveConversation)
+        val localInput = DoctorInferenceInput(
+            latestUserMessage = latestUserMessage,
+            conversation = conversation,
+            stage = stage,
+            followUpCount = followUpCount,
+            snapshot = snapshotBundle.snapshot,
+            riskSummary = riskSummary,
+            contextBlock = contextBlock,
+            ragContext = ragContext
         )
-        val turn = doctorAiService.generateCloudTurn(
+        val cloudTurn = doctorAiService.generateCloudTurn(
             conversationBlock = conversationBlock,
             contextBlock = contextBlock,
             ragContext = ragContext,
             stage = stage,
             followUpCount = followUpCount,
             defaultRiskLevel = riskSummary.level.name
-        ) ?: DoctorInferenceEngine.generateTurn(
-            DoctorInferenceInput(
-                latestUserMessage = latestUserMessage,
-                conversation = conversation,
-                stage = stage,
-                followUpCount = followUpCount,
-                snapshot = snapshotBundle.snapshot,
-                riskSummary = riskSummary,
-                contextBlock = contextBlock,
-                ragContext = ragContext
-            )
         )
+        val localTurn by lazy { DoctorInferenceEngine.generateTurn(localInput) }
+        val turn = when {
+            cloudTurn == null -> localTurn
+            stage == DoctorInquiryStage.ASSESSING && cloudTurn.assessment == null -> localTurn
+            else -> cloudTurn
+        }
         return DoctorTurnUiResult(
             turn = turn,
             riskSummary = riskSummary,
@@ -740,18 +757,11 @@ class DoctorChatViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun defaultModelStatusText(): String {
-        return if (networkRepository.getCurrentSession() != null) {
-            app.getString(R.string.doctor_model_status_cloud_ready)
-        } else {
-            app.getString(R.string.doctor_model_status_local_ready)
-        }
+        return app.getString(R.string.doctor_model_status_ready)
     }
 
-    private fun modelStatusText(source: DoctorInferenceSource): String {
-        return when (source) {
-            DoctorInferenceSource.CLOUD_ENHANCED -> app.getString(R.string.doctor_model_status_cloud_ready)
-            DoctorInferenceSource.LOCAL_RULE -> app.getString(R.string.doctor_model_status_local_active)
-        }
+    private fun modelStatusText(@Suppress("UNUSED_PARAMETER") source: DoctorInferenceSource): String {
+        return defaultModelStatusText()
     }
 
     private fun startOfDay(timeMillis: Long): Long {
@@ -817,17 +827,12 @@ private fun String.toDoctorMessageType(): DoctorMessageType {
 
 private fun com.example.newstart.network.models.RecommendationExplanationItem.toDoctorExplanationUiState():
     DoctorRecommendationExplanationUiState {
-    val metaParts = listOfNotNull(
-        modelProfile?.takeIf { it.isNotBlank() },
-        configSource?.takeIf { it.isNotBlank() },
-        recommendationMode?.takeIf { it.isNotBlank() }
-    )
     return DoctorRecommendationExplanationUiState(
         visible = summary.isNotBlank() || reasons.isNotEmpty() || nextStep.isNotBlank(),
         summary = summary,
         reasons = reasons.take(3),
         nextStep = nextStep,
-        metaLabel = metaParts.joinToString(" 路 ")
+        metaLabel = ""
     )
 }
 

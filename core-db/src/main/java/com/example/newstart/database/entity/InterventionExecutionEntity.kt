@@ -34,6 +34,6 @@ data class InterventionExecutionEntity(
     val beforeHr: Int,
     val afterHr: Int,
     val effectScore: Float,
-    val completionType: String
+    val completionType: String,
+    val metadataJson: String? = null
 )
-

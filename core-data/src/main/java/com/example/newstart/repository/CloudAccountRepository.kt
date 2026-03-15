@@ -5,6 +5,7 @@ import com.example.newstart.network.CloudSession
 import com.example.newstart.network.models.ActionResponse
 import com.example.newstart.network.models.AuthData
 import com.example.newstart.network.models.AuthResponse
+import com.example.newstart.network.models.DemoBootstrapData
 import com.example.newstart.network.models.EmailActionRequest
 import com.example.newstart.network.models.LoginRequest
 import com.example.newstart.network.models.RegisterRequest
@@ -41,7 +42,9 @@ class CloudAccountRepository {
                 val response = runCatching {
                     apiService.register(RegisterRequest(email, password, username))
                 }.getOrElse { firstError ->
-                    if (firstError is CancellationException) throw firstError
+                    if (firstError is CancellationException) {
+                        throw firstError
+                    }
                     if (isTransientNetworkError(firstError)) {
                         delay(800)
                         return@withContext runCatching {
@@ -49,7 +52,9 @@ class CloudAccountRepository {
                         }.fold(
                             onSuccess = { handleAuthResponse(it, "注册失败") },
                             onFailure = { retryError ->
-                                if (retryError is CancellationException) throw retryError
+                                if (retryError is CancellationException) {
+                                    throw retryError
+                                }
                                 Result.failure(Exception(mapExceptionMessage(retryError)))
                             }
                         )
@@ -132,6 +137,30 @@ class CloudAccountRepository {
                             extractAuthenticatedErrorMessage(
                                 response,
                                 response.body()?.message ?: "保存个人资料失败"
+                            )
+                        )
+                    )
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Result.failure(Exception(mapExceptionMessage(e)))
+            }
+        }
+    }
+
+    suspend fun getDemoBootstrap(): Result<DemoBootstrapData> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = apiService.getDemoBootstrap()
+                if (response.isSuccessful && response.body()?.data != null) {
+                    Result.success(response.body()!!.data!!)
+                } else {
+                    Result.failure(
+                        Exception(
+                            extractAuthenticatedErrorMessage(
+                                response,
+                                response.body()?.message ?: "获取演示数据失败"
                             )
                         )
                     )
@@ -233,8 +262,9 @@ class CloudAccountRepository {
         val lower = message.lowercase()
         return when {
             lower.contains("rate limit") -> "请求过于频繁，请稍后再试"
-            lower.contains("connection closed") || lower.contains("unexpected end") || lower.contains("eof") ->
-                "网络连接中断，请检查网络后重试"
+            lower.contains("connection closed") ||
+                lower.contains("unexpected end") ||
+                lower.contains("eof") -> "网络连接中断，请检查网络后重试"
             lower.contains("timeout") -> "请求超时，请稍后再试"
             message.isNotBlank() -> message
             else -> "网络请求失败"

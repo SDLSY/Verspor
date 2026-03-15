@@ -70,6 +70,12 @@ class MainActivity : AppCompatActivity(), AvatarAudioHost {
     private val preferCompactAvatarMode by lazy(LazyThreadSafetyMode.NONE) {
         shouldPreferCompactAvatarMode()
     }
+    private val profileSettingsDestinationIds = setOf(
+        CommonR.id.navigation_profile_personal_info,
+        CommonR.id.navigation_profile_notifications,
+        CommonR.id.navigation_profile_privacy,
+        CommonR.id.navigation_profile_about
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -226,11 +232,7 @@ class MainActivity : AppCompatActivity(), AvatarAudioHost {
 
     private fun applyAvatarOverlayForDestination(destinationId: Int) {
         val avatarHiddenDestinations = setOf(
-            CommonR.id.navigation_cloud_auth,
-            CommonR.id.navigation_profile_personal_info,
-            CommonR.id.navigation_profile_notifications,
-            CommonR.id.navigation_profile_privacy,
-            CommonR.id.navigation_profile_about
+            CommonR.id.navigation_cloud_auth
         )
         val showAvatar = destinationId !in avatarHiddenDestinations
         avatarOverlayEnabled = showAvatar
@@ -248,7 +250,8 @@ class MainActivity : AppCompatActivity(), AvatarAudioHost {
         val isHomePage = destinationId == CommonR.id.navigation_home
         val isTrendPage = destinationId == CommonR.id.navigation_trend
         val isDevicePage = destinationId == CommonR.id.navigation_device
-        val isProfilePage = destinationId == CommonR.id.navigation_profile
+        val isProfilePage = destinationId == CommonR.id.navigation_profile ||
+            destinationId in profileSettingsDestinationIds
         val isInterventionHubPage = destinationId == CommonR.id.navigation_intervention_center
         val isExecutionPage = destinationId in setOf(
             CommonR.id.navigation_relax_hub,
@@ -581,6 +584,10 @@ class MainActivity : AppCompatActivity(), AvatarAudioHost {
             CommonR.id.navigation_trend,
             CommonR.id.navigation_device,
             CommonR.id.navigation_profile,
+            CommonR.id.navigation_profile_personal_info,
+            CommonR.id.navigation_profile_notifications,
+            CommonR.id.navigation_profile_privacy,
+            CommonR.id.navigation_profile_about,
             CommonR.id.navigation_intervention_center,
             CommonR.id.navigation_relax_hub,
             CommonR.id.navigation_relax_center_legacy,
@@ -692,6 +699,10 @@ class MainActivity : AppCompatActivity(), AvatarAudioHost {
             CommonR.id.navigation_trend -> getString(CommonR.string.trend_page_title_clean)
             CommonR.id.navigation_device -> getString(CommonR.string.device_page_title_clean)
             CommonR.id.navigation_profile -> getString(CommonR.string.profile_page_title_clean)
+            CommonR.id.navigation_profile_personal_info -> getString(CommonR.string.profile_personal_info_title)
+            CommonR.id.navigation_profile_notifications -> getString(CommonR.string.profile_notification_settings_title)
+            CommonR.id.navigation_profile_privacy -> getString(CommonR.string.profile_privacy_settings_title)
+            CommonR.id.navigation_profile_about -> getString(CommonR.string.profile_about_project_title)
             CommonR.id.navigation_intervention_center -> getString(CommonR.string.intervention_center_title)
             CommonR.id.navigation_relax_hub -> getString(CommonR.string.symptom_guide_title)
             CommonR.id.navigation_relax_center_legacy -> getString(CommonR.string.relax_hub_title)
@@ -709,6 +720,10 @@ class MainActivity : AppCompatActivity(), AvatarAudioHost {
             CommonR.id.navigation_trend -> getString(CommonR.string.trend_page_subtitle_clean)
             CommonR.id.navigation_device -> getString(CommonR.string.device_page_subtitle_clean)
             CommonR.id.navigation_profile -> getString(CommonR.string.profile_page_subtitle_clean)
+            CommonR.id.navigation_profile_personal_info -> "继续维护你的云端资料与基础档案。"
+            CommonR.id.navigation_profile_notifications -> "调整通知、提醒和桌面机器人播报方式。"
+            CommonR.id.navigation_profile_privacy -> "查看账号状态并管理本地数据与隐私选项。"
+            CommonR.id.navigation_profile_about -> "查看版本、项目定位和当前能力说明。"
             CommonR.id.navigation_intervention_center -> getString(CommonR.string.intervention_center_subtitle)
             else -> getString(CommonR.string.avatar_voice_entry_hint)
         }
@@ -722,6 +737,10 @@ class MainActivity : AppCompatActivity(), AvatarAudioHost {
             CommonR.id.navigation_trend -> "提醒用户先看周报结论，再决定是否进入干预中心。"
             CommonR.id.navigation_device -> "提醒用户先确认连接和同步，再考虑高级工具。"
             CommonR.id.navigation_profile -> "提醒用户先处理账号和设置，再通过快捷入口回到主流程。"
+            CommonR.id.navigation_profile_personal_info -> "提醒用户先核对用户名、年龄和性别，再保存资料。"
+            CommonR.id.navigation_profile_notifications -> "提醒用户先确认通知总开关，再调整提醒和机器人播报。"
+            CommonR.id.navigation_profile_privacy -> "提醒用户先确认当前登录状态，再决定是否清理本地数据。"
+            CommonR.id.navigation_profile_about -> "解释当前版本信息，并提示用户返回主流程继续使用。"
             CommonR.id.navigation_intervention_center -> "提醒用户从最贴近当前问题的干预入口开始。"
             CommonR.id.navigation_relax_center_legacy -> "提醒用户先选中不适部位，再查看完整示意图和对应干预建议。"
             CommonR.id.navigation_relax_hub -> "提醒用户先完成症状定位，再生成辅助判断。"
@@ -741,6 +760,10 @@ class MainActivity : AppCompatActivity(), AvatarAudioHost {
             CommonR.id.navigation_trend -> "trend"
             CommonR.id.navigation_device -> "device"
             CommonR.id.navigation_profile -> "profile"
+            CommonR.id.navigation_profile_personal_info -> "profile_personal_info"
+            CommonR.id.navigation_profile_notifications -> "profile_notifications"
+            CommonR.id.navigation_profile_privacy -> "profile_privacy"
+            CommonR.id.navigation_profile_about -> "profile_about"
             CommonR.id.navigation_intervention_center -> "intervention_center"
             CommonR.id.navigation_relax_hub -> "symptom_guide"
             CommonR.id.navigation_relax_center_legacy -> "relax_center"

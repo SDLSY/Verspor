@@ -35,7 +35,6 @@ import com.example.newstart.ui.doctor.DOCTOR_PREFILL_MESSAGE_KEY
 import com.example.newstart.repository.NetworkRepository
 import com.example.newstart.xfyun.XfyunConfig
 import com.example.newstart.xfyun.speech.XfyunIatWsClient
-import com.example.newstart.xfyun.speech.XfyunTtsWsClient
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -77,7 +76,6 @@ class DoctorChatFragment : Fragment() {
     private val speechService = SpeechService(networkRepository)
     private val mediaGenerationService = MediaGenerationService(networkRepository)
     private val xfyunIatClient = XfyunIatWsClient()
-    private val xfyunTtsClient = XfyunTtsWsClient()
 
     private var isRecording = false
     private var isVoiceCallModeActive = false
@@ -265,9 +263,13 @@ class DoctorChatFragment : Fragment() {
             currentBinding.tvDoctorSuggestionSource.text = state.suggestionSourceText
             currentBinding.tvDoctorConfidence.text = state.confidenceText
             currentBinding.tvDoctorModelStatus.text = state.modelStatusText
+            currentBinding.tvDoctorModelStatus.visibility =
+                if (state.modelStatusText.isBlank()) View.GONE else View.VISIBLE
             currentBinding.cardDoctorExplanation.isVisible = state.recommendationExplanation.visible
             currentBinding.tvDoctorExplanationSummary.text = state.recommendationExplanation.summary
             currentBinding.tvDoctorExplanationMeta.text = state.recommendationExplanation.metaLabel
+            currentBinding.tvDoctorExplanationMeta.visibility =
+                if (state.recommendationExplanation.metaLabel.isBlank()) View.GONE else View.VISIBLE
             currentBinding.tvDoctorExplanationReasons.text = if (state.recommendationExplanation.reasons.isEmpty()) {
                 getString(R.string.doctor_explanation_reasons_empty)
             } else {
@@ -381,19 +383,16 @@ class DoctorChatFragment : Fragment() {
             setVoiceCallState(VoiceCallState.SPEAKING)
             pendingAssistantPlayback = true
             val audioUrl = runCatching {
-                if (XfyunConfig.ttsCredentials.isReady) {
-                    android.util.Log.i(TAG, "Using Xfyun TTS for doctor reply, type=${latestAssistant.messageType}")
-                    xfyunTtsClient.synthesize(latestAssistant.content)
-                } else {
-                    android.util.Log.i(TAG, "Falling back to cloud TTS for doctor reply, type=${latestAssistant.messageType}")
-                    speechService.synthesize(
-                        text = latestAssistant.content,
-                        profile = profile
-                    )?.audioUrl.orEmpty()
-                }
+                android.util.Log.i(TAG, "Using cloud TTS for doctor reply, type=${latestAssistant.messageType}")
+                speechService.synthesize(
+                    text = latestAssistant.content,
+                    voice = XfyunConfig.defaultVoiceName,
+                    profile = profile
+                )?.audioUrl.orEmpty()
             }.getOrElse {
                 speechService.synthesize(
                     text = latestAssistant.content,
+                    voice = XfyunConfig.defaultVoiceName,
                     profile = profile
                 )?.audioUrl.orEmpty()
             }

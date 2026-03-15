@@ -166,6 +166,33 @@
                     android:textSize="14sp"
                     tools:text="吸气 · 4 秒" />
 
+                <com.example.newstart.ui.relax.BiofeedbackBreathingView
+                    android:id="@+id/biofeedback_breathing_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="170dp"
+                    android:layout_marginTop="12dp" />
+
+                <TextView
+                    android:id="@+id/tv_breath_feedback_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:text="@string/relax_realtime_feedback_live"
+                    android:textColor="@android:color/white"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_breath_feedback_detail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    tools:text="放松信号 62% · HR 66 · HRV 34" />
+
                 <com.google.android.material.progressindicator.LinearProgressIndicator
                     android:id="@+id/progress_breath_phase"
                     android:layout_width="match_parent"
@@ -272,7 +299,7 @@
                     android:layout_marginTop="4dp"
                     android:textColor="@color/text_secondary"
                     android:textSize="12sp"
-                    tools:text="已写入今日记录。(60s)" />
+                    tools:text="已写入今日记录 (60s)" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

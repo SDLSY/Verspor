@@ -295,4 +295,27 @@
             app:argType="string" />
     </fragment>
 
+    <fragment
+        android:id="@+id/navigation_zen_interaction"
+        android:name="com.example.newstart.ui.relax.ZenInteractionFragment"
+        android:label="@string/zen_interaction_title"
+        tools:layout="@layout/fragment_zen_interaction">
+        <argument
+            android:name="protocolCode"
+            android:defaultValue="ZEN_WAVE_GARDEN_5M"
+            app:argType="string" />
+        <argument
+            android:name="protocolTitle"
+            android:defaultValue=""
+            app:argType="string" />
+        <argument
+            android:name="durationSec"
+            android:defaultValue="300"
+            app:argType="integer" />
+        <argument
+            android:name="rationale"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
+
 </navigation>

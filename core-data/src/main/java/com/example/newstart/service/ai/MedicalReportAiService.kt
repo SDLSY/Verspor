@@ -13,8 +13,15 @@ object MedicalReportAiService {
     private const val MAX_CLOUD_OCR_TEXT_LENGTH = 10_000
     private const val MAX_CLOUD_OCR_MARKDOWN_LENGTH = 32_000
 
-    fun parse(rawText: String): List<ParsedMedicalMetric> {
-        return MedicalReportParser.parse(rawText)
+    fun parse(rawText: String, ocrMarkdown: String = ""): List<ParsedMedicalMetric> {
+        val candidates = buildLocalParsingCandidates(rawText, ocrMarkdown)
+        val merged = linkedMapOf<String, ParsedMedicalMetric>()
+        candidates.forEach { candidate ->
+            MedicalReportParser.parse(candidate).forEach { metric ->
+                merged.putIfAbsent(metric.metricCode, metric)
+            }
+        }
+        return merged.values.toList()
     }
 
     fun mapToEntity(reportId: String, parsed: ParsedMedicalMetric): MedicalMetricEntity {
@@ -46,11 +53,12 @@ object MedicalReportAiService {
 
     private fun buildCompactCloudText(ocrText: String, ocrMarkdown: String): String {
         val normalizedText = MedicalReportDraftFormatter.normalizeRawText(ocrText)
-        if (normalizedText.length <= MAX_CLOUD_OCR_TEXT_LENGTH) {
-            return normalizedText
-        }
         val markdownText = MedicalReportDraftFormatter.markdownToPlainText(ocrMarkdown)
-        val fallback = markdownText.ifBlank { normalizedText }
+        val merged = mergeTextSources(markdownText, normalizedText)
+        if (merged.length <= MAX_CLOUD_OCR_TEXT_LENGTH) {
+            return merged
+        }
+        val fallback = markdownText.ifBlank { merged.ifBlank { normalizedText } }
         return fallback.take(MAX_CLOUD_OCR_TEXT_LENGTH).trim()
     }
 
@@ -62,5 +70,25 @@ object MedicalReportAiService {
             .take(MAX_CLOUD_OCR_MARKDOWN_LENGTH)
             .trim()
         return normalizedMarkdown.ifBlank { null }
+    }
+
+    private fun buildLocalParsingCandidates(rawText: String, ocrMarkdown: String): List<String> {
+        val normalizedText = MedicalReportDraftFormatter.normalizeRawText(rawText)
+        val markdownText = MedicalReportDraftFormatter.markdownToPlainText(ocrMarkdown)
+        return buildList {
+            if (markdownText.isNotBlank()) add(markdownText)
+            if (normalizedText.isNotBlank()) add(normalizedText)
+            val merged = mergeTextSources(markdownText, normalizedText)
+            if (merged.isNotBlank()) add(merged)
+        }.distinct()
+    }
+
+    private fun mergeTextSources(primary: String, secondary: String): String {
+        return buildList {
+            if (primary.isNotBlank()) add(primary.trim())
+            if (secondary.isNotBlank()) add(secondary.trim())
+        }.distinct()
+            .joinToString(separator = "\n")
+            .trim()
     }
 }

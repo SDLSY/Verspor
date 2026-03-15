@@ -138,7 +138,7 @@ class MedicalReportAnalyzeViewModel(application: Application) : AndroidViewModel
         viewModelScope.launch {
             val parseStart = PerformanceTelemetry.nowElapsedMs()
             val parsingText = MedicalReportDraftFormatter.toParsingText(editedText, draftRawOcrText)
-            val parsedMetrics = MedicalReportAiService.parse(parsingText)
+            val parsedMetrics = MedicalReportAiService.parse(parsingText, draftOcrMarkdown)
             val hadCloudSession = networkRepository.getCurrentSession() != null
             PerformanceTelemetry.recordDuration(
                 metric = "ocr_parse_latency",
@@ -204,7 +204,7 @@ class MedicalReportAnalyzeViewModel(application: Application) : AndroidViewModel
     ) {
         viewModelScope.launch {
             val parseStart = PerformanceTelemetry.nowElapsedMs()
-            val parsedMetrics = MedicalReportAiService.parse(textForParsing)
+            val parsedMetrics = MedicalReportAiService.parse(textForParsing, draftOcrMarkdown)
             val hadCloudSession = networkRepository.getCurrentSession() != null
             val cloudEnhanced = MedicalReportAiService.enhanceIfAvailable(
                 networkRepository = networkRepository,
@@ -316,7 +316,8 @@ class MedicalReportAnalyzeViewModel(application: Application) : AndroidViewModel
             riskLevel = draftRiskLevel,
             metrics = metrics,
             cloudSummary = cloudEnhanced?.summary,
-            rawOcrText = draftRawOcrText
+            rawOcrText = draftRawOcrText,
+            ocrMarkdown = draftOcrMarkdown
         )
     }
 

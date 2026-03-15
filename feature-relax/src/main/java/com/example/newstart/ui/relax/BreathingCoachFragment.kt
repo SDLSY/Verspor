@@ -1,5 +1,6 @@
 package com.example.newstart.ui.relax
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.newstart.core.common.R
 import com.example.newstart.feature.relax.databinding.FragmentBreathingCoachBinding
+import com.example.newstart.intervention.HapticPatternMode
 import java.util.Locale
 
 class BreathingCoachFragment : Fragment() {
@@ -18,6 +20,8 @@ class BreathingCoachFragment : Fragment() {
 
     private val viewModel: BreathingCoachViewModel by viewModels()
     private var latestState: BreathingCoachUiState = BreathingCoachUiState()
+    private lateinit var hapticController: HapticPacingController
+    private var lastPhase: BreathingPhase? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -30,13 +34,12 @@ class BreathingCoachFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        hapticController = HapticPacingController(requireContext())
         viewModel.initialize(
             protocolTypeArg = arguments?.getString("protocolType"),
             durationSecArg = arguments?.getInt("durationSec"),
             taskIdArg = arguments?.getString("taskId")
         )
-
         setupActions()
         observeData()
     }
@@ -47,17 +50,9 @@ class BreathingCoachFragment : Fragment() {
                 findNavController().navigate(R.id.navigation_relax_hub)
             }
         }
-
-        binding.chipProtocol46.setOnClickListener {
-            viewModel.selectProtocol(BreathingProtocol.BREATH_4_6)
-        }
-        binding.chipProtocol478.setOnClickListener {
-            viewModel.selectProtocol(BreathingProtocol.BREATH_4_7_8)
-        }
-        binding.chipProtocolBox.setOnClickListener {
-            viewModel.selectProtocol(BreathingProtocol.BOX)
-        }
-
+        binding.chipProtocol46.setOnClickListener { viewModel.selectProtocol(BreathingProtocol.BREATH_4_6) }
+        binding.chipProtocol478.setOnClickListener { viewModel.selectProtocol(BreathingProtocol.BREATH_4_7_8) }
+        binding.chipProtocolBox.setOnClickListener { viewModel.selectProtocol(BreathingProtocol.BOX) }
         binding.chipDuration1m.setOnClickListener { viewModel.selectDuration(60) }
         binding.chipDuration3m.setOnClickListener { viewModel.selectDuration(180) }
         binding.chipDuration5m.setOnClickListener { viewModel.selectDuration(300) }
@@ -65,12 +60,18 @@ class BreathingCoachFragment : Fragment() {
         binding.btnBreathPrimary.setOnClickListener {
             if (latestState.isRunning) {
                 viewModel.stopSessionEarly()
+                hapticController.stop()
             } else {
-                viewModel.startSession()
+                val (hapticsEnabled, hapticMode) = loadHapticSettings()
+                viewModel.startSession(hapticsEnabled = hapticsEnabled, hapticMode = hapticMode)
+                if (hapticsEnabled) {
+                    hapticController.pulseSessionAccent(hapticMode)
+                }
             }
         }
 
         binding.btnBreathSecondary.setOnClickListener {
+            hapticController.stop()
             viewModel.reset()
         }
     }
@@ -78,11 +79,9 @@ class BreathingCoachFragment : Fragment() {
     private fun observeData() {
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             latestState = state
-
             binding.chipProtocol46.isChecked = state.selectedProtocol == BreathingProtocol.BREATH_4_6
             binding.chipProtocol478.isChecked = state.selectedProtocol == BreathingProtocol.BREATH_4_7_8
             binding.chipProtocolBox.isChecked = state.selectedProtocol == BreathingProtocol.BOX
-
             binding.chipDuration1m.isChecked = state.selectedDurationSec == 60
             binding.chipDuration3m.isChecked = state.selectedDurationSec == 180
             binding.chipDuration5m.isChecked = state.selectedDurationSec == 300
@@ -107,12 +106,26 @@ class BreathingCoachFragment : Fragment() {
                 phaseLabel,
                 state.phaseRemainingSec.coerceAtLeast(0)
             )
-
-            val min = state.totalRemainingSec / 60
-            val sec = state.totalRemainingSec % 60
-            binding.tvBreathTotalCountdown.text = getString(R.string.relax_total_countdown, min, sec)
+            binding.tvBreathTotalCountdown.text = getString(
+                R.string.relax_total_countdown,
+                state.totalRemainingSec / 60,
+                state.totalRemainingSec % 60
+            )
             binding.progressBreathPhase.progress = state.phaseProgress
             binding.tvBreathCycleHint.text = getString(R.string.relax_cycle_hint)
+            binding.biofeedbackBreathingView.render(state.phaseProgress, state.feedback)
+            binding.tvBreathFeedbackTitle.text = state.feedbackHeadline
+            binding.tvBreathFeedbackDetail.text = state.feedbackDetail
+
+            if (state.isRunning && lastPhase != state.phase) {
+                val (hapticsEnabled, hapticMode) = loadHapticSettings()
+                if (hapticsEnabled) {
+                    hapticController.playPhase(state.phase, hapticMode)
+                }
+            } else if (!state.isRunning) {
+                hapticController.stop()
+            }
+            lastPhase = state.phase
 
             binding.btnBreathPrimary.text = if (state.isRunning) {
                 getString(R.string.relax_breath_stop)
@@ -154,9 +167,23 @@ class BreathingCoachFragment : Fragment() {
         }
     }
 
+    override fun onStop() {
+        hapticController.stop()
+        super.onStop()
+    }
+
     override fun onDestroyView() {
+        hapticController.stop()
         super.onDestroyView()
         _binding = null
     }
-}
 
+    private fun loadHapticSettings(): Pair<Boolean, HapticPatternMode> {
+        val prefs = requireContext().applicationContext.getSharedPreferences("profile_settings", Context.MODE_PRIVATE)
+        val enabled = prefs.getBoolean("haptics_enabled", false)
+        val mode = HapticPatternMode.fromStorageValue(
+            prefs.getString("preferred_haptic_mode", HapticPatternMode.BREATH.name)
+        )
+        return enabled to mode
+    }
+}

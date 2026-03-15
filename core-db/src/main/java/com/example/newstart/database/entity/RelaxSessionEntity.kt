@@ -20,5 +20,6 @@ data class RelaxSessionEntity(
     val postHrv: Int,
     val preMotion: Float,
     val postMotion: Float,
-    val effectScore: Float
+    val effectScore: Float,
+    val metadataJson: String? = null
 )

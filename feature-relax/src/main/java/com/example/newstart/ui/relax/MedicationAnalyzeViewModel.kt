@@ -239,10 +239,6 @@ class MedicationAnalyzeViewModel(application: Application) : AndroidViewModel(ap
                 },
                 evidenceText = payload.evidenceNotes.joinToString("\n"),
                 confidence = payload.confidence,
-                metadataText = listOfNotNull(
-                    payload.metadata?.providerId,
-                    payload.metadata?.modelId
-                ).joinToString(" / "),
                 requiresManualReview = payload.requiresManualReview
             )
         )
@@ -281,6 +277,5 @@ data class MedicationAnalyzeUiState(
     val advice: String = "",
     val evidenceText: String = "",
     val confidence: Float = 0f,
-    val metadataText: String = "",
     val requiresManualReview: Boolean = false
 )

@@ -5,6 +5,8 @@ import com.example.newstart.core.common.R as CommonR
 
 object AvatarEntryAudioRegistry {
 
+    private const val BUNDLED_ENTRY_AUDIO_ENABLED = false
+
     fun audioResIdForPageKey(pageKey: String): Int? {
         return when (pageKey) {
             "home" -> CommonR.raw.avatar_entry_home
@@ -25,9 +27,14 @@ object AvatarEntryAudioRegistry {
         }
     }
 
-    fun hasBundledAudio(pageKey: String): Boolean = audioResIdForPageKey(pageKey) != null
+    fun hasBundledAudio(pageKey: String): Boolean {
+        return BUNDLED_ENTRY_AUDIO_ENABLED && audioResIdForPageKey(pageKey) != null
+    }
 
     fun audioSource(context: Context, pageKey: String): String? {
+        if (!BUNDLED_ENTRY_AUDIO_ENABLED) {
+            return null
+        }
         val resId = audioResIdForPageKey(pageKey) ?: return null
         return "android.resource://${context.packageName}/$resId"
     }

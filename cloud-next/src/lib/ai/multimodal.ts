@@ -2,6 +2,10 @@ import { z } from "zod";
 import { createTraceId } from "@/lib/http";
 import { generateStructuredText } from "@/lib/ai/openai-compatible";
 import {
+  generateDoubaoSpeechSynthesis,
+  type SpeechSynthesisResult,
+} from "@/lib/ai/doubao-tts";
+import {
   buildImageGenerationPrompt,
   buildSpeechRewritePrompt,
   buildSpeechTranscriptionPrompt,
@@ -178,6 +182,27 @@ export async function generateSpeechSynthesis(
   profile: SpeechPromptProfile,
   traceId?: string
 ) {
+  const resolvedTraceId = traceId ?? createTraceId();
+  const narrationText = await rewriteSpeechText(text, profile, resolvedTraceId);
+
+  const doubaoResult = await generateDoubaoSpeechSynthesis(
+    narrationText,
+    voice,
+    profile,
+    resolvedTraceId
+  );
+  if (doubaoResult) {
+    return doubaoResult;
+  }
+
+  return generateVectorSpeechSynthesis(narrationText, voice, resolvedTraceId);
+}
+
+async function generateVectorSpeechSynthesis(
+  narrationText: string,
+  voice: string,
+  traceId: string
+): Promise<SpeechSynthesisResult | null> {
   const selected = pickProvider("speech.tts", traceId);
   if (!selected) return null;
   const apiKey = getProviderApiKey(selected.providerId);
@@ -187,15 +212,13 @@ export async function generateSpeechSynthesis(
     return null;
   }
 
-  const narrationText = await rewriteSpeechText(text, profile, selected.traceId);
-
   const response = await fetch(VECTOR_AUDIO_SPEECH_URL, {
     method: "POST",
     headers: buildJsonHeaders(selected.providerId, apiKey),
     body: JSON.stringify({
       model: selected.modelId,
       input: narrationText,
-      voice,
+      voice: resolveVectorSpeechVoice(voice),
       format: "mp3",
     }),
   });
@@ -211,13 +234,21 @@ export async function generateSpeechSynthesis(
   return {
     audioUrl: toDataUrl(contentType, bytes),
     text: narrationText,
-    voice,
+    voice: resolveVectorSpeechVoice(voice),
     providerId: selected.providerId,
     modelId: selected.modelId,
     traceId: selected.traceId,
-    fallbackUsed: selected.providerId !== getAiProviderOrder()[0],
+    fallbackUsed: true,
     status: "completed",
   };
+}
+
+function resolveVectorSpeechVoice(voice: string): string {
+  return whenLegacyVoice(voice) ? "alloy" : voice.trim().toLowerCase() || "alloy";
+}
+
+function whenLegacyVoice(voice: string): boolean {
+  return ["", "x4_yezi", "x4_lingxiaoyao_em"].includes(voice.trim().toLowerCase());
 }
 
 export async function generateImage(

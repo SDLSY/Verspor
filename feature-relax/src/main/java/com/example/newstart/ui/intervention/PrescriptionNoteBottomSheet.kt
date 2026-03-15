@@ -134,7 +134,7 @@ class PrescriptionNoteBottomSheet : BottomSheetDialogFragment() {
                 summary = getString(R.string.prescription_support_login_required),
                 reasons = emptyList(),
                 effects = getString(R.string.prescription_support_effects_login_required),
-                meta = getString(R.string.prescription_support_meta_local)
+                meta = "基于当前状态与执行记录整理"
             )
             return
         }
@@ -164,13 +164,7 @@ class PrescriptionNoteBottomSheet : BottomSheetDialogFragment() {
                         effects.avgStressDrop
                     )
                 },
-                meta = listOfNotNull(
-                    explanation?.modelProfile?.takeIf { it.isNotBlank() },
-                    explanation?.configSource?.takeIf { it.isNotBlank() },
-                    explanation?.recommendationMode?.takeIf { it.isNotBlank() }
-                ).joinToString(" | ").ifBlank {
-                    getString(R.string.prescription_support_meta_local)
-                }
+                meta = "基于当前状态与执行记录整理"
             )
         }
     }
@@ -184,6 +178,7 @@ class PrescriptionNoteBottomSheet : BottomSheetDialogFragment() {
         binding.groupPrescriptionSupport.isVisible = true
         binding.tvPrescriptionSupportSummary.text = summary
         binding.tvPrescriptionSupportMeta.text = meta
+        binding.tvPrescriptionSupportMeta.isVisible = meta.isNotBlank()
         binding.tvPrescriptionSupportReasons.text = if (reasons.isEmpty()) {
             getString(R.string.prescription_support_reasons_empty)
         } else {

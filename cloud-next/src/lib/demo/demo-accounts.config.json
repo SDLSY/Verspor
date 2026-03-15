@@ -1,0 +1,35 @@
+{
+  "seedVersion": "2026-03-demo-v1",
+  "accounts": [
+    {
+      "role": "demo_user",
+      "scenario": "demo_baseline_recovery",
+      "displayName": "演示账号 · 恢复基线"
+    },
+    {
+      "role": "demo_user",
+      "scenario": "demo_report_doctor_loop",
+      "displayName": "演示账号 · 报告问诊闭环"
+    },
+    {
+      "role": "demo_user",
+      "scenario": "demo_lifestyle_loop",
+      "displayName": "演示账号 · 药食画像闭环"
+    },
+    {
+      "role": "demo_user",
+      "scenario": "demo_live_intervention",
+      "displayName": "演示账号 · 实时干预闭环"
+    },
+    {
+      "role": "demo_user",
+      "scenario": "demo_high_risk_ops",
+      "displayName": "演示账号 · 高风险运维"
+    },
+    {
+      "role": "demo_admin",
+      "scenario": "demo_admin_console",
+      "displayName": "演示后台管理员"
+    }
+  ]
+}

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -120,17 +121,15 @@ class FoodAnalyzeFragment : Fragment() {
             syncText(binding.etFoodFlags, state.nutritionFlagsText)
             syncText(binding.etFoodContribution, state.dailyContribution)
             syncText(binding.etFoodAdvice, state.advice)
-            binding.tvFoodMetadata.text = buildString {
+            binding.tvFoodResultNote.text = buildString {
                 append(getString(R.string.food_analyze_confidence_label, (state.confidence * 100).toInt()))
                 if (state.requiresManualReview) {
                     append("\n")
                     append(getString(R.string.food_analyze_manual_review_required))
                 }
-                if (state.metadataText.isNotBlank()) {
-                    append("\n")
-                    append(state.metadataText)
-                }
             }
+            binding.tvFoodResultNote.visibility =
+                if (binding.tvFoodResultNote.text.isNullOrBlank()) View.GONE else View.VISIBLE
         }
 
         viewModel.toastEvent.observe(viewLifecycleOwner) { message ->
@@ -141,7 +140,7 @@ class FoodAnalyzeFragment : Fragment() {
         }
     }
 
-    private fun syncText(view: android.widget.EditText, target: String) {
+    private fun syncText(view: EditText, target: String) {
         if (view.text?.toString().orEmpty() != target) {
             view.setText(target)
         }

@@ -4,10 +4,11 @@ import android.content.Context
 import android.util.Base64
 import com.example.newstart.network.ApiClient
 import com.example.newstart.network.models.AvatarNarrationRequest
+import com.example.newstart.repository.NetworkRepository
+import com.example.newstart.service.ai.SpeechService
 import com.example.newstart.xfyun.XfyunConfig
 import com.example.newstart.xfyun.spark.XfyunSparkLiteWsClient
 import com.example.newstart.xfyun.spark.XfyunSparkXWsClient
-import com.example.newstart.xfyun.speech.XfyunTtsWsClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -19,13 +20,13 @@ class DesktopAvatarNarrationService(
     context: Context,
     private val sparkLiteClient: XfyunSparkLiteWsClient = XfyunSparkLiteWsClient(XfyunConfig.sparkLiteEndpoint),
     private val sparkXClient: XfyunSparkXWsClient = XfyunSparkXWsClient(XfyunConfig.sparkXEndpoint),
-    private val ttsClient: XfyunTtsWsClient = XfyunTtsWsClient()
+    private val speechService: SpeechService = SpeechService(NetworkRepository())
 ) {
 
     private val appContext = context.applicationContext
     private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val localVoiceCacheDir: File by lazy(LazyThreadSafetyMode.NONE) {
-        File(appContext.cacheDir, "avatar-local-voice").apply { mkdirs() }
+        File(appContext.cacheDir, "avatar-local-voice-doubao-v1").apply { mkdirs() }
     }
 
     suspend fun generate(context: PageNarrationContext): AvatarNarration {
@@ -46,7 +47,7 @@ class DesktopAvatarNarrationService(
 
         backgroundScope.launch {
             runCatching {
-                val audioDataUrl = synthesizeAudio(narration.text)
+                val audioDataUrl = synthesizeAudio(narration.text, context.pageKey)
                 persistAudioDataUrl(cacheFile, audioDataUrl)
             }
         }
@@ -71,11 +72,21 @@ class DesktopAvatarNarrationService(
             )
         }
 
-        prewarmLocalNarration(context)
+        val audioDataUrl = synthesizeAudio(narration.text, context.pageKey)
+        if (audioDataUrl.isBlank()) {
+            prewarmLocalNarration(context)
+            return narration.copy(
+                audioDataUrl = "",
+                source = "local_script",
+                modelLabel = "Local script"
+            )
+        }
+
+        persistAudioDataUrl(cacheFile, audioDataUrl)
         return narration.copy(
-            audioDataUrl = "",
-            source = "local_script",
-            modelLabel = "Local script"
+            audioDataUrl = cacheFile.toPlaybackSource(),
+            source = "cloud_tts_cache",
+            modelLabel = "Cloud TTS cached voice"
         )
     }
 
@@ -93,7 +104,7 @@ class DesktopAvatarNarrationService(
             .sanitizeNarration()
             .ifBlank { fallbackNarration.text }
         val finalAction = localNarration.semanticAction.ifBlank { fallbackNarration.semanticAction }
-        val audioDataUrl = synthesizeAudio(finalText)
+        val audioDataUrl = synthesizeAudio(finalText, context.pageKey)
 
         return localNarration.copy(
             text = finalText,
@@ -211,16 +222,29 @@ class DesktopAvatarNarrationService(
         }
     }
 
-    private suspend fun synthesizeAudio(text: String): String {
-        if (text.isBlank() || !XfyunConfig.ttsCredentials.isReady) {
+    private suspend fun synthesizeAudio(text: String, pageKey: String): String {
+        if (text.isBlank()) {
             return ""
         }
         return runCatching {
-            ttsClient.synthesize(
+            speechService.synthesize(
                 text = text,
-                voiceName = XfyunConfig.defaultVoiceName
-            )
+                voice = XfyunConfig.defaultVoiceName,
+                profile = resolveSpeechProfile(pageKey)
+            )?.audioUrl.orEmpty()
         }.getOrDefault("")
+    }
+
+    private fun resolveSpeechProfile(pageKey: String): String {
+        return when (pageKey) {
+            "doctor" -> "doctor_summary"
+            "breathing_coach",
+            "intervention_center",
+            "relax_center",
+            "symptom_guide",
+            "intervention_session" -> "sleep_coach"
+            else -> "calm_assistant"
+        }
     }
 
     private fun persistAudioDataUrl(targetFile: File, audioDataUrl: String) {

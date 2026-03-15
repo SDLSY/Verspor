@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { requireAuth } from "@/lib/auth";
 import { createTraceId, fail, ok, parseJsonBody } from "@/lib/http";
 import {
   SpeechSynthesisRequestSchema,
@@ -8,10 +7,6 @@ import {
 
 export async function POST(req: Request) {
   const traceId = createTraceId();
-  const auth = await requireAuth(req);
-  if (!auth.authenticated) {
-    return auth.response;
-  }
 
   let json: unknown;
   try {

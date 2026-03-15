@@ -12,7 +12,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newstart.core.common.R
 import com.example.newstart.core.common.ui.cards.CardTone
@@ -28,7 +28,7 @@ class DeviceFragment : Fragment() {
     private var _binding: FragmentDeviceBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: DeviceViewModel by viewModels()
+    private val viewModel: DeviceViewModel by activityViewModels()
     private lateinit var deviceAdapter: DeviceListAdapter
     private var advancedExpanded = false
     private var latestDevice: DeviceInfo? = null

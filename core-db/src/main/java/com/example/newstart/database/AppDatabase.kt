@@ -71,7 +71,7 @@ import com.example.newstart.database.entity.SleepDataEntity
         MedicationAnalysisEntity::class,
         FoodAnalysisEntity::class
     ],
-    version = 11,
+    version = 12,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -441,6 +441,23 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    ALTER TABLE relax_sessions
+                    ADD COLUMN metadataJson TEXT
+                    """.trimIndent()
+                )
+                db.execSQL(
+                    """
+                    ALTER TABLE intervention_executions
+                    ADD COLUMN metadataJson TEXT
+                    """.trimIndent()
+                )
+            }
+        }
+
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -453,6 +470,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(MIGRATION_8_9)
                     .addMigrations(MIGRATION_9_10)
                     .addMigrations(MIGRATION_10_11)
+                    .addMigrations(MIGRATION_11_12)
                     .build()
                 INSTANCE = instance
                 instance

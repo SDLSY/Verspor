@@ -105,7 +105,7 @@ function toRiskLevel(value: unknown, fallback = "LOW"): string {
 }
 
 function joinCompact(values: string[]): string {
-  return values.filter(Boolean).join("，").trim();
+  return values.filter(Boolean).join("; ").trim();
 }
 
 export function normalizeMedicationVisionPayload(input: unknown): MedicationVisionPayload {
@@ -184,14 +184,14 @@ export async function loadLifestyleUserContext(
     symptomSummary:
       doctor?.doctor_summary?.trim() ||
       doctor?.chief_complaint?.trim() ||
-      "暂无结构化症状摘要",
+      "No structured symptom summary yet.",
     currentStatus:
       joinCompact([
-        nightly?.recovery_score != null ? `最近恢复分 ${Math.round(nightly.recovery_score)}` : "",
-        nightly?.sleep_quality ? `睡眠质量 ${nightly.sleep_quality}` : "",
-        medical?.risk_level ? `最近医检风险 ${medical.risk_level}` : "",
-        medical?.report_type ? `最近报告类型 ${medical.report_type}` : "",
-      ]) || "暂无最新恢复状态摘要",
+        nightly?.recovery_score != null ? `Recent recovery score ${Math.round(nightly.recovery_score)}` : "",
+        nightly?.sleep_quality ? `Sleep quality ${nightly.sleep_quality}` : "",
+        medical?.risk_level ? `Latest medical risk ${medical.risk_level}` : "",
+        medical?.report_type ? `Latest report type ${medical.report_type}` : "",
+      ]) || "No recent structured recovery summary yet.",
     redFlags: toStringArray(doctor?.red_flags_json, 8, 120),
   };
 }

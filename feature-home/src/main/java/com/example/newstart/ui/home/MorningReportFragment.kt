@@ -185,12 +185,14 @@ class MorningReportFragment : Fragment() {
             latestAiCredibilityState = state
             binding.tvAiSummary.text = state.summary
             binding.tvAiSource.text = state.sourceLabel
+            binding.tvAiSource.visibility = if (state.sourceLabel.isBlank()) View.GONE else View.VISIBLE
             binding.tvAiConfidenceValue.text = "${state.confidencePercent}%"
             binding.tvAiConfidenceLabel.text = state.confidenceLabel
             binding.progressAiConfidence.progress = state.confidencePercent
             binding.tvAiPrimaryFactor.text = state.primaryFactor
             binding.tvAiReason.text = state.reason
             binding.tvAiInference.text = state.inferenceHint
+            binding.tvAiInference.visibility = if (state.inferenceHint.isBlank()) View.GONE else View.VISIBLE
 
             val indicatorColor = when (state.indicatorLevel) {
                 CredibilityLevel.HIGH -> color(R.color.status_positive)
@@ -412,7 +414,7 @@ class MorningReportFragment : Fragment() {
                 summary = ai.summary,
                 supportingText = insight.effectDetail,
                 bullets = buildList {
-                    add(ai.inferenceHint)
+                    if (ai.inferenceHint.isNotBlank()) add(ai.inferenceHint)
                     if (insight.effectHeadline.isNotBlank()) add(insight.effectHeadline)
                     if (personalization?.isPreview == true) add(personalization.detail)
                 },

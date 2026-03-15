@@ -17,6 +17,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.newstart.core.common.R
 import com.example.newstart.feature.profile.databinding.FragmentCloudAuthBinding
 import com.example.newstart.repository.CloudAccountRepository
+import com.example.newstart.repository.DemoBootstrapCoordinator
+import com.example.newstart.network.models.AuthData
 import kotlinx.coroutines.launch
 
 class CloudAuthFragment : Fragment() {
@@ -24,6 +26,9 @@ class CloudAuthFragment : Fragment() {
     private var _binding: FragmentCloudAuthBinding? = null
     private val binding get() = _binding!!
     private val accountRepository = CloudAccountRepository()
+    private val demoBootstrapCoordinator by lazy(LazyThreadSafetyMode.NONE) {
+        DemoBootstrapCoordinator(requireContext().applicationContext)
+    }
 
     private var mode: String = MODE_LOGIN
     private var pendingConfirmationEmail: String? = null
@@ -184,16 +189,33 @@ class CloudAuthFragment : Fragment() {
         }
     }
 
-    private fun handleAuthResult(authData: com.example.newstart.network.models.AuthData, isRegister: Boolean) {
+    private suspend fun handleAuthResult(authData: AuthData, isRegister: Boolean) {
         if (authData.authState == "PENDING_CONFIRMATION") {
             pendingConfirmationEmail = authData.email
             renderPendingConfirmation(authData.email)
             return
         }
 
+        val bootstrapResult = demoBootstrapCoordinator.bootstrapForAuth(authData).getOrElse {
+            handleFailure(
+                it.message,
+                if (isRegister) R.string.cloud_auth_register_failed_generic else R.string.cloud_auth_login_failed_generic
+            )
+            return
+        }
+
         Toast.makeText(
             requireContext(),
-            getString(if (isRegister) R.string.profile_toast_register_success else R.string.profile_toast_login_success),
+            when {
+                bootstrapResult.isDemoAccount && bootstrapResult.message.isNotBlank() -> bootstrapResult.message
+                else -> getString(
+                    if (isRegister) {
+                        R.string.profile_toast_register_success
+                    } else {
+                        R.string.profile_toast_login_success
+                    }
+                )
+            },
             Toast.LENGTH_SHORT
         ).show()
         findNavController().navigateUp()

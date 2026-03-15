@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { writeAuditEvent } from "@/lib/audit";
+import { readDemoMetadata } from "@/lib/demo/bootstrap";
 import { fail, ok, parseJsonBody } from "@/lib/http";
 import { createPublicClient, createServiceClient } from "@/lib/supabase";
 import { findConfirmationState, type AuthPayload } from "@/lib/auth-state";
@@ -38,6 +39,7 @@ export async function POST(req: Request) {
     const metadata = data.user.user_metadata as Record<string, unknown> | null;
     const metadataName = metadata?.username;
     const username = typeof metadataName === "string" ? metadataName : email.split("@")[0];
+    const demoMetadata = readDemoMetadata(metadata);
 
     const serviceClient = createServiceClient();
     await writeAuditEvent(serviceClient, {
@@ -56,6 +58,10 @@ export async function POST(req: Request) {
         refreshToken: data.session.refresh_token ?? "",
         userId: data.user.id,
         username,
+        demoRole: demoMetadata.demoRole || null,
+        demoScenario: demoMetadata.demoScenario || null,
+        demoSeedVersion: demoMetadata.demoSeedVersion || null,
+        displayName: demoMetadata.displayName || null,
         canResendConfirmation: false,
       })
     );

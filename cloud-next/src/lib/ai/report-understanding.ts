@@ -32,6 +32,8 @@ export const ReportUnderstandingSchema = z.object({
 export type ReportUnderstandingRequest = z.infer<typeof ReportUnderstandingRequestSchema>;
 export type ReportUnderstanding = z.infer<typeof ReportUnderstandingSchema>;
 
+type JsonObject = Record<string, unknown>;
+
 function readNonEmptyEnv(name: string): string | null {
   const value = process.env[name]?.trim();
   return value ? value : null;
@@ -67,19 +69,191 @@ function resolveReportModelOverrides(): Partial<Record<AiProviderId, string>> {
   };
 }
 
+function toObject(value: unknown): JsonObject {
+  if (typeof value !== "object" || value == null || Array.isArray(value)) {
+    return {};
+  }
+  return value as JsonObject;
+}
+
+function toStringValue(value: unknown, maxLength: number, fallback = ""): string {
+  const normalized =
+    typeof value === "string"
+      ? value.trim()
+      : typeof value === "number" || typeof value === "boolean"
+        ? String(value)
+        : "";
+  return normalized.slice(0, maxLength) || fallback;
+}
+
+function toBooleanValue(value: unknown): boolean {
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "string") {
+    return value.trim().toLowerCase() === "true";
+  }
+  return false;
+}
+
+function toNullableNumberValue(value: unknown): number | null {
+  if (value == null || value === "") {
+    return null;
+  }
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+  if (typeof value === "string") {
+    const matched = value.replace(/,/g, "").match(/-?\d+(?:\.\d+)?/);
+    if (!matched) {
+      return null;
+    }
+    const parsed = Number(matched[0]);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function toBoundedNumberValue(
+  value: unknown,
+  min: number,
+  max: number,
+  fallback: number
+): number {
+  const parsed = toNullableNumberValue(value);
+  if (parsed == null) {
+    return fallback;
+  }
+  return Math.min(max, Math.max(min, parsed));
+}
+
+function toRiskLevel(value: unknown, fallback = "LOW"): "LOW" | "MEDIUM" | "HIGH" {
+  const normalized = toStringValue(value, 32, fallback).toUpperCase();
+  if (normalized === "HIGH" || normalized === "MEDIUM" || normalized === "LOW") {
+    return normalized;
+  }
+  return fallback as "LOW" | "MEDIUM" | "HIGH";
+}
+
+function normalizeMetricPayload(value: unknown) {
+  const payload = toObject(value);
+  const metricCode = toStringValue(payload.metricCode, 32);
+  const metricName = toStringValue(payload.metricName, 120, metricCode);
+  const metricValue = toNullableNumberValue(payload.metricValue);
+  if (!metricCode || !metricName || metricValue == null) {
+    return null;
+  }
+
+  const refLow = toNullableNumberValue(payload.refLow);
+  const refHigh = toNullableNumberValue(payload.refHigh);
+  const isAbnormal =
+    toBooleanValue(payload.isAbnormal) ||
+    (refLow != null && metricValue < refLow) ||
+    (refHigh != null && metricValue > refHigh);
+
+  return {
+    metricCode,
+    metricName,
+    metricValue,
+    unit: toStringValue(payload.unit, 32),
+    refLow,
+    refHigh,
+    isAbnormal,
+    confidence: toBoundedNumberValue(payload.confidence, 0, 1, 0.85),
+  };
+}
+
+function buildFallbackSummary(
+  riskLevel: "LOW" | "MEDIUM" | "HIGH",
+  abnormalCount: number
+): string {
+  if (abnormalCount <= 0) {
+    return "已完成报告整理，当前未识别到明确异常项，仍建议结合原始报告继续核对。";
+  }
+  if (riskLevel === "HIGH") {
+    return `已整理出 ${abnormalCount} 项偏离指标，建议尽快结合原始报告进行线下评估。`;
+  }
+  return `已整理出 ${abnormalCount} 项需要关注的指标，建议结合原始报告继续核对。`;
+}
+
+function buildFallbackReadableReport(
+  riskLevel: "LOW" | "MEDIUM" | "HIGH",
+  abnormalCount: number,
+  summary: string,
+  metrics: Array<ReturnType<typeof normalizeMetricPayload>>
+): string {
+  const validMetrics = metrics.filter(
+    (metric): metric is NonNullable<ReturnType<typeof normalizeMetricPayload>> => metric != null
+  );
+  const lines = [
+    `报告结论：${summary}`,
+    `风险等级：${riskLevel}`,
+    `异常项：${abnormalCount} 项`,
+  ];
+  if (validMetrics.length > 0) {
+    lines.push("关键指标：");
+    validMetrics.slice(0, 5).forEach((metric, index) => {
+      lines.push(
+        `${index + 1}. ${metric.metricName} ${metric.metricValue}${metric.unit ? ` ${metric.unit}` : ""}${
+          metric.isAbnormal ? "（偏离参考范围）" : ""
+        }`
+      );
+    });
+  }
+  return lines.join("\n").trim();
+}
+
+function normalizeReportUnderstandingPayload(
+  input: unknown,
+  request: ReportUnderstandingRequest
+): ReportUnderstanding {
+  const payload = toObject(input);
+  const metrics = Array.isArray(payload.metrics)
+    ? payload.metrics
+        .map((item) => normalizeMetricPayload(item))
+        .filter((item): item is NonNullable<ReturnType<typeof normalizeMetricPayload>> => item != null)
+        .slice(0, 20)
+    : [];
+  const inferredAbnormalCount = metrics.filter((metric) => metric.isAbnormal).length;
+  const abnormalCount = Math.max(
+    0,
+    Math.round(toBoundedNumberValue(payload.abnormalCount, 0, 99, inferredAbnormalCount))
+  );
+  const riskLevel = toRiskLevel(
+    payload.riskLevel,
+    inferredAbnormalCount >= 3 ? "HIGH" : inferredAbnormalCount >= 1 ? "MEDIUM" : "LOW"
+  );
+  const summary = toStringValue(payload.summary, 1200, buildFallbackSummary(riskLevel, abnormalCount));
+  const readableReport = toStringValue(
+    payload.readableReport,
+    4000,
+    buildFallbackReadableReport(riskLevel, abnormalCount, summary, metrics)
+  );
+
+  return {
+    reportType: toStringValue(payload.reportType, 64, request.reportType),
+    riskLevel,
+    abnormalCount,
+    readableReport,
+    summary,
+    metrics,
+  };
+}
+
 function buildUserPrompt(input: ReportUnderstandingRequest): string {
   const markdownBlock = input.ocrMarkdown.trim()
-    ? `\nOCR markdown：\n${input.ocrMarkdown}\n`
+    ? `\nOCR markdown:\n${input.ocrMarkdown}\n`
     : "";
 
   return `
-报告类型：${input.reportType}
+Report type: ${input.reportType}
 
-OCR 文本：
+OCR text:
 ${input.ocrText}
 ${markdownBlock}
 
-请输出固定 JSON：{
+Return strict JSON only with this shape:
+{
   "reportType":"string",
   "riskLevel":"LOW|MEDIUM|HIGH",
   "abnormalCount":0,
@@ -98,66 +272,87 @@ ${markdownBlock}
     }
   ]
 }
-`.trim();
+Numeric fields must be JSON numbers, not quoted strings.
+String fields must never be null.
+All narrative text must be concise Simplified Chinese.
+  `.trim();
 }
 
 export async function generateReportUnderstanding(
   input: ReportUnderstandingRequest,
   traceId: string
 ): Promise<{ payload: ReportUnderstanding; providerId: string; fallbackUsed: boolean } | null> {
+  const providerOrder = resolveReportProviderOrder();
+  const modelOverrideByProvider = resolveReportModelOverrides();
   const systemPrompt = `
-你是医疗报告理解助手，负责把 OCR 提取出的体检或检验文本整理成用户能直接看懂的结构化结果。
-你的职责有三项：
-1. 提取可识别的指标、参考范围和异常标记。
-2. 给出风险分层和一句话摘要。
-3. 把 OCR 文本或 OCR markdown 整理成适合人阅读的报告说明，便于用户核对，而不是直接复述原始 OCR 文本。
+You are a medical report understanding assistant.
+You convert OCR text from lab reports or physical exam reports into a user-readable structured summary.
+Your job:
+1. Extract identifiable metrics, reference ranges, and abnormal markers.
+2. Produce a concise risk level and summary.
+3. Produce a readable Simplified Chinese report that the user can understand directly.
 
-约束：
-- 不输出明确诊断，不给药物和治疗方案。
-- 只基于 OCR 内容中能支持的内容回答，不编造缺失指标。
-- readableReport 必须是简体中文、多行文本，可直接展示给用户。
-- readableReport 建议按以下结构组织：
-  报告结论：
-  关键指标：
-  需要关注：
-- 如果没有识别出有效指标，也要给出简洁说明，提示用户重新拍摄或补充更清晰的报告。
-- riskLevel 只能是 LOW、MEDIUM、HIGH。
-- confidence 必须是 0 到 1 之间的小数。
-- 输出必须是严格 JSON。`.trim();
+Constraints:
+- Do not give a definitive diagnosis.
+- Do not prescribe drugs or treatment plans.
+- Only use information supported by the OCR text or OCR markdown.
+- readableReport must be concise Simplified Chinese and suitable for direct display.
+- If no stable metrics can be extracted, still explain that the report needs clearer OCR or manual review.
+- riskLevel must be LOW, MEDIUM, or HIGH.
+- confidence values must be decimals between 0 and 1.
+- Output must be strict JSON only.
+  `.trim();
 
-  const result = await generateStructuredText({
-    capability: "StructuredText",
-    logicalModelId: "text.structured",
-    providerOrder: resolveReportProviderOrder(),
-    modelOverrideByProvider: resolveReportModelOverrides(),
-    responseFormat: "json_object",
-    maxTokens: 2200,
-    temperature: 0.1,
-    traceId,
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: buildUserPrompt(input) },
-    ],
-  });
-
-  if (!result) {
-    return null;
-  }
-
-  const jsonText = extractJsonObject(result.content) ?? result.content;
-  const parsed = ReportUnderstandingSchema.safeParse(JSON.parse(jsonText));
-  if (!parsed.success) {
-    console.warn("[AI][ReportUnderstanding] schema validation failed", {
-      issues: parsed.error.issues,
+  for (const providerId of providerOrder) {
+    const result = await generateStructuredText({
+      capability: "StructuredText",
+      logicalModelId: "text.structured",
+      providerOrder: [providerId],
+      modelOverrideByProvider,
+      responseFormat: "json_object",
+      maxTokens: 2200,
+      temperature: 0.1,
       traceId,
-      providerId: result.providerId,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: buildUserPrompt(input) },
+      ],
     });
-    return null;
+
+    if (!result) {
+      continue;
+    }
+
+    let parsedJson: unknown;
+    try {
+      const jsonText = extractJsonObject(result.content) ?? result.content;
+      parsedJson = JSON.parse(jsonText);
+    } catch (error) {
+      console.warn("[AI][ReportUnderstanding] invalid json", {
+        traceId,
+        providerId: result.providerId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      continue;
+    }
+
+    const normalized = normalizeReportUnderstandingPayload(parsedJson, input);
+    const parsed = ReportUnderstandingSchema.safeParse(normalized);
+    if (!parsed.success) {
+      console.warn("[AI][ReportUnderstanding] schema validation failed", {
+        issues: parsed.error.issues,
+        traceId,
+        providerId: result.providerId,
+      });
+      continue;
+    }
+
+    return {
+      payload: parsed.data,
+      providerId: result.providerId,
+      fallbackUsed: providerId !== providerOrder[0],
+    };
   }
 
-  return {
-    payload: parsed.data,
-    providerId: result.providerId,
-    fallbackUsed: result.fallbackUsed,
-  };
+  return null;
 }

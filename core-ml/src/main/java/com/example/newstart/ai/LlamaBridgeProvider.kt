@@ -2,6 +2,7 @@ package com.example.newstart.ai
 
 import android.util.Log
 import java.lang.reflect.Method
+import java.lang.reflect.Modifier
 
 internal object LlamaBridgeProvider {
 
@@ -18,6 +19,15 @@ internal object LlamaBridgeProvider {
 
     private val initGenerateModelMethod: Method? by lazy {
         bridgeClass?.getMethod("initGenerateModel", String::class.java)
+    }
+
+    private val bridgeInstance: Any? by lazy {
+        val safeClass = bridgeClass ?: return@lazy null
+        runCatching {
+            safeClass.getField("INSTANCE").get(null)
+        }.onFailure { error ->
+            Log.e(TAG, "Unable to obtain Llama bridge singleton instance", error)
+        }.getOrNull()
     }
 
     private val generateMethod: Method? by lazy {
@@ -79,7 +89,13 @@ internal object LlamaBridgeProvider {
             return null
         }
         return runCatching {
-            method.invoke(null, *args)
+            val receiver = if (Modifier.isStatic(method.modifiers)) null else bridgeInstance
+            if (!Modifier.isStatic(method.modifiers) && receiver == null) {
+                Log.w(TAG, "Llama bridge receiver unavailable: ${method.name}")
+                null
+            } else {
+                method.invoke(receiver, *args)
+            }
         }.onFailure { error ->
             Log.e(TAG, "Llama bridge invocation failed: ${method.name}", error)
         }.getOrNull()

@@ -57,17 +57,23 @@ class SleepTrendFragment : Fragment() {
         setupUi()
         setupCharts()
         observeData()
-        loadData(currentTimeRange)
+        applyTimeRangeSelection(currentTimeRange, force = true)
     }
 
     private fun setupUi() {
+        binding.chip7Days.setOnClickListener {
+            applyTimeRangeSelection(TimeRange.LAST_7_DAYS)
+        }
+        binding.chip30Days.setOnClickListener {
+            applyTimeRangeSelection(TimeRange.LAST_30_DAYS)
+        }
         binding.chipGroupTimeRange.setOnCheckedStateChangeListener { _, checkedIds ->
             if (checkedIds.isEmpty()) return@setOnCheckedStateChangeListener
-            currentTimeRange = when (checkedIds.first()) {
+            val selectedRange = when (checkedIds.first()) {
                 com.example.newstart.feature.trend.R.id.chip_30_days -> TimeRange.LAST_30_DAYS
                 else -> TimeRange.LAST_7_DAYS
             }
-            loadData(currentTimeRange)
+            applyTimeRangeSelection(selectedRange)
         }
 
         binding.btnTrendOpenCenter.setOnClickListener {
@@ -333,6 +339,31 @@ class SleepTrendFragment : Fragment() {
 
     private fun loadData(timeRange: TimeRange) {
         viewModel.loadTrendData(timeRange)
+    }
+
+    private fun applyTimeRangeSelection(timeRange: TimeRange, force: Boolean = false) {
+        val changed = currentTimeRange != timeRange
+        currentTimeRange = timeRange
+        updatePageTitle(timeRange)
+        val targetChipId = when (timeRange) {
+            TimeRange.LAST_7_DAYS -> com.example.newstart.feature.trend.R.id.chip_7_days
+            TimeRange.LAST_30_DAYS -> com.example.newstart.feature.trend.R.id.chip_30_days
+        }
+        if (binding.chipGroupTimeRange.checkedChipId != targetChipId) {
+            binding.chipGroupTimeRange.check(targetChipId)
+        }
+        if (force || changed) {
+            loadData(timeRange)
+        }
+    }
+
+    private fun updatePageTitle(timeRange: TimeRange) {
+        binding.tvTrendPageTitle.text = getString(
+            when (timeRange) {
+                TimeRange.LAST_7_DAYS -> CommonR.string.trend_page_title_weekly
+                TimeRange.LAST_30_DAYS -> CommonR.string.trend_page_title_monthly
+            }
+        )
     }
 
     private fun color(@ColorRes colorRes: Int): Int =

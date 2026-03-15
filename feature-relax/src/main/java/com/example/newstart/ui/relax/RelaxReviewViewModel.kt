@@ -13,7 +13,9 @@ import com.example.newstart.database.dao.RelaxRecoveryLinkSummary
 import com.example.newstart.database.dao.RelaxDailySummary
 import com.example.newstart.database.dao.RelaxProtocolStat
 import com.example.newstart.database.dao.RelaxTopProtocol
+import com.example.newstart.database.entity.RelaxSessionEntity
 import com.example.newstart.repository.RelaxRepository
+import com.example.newstart.repository.InterventionExperienceCodec
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -41,6 +43,7 @@ class RelaxReviewViewModel(application: Application) : AndroidViewModel(applicat
     private var rankJob: Job? = null
     private var recoveryLinkJob: Job? = null
     private var recoveryControlJob: Job? = null
+    private var modalityJob: Job? = null
 
     private var latestSummary = RelaxDailySummary()
     private var latestTop: RelaxTopProtocol? = null
@@ -48,6 +51,8 @@ class RelaxReviewViewModel(application: Application) : AndroidViewModel(applicat
     private var latestRank: List<RelaxProtocolStat> = emptyList()
     private var latestRecoveryLink = RelaxRecoveryLinkSummary()
     private var latestRecoveryControl = RelaxRecoveryControlSummary()
+    private var latestModalityLines: List<String> = emptyList()
+    private var latestBestModality: String = ""
 
     init {
         observeRange(currentRange)
@@ -68,6 +73,7 @@ class RelaxReviewViewModel(application: Application) : AndroidViewModel(applicat
         rankJob?.cancel()
         recoveryLinkJob?.cancel()
         recoveryControlJob?.cancel()
+        modalityJob?.cancel()
 
         summaryJob = viewModelScope.launch {
             repository.getTodaySummary(startTime, endTime).collectLatest { summary ->
@@ -109,6 +115,33 @@ class RelaxReviewViewModel(application: Application) : AndroidViewModel(applicat
                 latestRecoveryControl = control
                 rebuildUiState()
             }
+        }
+
+        modalityJob = viewModelScope.launch {
+            val sessions = repository.getRecentSessions(180)
+                .filter { it.endTime in startTime..endTime }
+            val modalityStats = sessions
+                .mapNotNull { session ->
+                    val modality = InterventionExperienceCodec.resolveModality(
+                        protocolType = session.protocolType,
+                        metadataJson = session.metadataJson
+                    ) ?: return@mapNotNull null
+                    modality.name to session.effectScore
+                }
+                .groupBy({ it.first }, { it.second })
+            latestModalityLines = modalityStats.entries
+                .sortedByDescending { it.value.size }
+                .take(4)
+                .map { entry ->
+                    app.getString(
+                        R.string.relax_review_modality_item,
+                        modalityLabel(entry.key),
+                        entry.value.size,
+                        entry.value.average().roundToInt().coerceIn(0, 100)
+                    )
+                }
+            latestBestModality = modalityStats.maxByOrNull { it.value.average() }?.key?.let(::modalityLabel).orEmpty()
+            rebuildUiState()
         }
     }
 
@@ -161,6 +194,8 @@ class RelaxReviewViewModel(application: Application) : AndroidViewModel(applicat
                 recoveryDelta = latestRecoveryLink.avgRecoveryDelta,
                 recoveryControlDelta = latestRecoveryControl.avgRecoveryDelta,
                 recoveryGainVsControl = gainVsControl,
+                modalitySummaryLines = latestModalityLines,
+                bestModalityHint = latestBestModality,
                 hasData = hasData
             )
         )
@@ -199,6 +234,18 @@ class RelaxReviewViewModel(application: Application) : AndroidViewModel(applicat
             this
         }
     }
+
+    private fun modalityLabel(raw: String): String {
+        return when (raw.uppercase(Locale.ROOT)) {
+            "BREATH_VISUAL" -> "视觉呼吸训练"
+            "HAPTIC" -> "触觉节拍"
+            "ZEN" -> "禅定轻交互"
+            "SOUNDSCAPE" -> "动态音景"
+            "AUDIO" -> "引导音频"
+            "TASK" -> "生活任务"
+            else -> "恢复训练"
+        }
+    }
 }
 
 data class RelaxReviewUiState(
@@ -219,6 +266,8 @@ data class RelaxReviewUiState(
     val recoveryDelta: Float = 0f,
     val recoveryControlDelta: Float = 0f,
     val recoveryGainVsControl: Float = 0f,
+    val modalitySummaryLines: List<String> = emptyList(),
+    val bestModalityHint: String = "",
     val hasData: Boolean = false
 )
 

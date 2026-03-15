@@ -3,6 +3,7 @@ package com.example.newstart.ui.intervention
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.content.Context
 import android.content.res.ColorStateList
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -18,8 +19,15 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.newstart.core.common.R
 import com.example.newstart.feature.relax.databinding.FragmentInterventionSessionBinding
+import com.example.newstart.intervention.HapticPatternMode
+import com.example.newstart.intervention.InterventionExperienceMetadata
+import com.example.newstart.intervention.InterventionExperienceModality
 import com.example.newstart.intervention.PersonalizationLevel
+import com.example.newstart.ui.relax.BreathingCoachUiState
+import com.example.newstart.ui.relax.BreathingPhase
+import com.example.newstart.ui.relax.HapticPacingController
 import com.google.android.material.snackbar.Snackbar
+import java.util.Locale
 
 class InterventionSessionFragment : Fragment() {
 
@@ -32,6 +40,11 @@ class InterventionSessionFragment : Fragment() {
     private var audioPlaybackFinished: Boolean = false
     private var indicatorPulseAnimator: AnimatorSet? = null
     private val mainHandler = Handler(Looper.getMainLooper())
+    private lateinit var soundscapeEngine: AdaptiveSoundscapeEngine
+    private lateinit var hapticController: HapticPacingController
+    private var soundscapePrefsApplied = false
+    private var updatingSoundscapeControls = false
+
     private val audioProgressRunnable = object : Runnable {
         override fun run() {
             syncAudioFeedback()
@@ -52,6 +65,8 @@ class InterventionSessionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        soundscapeEngine = AdaptiveSoundscapeEngine(requireContext())
+        hapticController = HapticPacingController(requireContext())
         viewModel.initialize(
             protocolCode = arguments?.getString("protocolCode"),
             title = arguments?.getString("protocolTitle"),
@@ -69,17 +84,34 @@ class InterventionSessionFragment : Fragment() {
                 findNavController().navigate(R.id.navigation_relax_hub)
             }
         }
-        binding.seekInterventionBefore.setOnSeekBarChangeListener(SimpleSeekBarListener { value ->
+        binding.seekInterventionBefore.setOnSeekBarChangeListener(SimpleSeekBarListener { value, _ ->
             viewModel.updateBeforeStress(value)
         })
-        binding.seekInterventionAfter.setOnSeekBarChangeListener(SimpleSeekBarListener { value ->
+        binding.seekInterventionAfter.setOnSeekBarChangeListener(SimpleSeekBarListener { value, _ ->
             viewModel.updateAfterStress(value)
         })
         binding.btnInterventionSessionStart.setOnClickListener {
+            val state = viewModel.uiState.value ?: return@setOnClickListener
+            val preferences = loadAssistPreferences()
+            if (state.isSoundscapeSession) {
+                soundscapeEngine.prepare()
+                applySoundscapeMix(fromUser = false)
+                soundscapeEngine.play()
+                if (preferences.hapticsEnabled) {
+                    hapticController.pulseSessionAccent(preferences.hapticMode)
+                }
+            }
             viewModel.startSession()
         }
         binding.btnInterventionSessionComplete.setOnClickListener {
-            viewModel.completeSession()
+            val state = viewModel.uiState.value ?: return@setOnClickListener
+            if (state.isSoundscapeSession) {
+                soundscapeEngine.pause()
+                hapticController.stop()
+                viewModel.completeSession(buildSoundscapeMetadata(state))
+            } else {
+                viewModel.completeSession()
+            }
         }
         binding.btnInterventionSessionCoach.setOnClickListener {
             val state = viewModel.uiState.value ?: return@setOnClickListener
@@ -96,6 +128,27 @@ class InterventionSessionFragment : Fragment() {
         binding.btnInterventionSessionAudioToggle.setOnClickListener {
             toggleAudio()
         }
+        binding.switchSoundscapeAdaptive.setOnCheckedChangeListener { _, isChecked ->
+            if (updatingSoundscapeControls) return@setOnCheckedChangeListener
+            viewModel.updateAdaptiveSoundscapeEnabled(isChecked)
+            applySoundscapeMix(fromUser = false)
+        }
+        configureSoundscapeSeekBar(
+            binding.seekSoundscapeRain,
+            binding.tvSoundscapeRainValue
+        )
+        configureSoundscapeSeekBar(
+            binding.seekSoundscapeFire,
+            binding.tvSoundscapeFireValue
+        )
+        configureSoundscapeSeekBar(
+            binding.seekSoundscapeNight,
+            binding.tvSoundscapeNightValue
+        )
+        configureSoundscapeSeekBar(
+            binding.seekSoundscapeLow,
+            binding.tvSoundscapeLowValue
+        )
     }
 
     private fun observeData() {
@@ -118,11 +171,8 @@ class InterventionSessionFragment : Fragment() {
             binding.tvInterventionSessionSteps.text = state.stepsText.ifBlank {
                 getString(R.string.intervention_session_steps_empty)
             }
-            binding.cardInterventionSessionAudio.visibility = if (state.showAudioCard) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
+            binding.cardInterventionSessionAudio.isVisible = state.showAudioCard
+            binding.cardInterventionSessionSoundscape.isVisible = state.isSoundscapeSession
             binding.tvInterventionSessionAudioTitle.text = state.audioTitle
             binding.tvInterventionSessionAudioSubtitle.text = state.audioSubtitle
             binding.tvInterventionSessionAudioSource.text = state.audioSourceText
@@ -154,11 +204,33 @@ class InterventionSessionFragment : Fragment() {
             binding.btnInterventionSessionStart.isEnabled = !state.hasStarted && !state.isCompleted
             binding.btnInterventionSessionComplete.isEnabled =
                 state.hasStarted && !state.isRunning && !state.isCompleted
-            binding.btnInterventionSessionCoach.visibility = if (state.showBreathingCoachEntry) {
-                View.VISIBLE
-            } else {
-                View.GONE
+            binding.btnInterventionSessionCoach.isVisible = state.showBreathingCoachEntry
+
+            if (state.isSoundscapeSession && !soundscapePrefsApplied) {
+                val preferences = loadAssistPreferences()
+                updatingSoundscapeControls = true
+                binding.switchSoundscapeAdaptive.isChecked = preferences.adaptiveEnabled
+                updatingSoundscapeControls = false
+                viewModel.updateAdaptiveSoundscapeEnabled(preferences.adaptiveEnabled)
+                soundscapePrefsApplied = true
             }
+
+            if (state.isSoundscapeSession) {
+                updatingSoundscapeControls = true
+                if (binding.switchSoundscapeAdaptive.isChecked != state.adaptiveSoundscapeEnabled) {
+                    binding.switchSoundscapeAdaptive.isChecked = state.adaptiveSoundscapeEnabled
+                }
+                updatingSoundscapeControls = false
+                binding.tvSoundscapeStatus.text = when {
+                    state.isRunning -> getString(R.string.soundscape_status_playing)
+                    state.isCompleted -> getString(R.string.soundscape_status_finished)
+                    state.hasStarted -> getString(R.string.soundscape_status_paused)
+                    else -> getString(R.string.soundscape_status_idle)
+                }
+                binding.tvSoundscapeHint.text = state.soundscapeHint
+                applySoundscapeMix(fromUser = false)
+            }
+
             if (!state.showAudioCard) {
                 stopAudioFeedbackTracking()
             } else {
@@ -173,6 +245,8 @@ class InterventionSessionFragment : Fragment() {
                 }
 
                 InterventionSessionEvent.Completed -> {
+                    soundscapeEngine.release()
+                    hapticController.stop()
                     viewModel.consumeEvent()
                 }
 
@@ -183,6 +257,8 @@ class InterventionSessionFragment : Fragment() {
 
     override fun onStop() {
         mediaPlayer?.takeIf { it.isPlaying }?.pause()
+        soundscapeEngine.pause()
+        hapticController.stop()
         stopAudioFeedbackTracking()
         syncAudioFeedback()
         super.onStop()
@@ -191,6 +267,8 @@ class InterventionSessionFragment : Fragment() {
     override fun onDestroyView() {
         stopAudioFeedbackTracking()
         releaseAudio()
+        soundscapeEngine.release()
+        hapticController.stop()
         super.onDestroyView()
         _binding = null
     }
@@ -341,11 +419,7 @@ class InterventionSessionFragment : Fragment() {
 
     private fun updateAudioButton(isPlaying: Boolean) {
         binding.btnInterventionSessionAudioToggle.text = getString(
-            if (isPlaying) {
-                R.string.intervention_session_audio_pause
-            } else {
-                R.string.intervention_session_audio_play
-            }
+            if (isPlaying) R.string.intervention_session_audio_pause else R.string.intervention_session_audio_play
         )
     }
 
@@ -398,11 +472,84 @@ class InterventionSessionFragment : Fragment() {
         }
     }
 
+    private fun applySoundscapeMix(fromUser: Boolean) {
+        val safeBinding = _binding ?: return
+        val state = viewModel.uiState.value ?: return
+        if (!state.isSoundscapeSession) return
+        val mix = currentSoundscapeMix()
+        if (fromUser) {
+            soundscapeEngine.markManualAdjustment()
+        }
+        val adaptiveState = soundscapeEngine.buildAdaptiveState(
+            mix,
+            safeBinding.switchSoundscapeAdaptive.isChecked,
+            state.soundscapeFeedback
+        )
+        safeBinding.tvSoundscapeMixSummary.text = "当前主导层：${adaptiveState.dominantLayerLabel}"
+        safeBinding.progressSoundscape.setProgressCompat(soundscapeEngine.currentProgress(), true)
+    }
+
+    private fun buildSoundscapeMetadata(state: InterventionSessionUiState): InterventionExperienceMetadata {
+        val preferences = loadAssistPreferences()
+        return InterventionExperienceMetadata(
+            modality = InterventionExperienceModality.SOUNDSCAPE,
+            sessionVariant = state.protocolCode,
+            hapticEnabled = preferences.hapticsEnabled,
+            preferredHapticMode = preferences.hapticMode,
+            realtimeSignalAvailable = state.soundscapeFeedback.hasRealtimeData,
+            avgRelaxSignal = null,
+            peakHeartRate = null,
+            averageHrv = null,
+            soundscapeMix = soundscapeEngine.currentMix(),
+            manualAdjustCount = soundscapeEngine.buildAdaptiveState(
+                currentSoundscapeMix(),
+                binding.switchSoundscapeAdaptive.isChecked,
+                state.soundscapeFeedback
+            ).manualAdjustCount,
+            completionQuality = 0
+        )
+    }
+
+    private fun currentSoundscapeMix(): Map<String, Float> {
+        return linkedMapOf(
+            AdaptiveSoundscapeEngine.LAYER_RAIN to binding.seekSoundscapeRain.progress / 100f,
+            AdaptiveSoundscapeEngine.LAYER_FIRE to binding.seekSoundscapeFire.progress / 100f,
+            AdaptiveSoundscapeEngine.LAYER_NIGHT to binding.seekSoundscapeNight.progress / 100f,
+            AdaptiveSoundscapeEngine.LAYER_LOW to binding.seekSoundscapeLow.progress / 100f
+        )
+    }
+
+    private fun configureSoundscapeSeekBar(
+        seekBar: android.widget.SeekBar,
+        valueView: android.widget.TextView
+    ) {
+        valueView.text = formatMixValue(seekBar.progress)
+        seekBar.setOnSeekBarChangeListener(SimpleSeekBarListener { value, fromUser ->
+            valueView.text = formatMixValue(value)
+            if (fromUser) {
+                applySoundscapeMix(fromUser = true)
+            }
+        })
+    }
+
+    private fun formatMixValue(progress: Int): String = String.format(Locale.getDefault(), "%d%%", progress)
+
+    private fun loadAssistPreferences(): AssistPreferences {
+        val prefs = requireContext().applicationContext.getSharedPreferences("profile_settings", Context.MODE_PRIVATE)
+        return AssistPreferences(
+            hapticsEnabled = prefs.getBoolean("haptics_enabled", false),
+            hapticMode = HapticPatternMode.fromStorageValue(
+                prefs.getString("preferred_haptic_mode", HapticPatternMode.BREATH.name)
+            ),
+            adaptiveEnabled = prefs.getBoolean("adaptive_soundscape_enabled", true)
+        )
+    }
+
     private fun formatPlaybackTime(durationMs: Int): String {
         val totalSeconds = (durationMs / 1000).coerceAtLeast(0)
         val minutes = totalSeconds / 60
         val seconds = totalSeconds % 60
-        return String.format("%02d:%02d", minutes, seconds)
+        return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
     }
 
     private fun dpToPx(dp: Int): Int {
@@ -427,21 +574,26 @@ class InterventionSessionFragment : Fragment() {
         private const val AUDIO_PROGRESS_MAX = 1000
         private const val AUDIO_PROGRESS_INTERVAL_MS = 250L
     }
+
+    private data class AssistPreferences(
+        val hapticsEnabled: Boolean,
+        val hapticMode: HapticPatternMode,
+        val adaptiveEnabled: Boolean
+    )
 }
 
 private class SimpleSeekBarListener(
-    private val onChanged: (Int) -> Unit
+    private val onChanged: (Int, Boolean) -> Unit
 ) : android.widget.SeekBar.OnSeekBarChangeListener {
     override fun onProgressChanged(
         seekBar: android.widget.SeekBar?,
         progress: Int,
         fromUser: Boolean
     ) {
-        onChanged(progress)
+        onChanged(progress, fromUser)
     }
 
     override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) = Unit
 
     override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) = Unit
 }
-

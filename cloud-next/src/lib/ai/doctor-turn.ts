@@ -34,6 +34,35 @@ export const DoctorTurnSchema = z.object({
 export type DoctorTurnRequest = z.infer<typeof DoctorTurnRequestSchema>;
 export type DoctorTurn = z.infer<typeof DoctorTurnSchema>;
 
+function hasAssessmentContent(payload: DoctorTurn): boolean {
+  return (
+    payload.chiefComplaint.trim().length > 0 &&
+    payload.doctorSummary.trim().length > 0 &&
+    payload.recommendedDepartment.trim().length > 0 &&
+    payload.suspectedIssues.length > 0
+  );
+}
+
+function normalizeDoctorTurnForStage(
+  payload: DoctorTurn,
+  requestedStage: DoctorTurnRequest["stage"]
+): DoctorTurn | null {
+  if (requestedStage !== "ASSESSING") {
+    return payload;
+  }
+  if (!hasAssessmentContent(payload)) {
+    return null;
+  }
+  return {
+    ...payload,
+    followUpQuestion: "",
+    stage:
+      payload.redFlags.length > 0 || payload.stage === "ESCALATED"
+        ? "ESCALATED"
+        : "COMPLETED",
+  };
+}
+
 export async function generateDoctorTurn(
   input: DoctorTurnRequest,
   traceId: string
@@ -96,8 +125,17 @@ ${input.ragContext}
     return null;
   }
 
+  const normalizedPayload = normalizeDoctorTurnForStage(parsed.data, input.stage);
+  if (!normalizedPayload) {
+    console.warn("[AI][DoctorTurn] assessing stage returned incomplete assessment", {
+      traceId,
+      providerId: result.providerId,
+    });
+    return null;
+  }
+
   return {
-    payload: parsed.data,
+    payload: normalizedPayload,
     providerId: result.providerId,
     fallbackUsed: result.fallbackUsed,
   };

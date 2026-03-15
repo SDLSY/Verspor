@@ -41,6 +41,19 @@ object InterventionActionNavigator {
                 true
             }
 
+            action.assetRef.startsWith("interactive://") -> {
+                fragment.findNavController().navigate(
+                    R.id.navigation_zen_interaction,
+                    bundleOf(
+                        "protocolCode" to action.protocolCode,
+                        "protocolTitle" to action.title,
+                        "durationSec" to action.durationSec,
+                        "rationale" to action.subtitle
+                    )
+                )
+                true
+            }
+
             action.assetRef == "screen://doctor" -> {
                 fragment.findNavController().navigate(R.id.navigation_doctor)
                 true

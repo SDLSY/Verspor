@@ -210,7 +210,7 @@ class PrescriptionRepository(
                     rationale = "压力或焦虑风险偏高，先给短时、明确的减压处方；若近期对呼吸训练依从差，则切换为肌肉放松。",
                     evidence = allEvidence.take(5),
                     primaryCode = if (breathingFatigue) "PMR_10M" else "BREATH_4_6",
-                    secondaryCode = if (breathingFatigue) "BODY_SCAN_NSDR_10M" else "PMR_10M",
+                    secondaryCode = if (breathingFatigue) "ZEN_MIST_ERASE_5M" else "PMR_10M",
                     lifestyleCodes = listOf("TASK_WORRY_LIST")
                 )
             }
@@ -221,7 +221,7 @@ class PrescriptionRepository(
                     rationale = "当前风险没有集中落在单一高危域，安排一个易开始的音景方案，再搭配轻量思绪卸载。",
                     evidence = allEvidence.take(4),
                     primaryCode = "SOUNDSCAPE_SLEEP_AUDIO_15M",
-                    secondaryCode = "COGNITIVE_OFFLOAD_5M",
+                    secondaryCode = "ZEN_WAVE_GARDEN_5M",
                     lifestyleCodes = listOf("TASK_DAYLIGHT_WALK")
                 )
             }

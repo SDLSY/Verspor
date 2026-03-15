@@ -133,6 +133,9 @@ export function resolveLogicalModelId(
     ) {
       return "gpt-4.1-mini";
     }
+    if (logicalModelId === "speech.tts") {
+      return "tts-1";
+    }
   }
 
   if (providerId === "deepseek") {

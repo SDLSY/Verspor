@@ -18,6 +18,7 @@ import com.example.newstart.intervention.PrescriptionItemType
 import com.example.newstart.network.models.PeriodSummaryActionItem
 import com.example.newstart.network.models.PeriodSummaryData
 import com.example.newstart.repository.InterventionProfileRepository
+import com.example.newstart.repository.InterventionExperienceCodec
 import com.example.newstart.repository.MedicalReportRepository
 import com.example.newstart.repository.NetworkRepository
 import com.example.newstart.repository.SleepRepository
@@ -227,7 +228,7 @@ class SleepTrendViewModel(application: Application) : AndroidViewModel(applicati
 
     private suspend fun buildLocalFallbackReport(timeRange: TimeRange): HealthPeriodReportUiModel {
         val days = if (timeRange == TimeRange.LAST_7_DAYS) 7 else 30
-        val periodLabel = if (timeRange == TimeRange.LAST_7_DAYS) "本周" else "本月"
+        val periodLabel = periodLabel(timeRange)
         val minSamples = if (timeRange == TimeRange.LAST_7_DAYS) 3 else 10
         val now = System.currentTimeMillis()
         val startTime = now - days.toLong() * 24L * 60L * 60L * 1000L
@@ -247,6 +248,7 @@ class SleepTrendViewModel(application: Application) : AndroidViewModel(applicati
         val abnormalMetrics = latestMetrics.filter { it.isAbnormal }
         val recentTasks = taskDao.getRecent(24).filter { it.date in startTime..now }
         val recentExecutions = executionDao.getRecent(24).filter { it.endedAt in startTime..now }
+        val modalityHint = buildModalityHint(recentExecutions, timeRange)
 
         val avgSleepHours = currentSleep.map { it.totalSleepMinutes / 60f }.takeIf { it.isNotEmpty() }?.average()?.toFloat()
         val prevSleepHours = previousSleep.map { it.totalSleepMinutes / 60f }.takeIf { it.isNotEmpty() }?.average()?.toFloat()
@@ -308,6 +310,7 @@ class SleepTrendViewModel(application: Application) : AndroidViewModel(applicati
             snapshot?.redFlags?.takeIf { it.isNotEmpty() }?.let {
                 add("画像提示需要优先关注高风险变化")
             }
+            modalityHint?.let { add(it) }
         }.ifEmpty {
             listOf("暂无足够样本，请继续记录睡眠、恢复与干预执行")
         }
@@ -331,7 +334,7 @@ class SleepTrendViewModel(application: Application) : AndroidViewModel(applicati
 
         return HealthPeriodReportUiModel(
             period = timeRange,
-            title = "${periodLabel}健康报告",
+            title = periodReportTitle(timeRange),
             headline = headline,
             sourceLabel = buildReportSourceLabel(periodLabel, false, viewData.personalizationStatus.level),
             sampleHint = buildReportSampleHint(
@@ -351,6 +354,10 @@ class SleepTrendViewModel(application: Application) : AndroidViewModel(applicati
                 if (executionSummary.count > 0) {
                     append("，平均效果分 ${executionSummary.avgEffectScore.toInt()} 分")
                 }
+                modalityHint?.let {
+                    append("\n")
+                    append(it)
+                }
             },
             nextFocusTitle = nextFocus.first,
             nextFocusDetail = nextFocus.second,
@@ -366,11 +373,12 @@ class SleepTrendViewModel(application: Application) : AndroidViewModel(applicati
         val personalizationLevel = parsePersonalizationLevel(data.personalizationLevel)
         val missingInputs = parseMissingInputs(data.missingInputs)
         val reportConfidence = parseReportConfidence(data.reportConfidence)
+        val normalizedPeriodLabel = periodLabel(timeRange)
         return HealthPeriodReportUiModel(
             period = timeRange,
-            title = data.title,
+            title = periodReportTitle(timeRange),
             headline = data.headline,
-            sourceLabel = buildReportSourceLabel(data.periodLabel, true, personalizationLevel),
+            sourceLabel = buildReportSourceLabel(normalizedPeriodLabel, true, personalizationLevel),
             sampleHint = buildReportSampleHint(
                 sampleSufficient = data.sampleSufficient,
                 missingInputs = missingInputs,
@@ -392,6 +400,14 @@ class SleepTrendViewModel(application: Application) : AndroidViewModel(applicati
             missingInputs = missingInputs,
             reportConfidence = reportConfidence
         )
+    }
+
+    private fun periodLabel(timeRange: TimeRange): String {
+        return if (timeRange == TimeRange.LAST_7_DAYS) "本周" else "本月"
+    }
+
+    private fun periodReportTitle(timeRange: TimeRange): String {
+        return "${periodLabel(timeRange)}健康报告"
     }
 
     private fun buildReportSourceLabel(
@@ -506,9 +522,9 @@ class SleepTrendViewModel(application: Application) : AndroidViewModel(applicati
             )
             adherenceRate != null && adherenceRate < 0.45f -> Quadruple(
                 "下阶段先提高可执行性",
-                "先用更低门槛的助眠音景和一个生活任务，把执行连续性做起来。",
+                "先用更低门槛的助眠音景和一个轻交互恢复动作，把执行连续性做起来。",
                 actionFromCatalog("SOUNDSCAPE_SLEEP_AUDIO_15M", PrescriptionItemType.PRIMARY),
-                actionFromCatalog("TASK_SCREEN_CURFEW", PrescriptionItemType.LIFESTYLE)
+                actionFromCatalog("ZEN_WAVE_GARDEN_5M", PrescriptionItemType.SECONDARY)
             )
             !bestProtocolCode.isNullOrBlank() -> Quadruple(
                 "下阶段延续本周期最有效的干预",
@@ -550,6 +566,35 @@ class SleepTrendViewModel(application: Application) : AndroidViewModel(applicati
             assetRef = definition.assetRef,
             itemType = itemType
         )
+    }
+
+    private fun buildModalityHint(
+        executions: List<InterventionExecutionEntity>,
+        timeRange: TimeRange
+    ): String? {
+        val modalityBuckets = executions.mapNotNull { execution ->
+            val modality = InterventionExperienceCodec.fromJson(execution.metadataJson)?.modality
+                ?: return@mapNotNull null
+            modality.name to execution.effectScore
+        }.groupBy({ it.first }, { it.second })
+        val best = modalityBuckets.maxByOrNull { (_, scores) -> scores.average() } ?: return null
+        val rangeLabel = if (timeRange == TimeRange.LAST_7_DAYS) "7 天" else "30 天"
+        return getApplication<Application>().getString(
+            R.string.trend_intervention_modality_hint,
+            rangeLabel,
+            modalityLabel(best.key)
+        )
+    }
+
+    private fun modalityLabel(raw: String): String {
+        return when (raw.uppercase(Locale.ROOT)) {
+            "BREATH_VISUAL" -> "视觉呼吸训练"
+            "ZEN" -> "禅定轻交互"
+            "SOUNDSCAPE" -> "动态音景"
+            "AUDIO" -> "引导音频"
+            "TASK" -> "生活任务"
+            else -> "恢复训练"
+        }
     }
 
     private fun PeriodSummaryActionItem.toUiAction(): InterventionActionUiModel {

@@ -39,6 +39,17 @@ class InterventionCenterFragment : Fragment() {
         binding.cardInterventionBreathing.setOnClickListener {
             findNavController().navigate(R.id.navigation_breathing_coach)
         }
+        binding.cardInterventionZen.setOnClickListener {
+            findNavController().navigate(
+                R.id.navigation_zen_interaction,
+                Bundle().apply {
+                    putString("protocolCode", "ZEN_WAVE_GARDEN_5M")
+                    putString("protocolTitle", getString(R.string.intervention_center_zen_title))
+                    putInt("durationSec", 300)
+                    putString("rationale", getString(R.string.intervention_center_zen_body))
+                }
+            )
+        }
         binding.cardInterventionReport.setOnClickListener {
             findNavController().navigate(R.id.navigation_medical_report_analyze)
         }

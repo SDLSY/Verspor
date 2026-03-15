@@ -18,6 +18,7 @@
         android:paddingBottom="@dimen/page_padding_bottom">
 
         <TextView
+            android:id="@+id/tv_trend_page_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/trend_page_title_clean"
@@ -192,7 +193,11 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1"
-                        android:text="@string/trend_period_secondary_action" />
+                        android:text="@string/trend_period_secondary_action"
+                        android:textColor="@android:color/white"
+                        app:backgroundTint="@android:color/transparent"
+                        app:rippleColor="#33FFFFFF"
+                        app:strokeColor="@android:color/white" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

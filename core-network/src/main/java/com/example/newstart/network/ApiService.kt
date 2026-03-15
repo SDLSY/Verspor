@@ -86,6 +86,9 @@ interface ApiService {
      */
     @GET("api/user/profile")
     suspend fun getUserProfile(): Response<UserProfileResponse>
+
+    @GET("api/demo/bootstrap")
+    suspend fun getDemoBootstrap(): Response<DemoBootstrapResponse>
     
     /**
      * 更新用户信息

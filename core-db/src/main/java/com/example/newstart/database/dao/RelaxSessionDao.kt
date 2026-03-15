@@ -13,6 +13,9 @@ interface RelaxSessionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(session: RelaxSessionEntity): Long
 
+    @Query("SELECT * FROM relax_sessions ORDER BY endTime DESC LIMIT :limit")
+    suspend fun getRecent(limit: Int): List<RelaxSessionEntity>
+
     @Query("SELECT * FROM relax_sessions WHERE startTime BETWEEN :startTime AND :endTime ORDER BY startTime DESC")
     fun getByTimeRange(startTime: Long, endTime: Long): Flow<List<RelaxSessionEntity>>
 

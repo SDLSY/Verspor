@@ -109,6 +109,26 @@ object InterventionProtocolCatalog {
             steps = listOf("佩戴耳机或外放低音量", "保持静卧", "仅关注声音，不主动用力放松")
         ),
         InterventionProtocolDefinition(
+            protocolCode = "ZEN_MIST_ERASE_5M",
+            interventionType = "ZEN_INTERACTION",
+            displayName = "擦除迷雾",
+            description = "通过缓慢擦除迷雾，把注意力从反复思考拉回到眼前动作。",
+            defaultDurationSec = 300,
+            defaultTimingSlot = PrescriptionTimingSlot.EVENING,
+            assetRef = "interactive://zen-mist",
+            steps = listOf("慢慢滑动手指", "只观察雾气散开的过程", "不用追求完成得很快")
+        ),
+        InterventionProtocolDefinition(
+            protocolCode = "ZEN_WAVE_GARDEN_5M",
+            interventionType = "ZEN_INTERACTION",
+            displayName = "拨动波浪",
+            description = "通过轻触和拨动波浪，让节律和注意力一起慢下来。",
+            defaultDurationSec = 300,
+            defaultTimingSlot = PrescriptionTimingSlot.EVENING,
+            assetRef = "interactive://zen-wave",
+            steps = listOf("轻触屏幕拨动线条", "跟着回弹节律慢下来", "不要急着切换动作")
+        ),
+        InterventionProtocolDefinition(
             protocolCode = "COGNITIVE_OFFLOAD_5M",
             interventionType = "COGNITIVE_OFFLOAD",
             displayName = "思绪卸载",

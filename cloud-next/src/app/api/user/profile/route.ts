@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { writeAuditEvent } from "@/lib/audit";
+import { readDemoMetadata } from "@/lib/demo/bootstrap";
 import { fail, ok, parseJsonBody } from "@/lib/http";
 import { createServiceClient } from "@/lib/supabase";
 
@@ -20,16 +21,25 @@ function buildProfile(
   email: string;
   age: number | null;
   gender: string | null;
+  demoRole: string | null;
+  demoScenario: string | null;
+  demoSeedVersion: string | null;
+  displayName: string | null;
 } {
   const usernameRaw = metadata?.username;
   const ageRaw = metadata?.age;
   const genderRaw = metadata?.gender;
+  const demoMetadata = readDemoMetadata(metadata);
   return {
     userId,
     username: typeof usernameRaw === "string" ? usernameRaw : email.split("@")[0],
     email,
     age: typeof ageRaw === "number" ? ageRaw : null,
     gender: typeof genderRaw === "string" ? genderRaw : null,
+    demoRole: demoMetadata.demoRole || null,
+    demoScenario: demoMetadata.demoScenario || null,
+    demoSeedVersion: demoMetadata.demoSeedVersion || null,
+    displayName: demoMetadata.displayName || null,
   };
 }
 

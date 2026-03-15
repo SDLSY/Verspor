@@ -37,10 +37,12 @@ import com.example.newstart.intervention.ProfileTriggerType
 import com.example.newstart.lifestyle.DailyReadinessContribution
 import com.example.newstart.repository.InterventionProfileRepository
 import com.example.newstart.repository.InterventionRepository
+import com.example.newstart.repository.InterventionExperienceCodec
 import com.example.newstart.repository.FoodAnalysisRepository
 import com.example.newstart.repository.MedicationAnalysisRepository
 import com.example.newstart.repository.NetworkRepository
 import com.example.newstart.repository.PrescriptionRepository
+import com.example.newstart.repository.RelaxRepository
 import com.example.newstart.repository.SleepRepository
 import com.example.newstart.service.ai.LocalAnomalyDetectionService
 import com.example.newstart.ui.intervention.InterventionActionUiModel
@@ -65,6 +67,7 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
     private val interventionRepository: InterventionRepository
     private val interventionProfileRepository: InterventionProfileRepository
     private val prescriptionRepository: PrescriptionRepository
+    private val relaxRepository: RelaxRepository
     private val medicationAnalysisRepository: MedicationAnalysisRepository
     private val foodAnalysisRepository: FoodAnalysisRepository
     private val networkRepository = NetworkRepository()
@@ -85,6 +88,10 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
         )
         interventionProfileRepository = InterventionProfileRepository(application, database)
         prescriptionRepository = PrescriptionRepository(application, database, interventionProfileRepository)
+        relaxRepository = RelaxRepository(
+            relaxSessionDao = database.relaxSessionDao(),
+            healthMetricsDao = database.healthMetricsDao()
+        )
         medicationAnalysisRepository = MedicationAnalysisRepository(application, database)
         foodAnalysisRepository = FoodAnalysisRepository(application, database)
     }
@@ -126,25 +133,27 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
 
     fun loadMorningReport() {
         viewModelScope.launch {
+            val localMetrics = repository.getLatestHealthMetrics().first()
+            val resolvedMetrics = localMetrics ?: createFallbackMetrics()
             val localSleep = repository.getLatestSleepData().first()
-            if (localSleep == null) {
-                loadMockData()
-                refreshMorningPrescription(forceGenerate = false)
-                refreshInterventionSummary()
-                return@launch
+            val resolvedSleep = localSleep ?: createFallbackSleepData()
+
+            _sleepData.value = resolvedSleep
+            _healthMetrics.value = resolvedMetrics
+
+            if (localSleep == null && localMetrics != null) {
+                Log.i(TAG, "no sleep record, showing latest realtime metrics with fallback sleep summary")
             }
 
-            _sleepData.value = localSleep
-            val localMetrics = repository.getLatestHealthMetrics().first() ?: createFallbackMetrics()
-            _healthMetrics.value = localMetrics
-
-            val localAnomaly = detectLocalAnomaly(localMetrics)
-            val baseRecovery = buildRecoveryFromData(localSleep, localMetrics, null, localAnomaly)
+            val localAnomaly = detectLocalAnomaly(resolvedMetrics)
+            val baseRecovery = buildRecoveryFromData(resolvedSleep, resolvedMetrics, null, localAnomaly)
             val readinessContribution = buildDailyReadinessContribution()
             val adjustedRecovery = applyDailyReadinessContribution(baseRecovery, readinessContribution)
             _recoveryScore.value = adjustedRecovery
             _recoveryContributionSummary.value = readinessContribution.summary
-            repository.saveRecoveryScore(localSleep.id, adjustedRecovery)
+            if (localSleep != null) {
+                repository.saveRecoveryScore(localSleep.id, adjustedRecovery)
+            }
 
             refreshMorningPrescription(forceGenerate = false)
             refreshInterventionSummary()
@@ -351,11 +360,11 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
                 AiCredibilityState(
                     confidencePercent = 0,
                     confidenceLabel = "可信度不足",
-                    sourceLabel = "端侧推理不可用",
+                    sourceLabel = "基础评估已更新",
                     summary = "本次未完成有效推理，恢复分仅基于基础规则计算。",
                     primaryFactor = "无法识别主导因子",
-                    reason = "建议检查模型文件或端侧运行环境后重试。",
-                    inferenceHint = "推理耗时：--",
+                    reason = "当前仅展示基础恢复结果，可稍后再次刷新查看。",
+                    inferenceHint = "",
                     indicatorLevel = CredibilityLevel.LOW,
                     riskLevel = AnomalyLevel.ERROR,
                     riskScore = 0f,
@@ -383,9 +392,9 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
         }
 
         val sourceLabel = when (result.source) {
-            InferenceSource.TFLITE -> "端侧 TFLite 模型"
-            InferenceSource.RULE_FALLBACK -> "规则降级（模型不可用）"
-            InferenceSource.ERROR -> "端侧推理异常"
+            InferenceSource.TFLITE -> "综合评估已更新"
+            InferenceSource.RULE_FALLBACK -> "基础评估已更新"
+            InferenceSource.ERROR -> "评估结果待复核"
         }
 
         val summary = when (result.level) {
@@ -421,7 +430,7 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
                 "关键指标处于相对稳定区间。"
         }
 
-        val inferenceHint = "推理耗时：${String.format(Locale.getDefault(), "%.1f", result.inferenceTimeMs)} ms"
+        val inferenceHint = ""
         val riskDetected = result.level == AnomalyLevel.MILD ||
             result.level == AnomalyLevel.WARNING ||
             result.level == AnomalyLevel.CRITICAL
@@ -442,25 +451,7 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
     }
 
     private suspend fun loadMockData() {
-        val calendar = Calendar.getInstance()
-        val wakeTime = calendar.time
-        calendar.add(Calendar.HOUR_OF_DAY, -8)
-        val bedTime = calendar.time
-
-        val mockSleepData = SleepData(
-            id = UUID.randomUUID().toString(),
-            date = Date(),
-            bedTime = bedTime,
-            wakeTime = wakeTime,
-            totalSleepMinutes = 492,
-            deepSleepMinutes = 150,
-            lightSleepMinutes = 216,
-            remSleepMinutes = 126,
-            awakeMinutes = 0,
-            sleepEfficiency = 85f,
-            fallAsleepMinutes = 12,
-            awakeCount = 2
-        )
+        val mockSleepData = createFallbackSleepData()
         _sleepData.value = mockSleepData
 
         val mockHealthMetrics = HealthMetrics(
@@ -504,11 +495,35 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
         refreshMorningPrescription(forceGenerate = false)
     }
 
+    private fun createFallbackSleepData(): SleepData {
+        val calendar = Calendar.getInstance()
+        val wakeTime = calendar.time
+        calendar.add(Calendar.HOUR_OF_DAY, -8)
+        val bedTime = calendar.time
+
+        return SleepData(
+            id = UUID.randomUUID().toString(),
+            date = Date(),
+            bedTime = bedTime,
+            wakeTime = wakeTime,
+            totalSleepMinutes = 492,
+            deepSleepMinutes = 150,
+            lightSleepMinutes = 216,
+            remSleepMinutes = 126,
+            awakeMinutes = 0,
+            sleepEfficiency = 85f,
+            fallAsleepMinutes = 12,
+            awakeCount = 2
+        )
+    }
+
     private suspend fun buildDailyReadinessContribution(
         now: Long = System.currentTimeMillis()
     ): DailyReadinessContribution = withContext(Dispatchers.IO) {
         val medication = medicationAnalysisRepository.getLatest()
         val foodRecords = foodAnalysisRepository.getRecentSince(now - 24L * 60L * 60L * 1000L)
+        val relaxSessions = relaxRepository.getRecentSessions(16)
+            .filter { it.endTime >= now - 24L * 60L * 60L * 1000L }
 
         var medicationDelta = 0
         val contributionNotes = mutableListOf<String>()
@@ -546,12 +561,40 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
             }
         }
 
+        var interventionDelta = 0
+        if (relaxSessions.isNotEmpty()) {
+            val completionScores = relaxSessions.mapNotNull { session ->
+                InterventionExperienceCodec.fromJson(session.metadataJson)
+                    ?.completionQuality
+                    ?.takeIf { it > 0 }
+            }
+            val avgCompletion = completionScores.average()
+            val realtimeImproved = relaxSessions.count { session ->
+                val metadata = InterventionExperienceCodec.fromJson(session.metadataJson)
+                metadata?.realtimeSignalAvailable == true && (session.postHrv > session.preHrv || session.postHr < session.preHr)
+            }
+            interventionDelta = when {
+                !avgCompletion.isNaN() && avgCompletion >= 78 -> 6
+                !avgCompletion.isNaN() && avgCompletion >= 60 -> 4
+                realtimeImproved > 0 -> 3
+                completionScores.isEmpty() && relaxSessions.size >= 2 -> 2
+                !avgCompletion.isNaN() && avgCompletion < 35 -> -3
+                else -> 1
+            }
+            contributionNotes += when {
+                interventionDelta > 0 -> app.getString(R.string.morning_intervention_delta_positive, interventionDelta)
+                interventionDelta < 0 -> app.getString(R.string.morning_intervention_delta_negative, interventionDelta)
+                else -> app.getString(R.string.morning_intervention_delta_neutral)
+            }
+        }
+
         val summary = contributionNotes.joinToString("，").ifBlank {
             app.getString(R.string.morning_recovery_contribution_default)
         }
         DailyReadinessContribution(
             medicationDelta = medicationDelta,
             nutritionDelta = nutritionDelta,
+            interventionDelta = interventionDelta,
             summary = summary
         )
     }
@@ -563,7 +606,8 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
         val finalScore = (
             baseRecovery.score +
                 contribution.medicationDelta +
-                contribution.nutritionDelta
+                contribution.nutritionDelta +
+                contribution.interventionDelta
             ).coerceIn(0, 100)
 
         val finalLevel = when {
@@ -774,11 +818,11 @@ data class AiCredibilityState(
             return AiCredibilityState(
                 confidencePercent = 0,
                 confidenceLabel = "等待推理",
-                sourceLabel = "端侧模型待执行",
+                sourceLabel = "评估待更新",
                 summary = "尚未生成 AI 判断结果。",
                 primaryFactor = "主导因子：待生成",
                 reason = "加载晨报后将自动完成端侧推理。",
-                inferenceHint = "推理耗时：--",
+                inferenceHint = "",
                 indicatorLevel = CredibilityLevel.MEDIUM,
                 riskLevel = AnomalyLevel.UNKNOWN,
                 riskScore = 0f,
@@ -843,10 +887,10 @@ data class MorningRecommendationInsightUiState(
                 summary = bundle?.rationale?.takeIf { it.isNotBlank() }
                     ?: app.getString(R.string.morning_recommendation_explanation_login_required),
                 reasons = reasons,
-                metaLabel = if (bundle != null) {
-                    app.getString(R.string.morning_recommendation_explanation_meta_local)
+                metaLabel = if (bundle != null || reasons.isNotEmpty()) {
+                    "基于当前设备与填写信息整理"
                 } else {
-                    app.getString(R.string.morning_recommendation_explanation_meta_default)
+                    "基于今日状态与近期记录整理"
                 },
                 effectHeadline = app.getString(R.string.morning_recommendation_effects_title),
                 effectDetail = app.getString(R.string.morning_recommendation_effects_login_required)
@@ -867,12 +911,10 @@ data class MorningRecommendationInsightUiState(
                 !bundle?.evidence.isNullOrEmpty() -> bundle!!.evidence.take(2)
                 else -> emptyList()
             }
-            val metaLabel = listOfNotNull(
-                explanation?.modelProfile?.takeIf { it.isNotBlank() },
-                explanation?.configSource?.takeIf { it.isNotBlank() },
-                explanation?.recommendationMode?.takeIf { it.isNotBlank() }
-            ).joinToString(" 路 ").ifBlank {
-                app.getString(R.string.morning_recommendation_explanation_meta_default)
+            val metaLabel = if (explanation != null || bundle != null) {
+                "基于今日状态与近期记录整理"
+            } else {
+                app.getString(R.string.morning_recommendation_explanation_loading)
             }
             val effectDetail = if (effects == null || effects.totalExecutions <= 0) {
                 app.getString(R.string.morning_recommendation_effects_empty)

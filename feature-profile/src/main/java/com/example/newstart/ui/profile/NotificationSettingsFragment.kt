@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.newstart.core.common.R
 import com.example.newstart.feature.profile.databinding.FragmentNotificationSettingsBinding
+import com.example.newstart.intervention.HapticPatternMode
 
 class NotificationSettingsFragment : Fragment() {
 
@@ -63,6 +64,12 @@ class NotificationSettingsFragment : Fragment() {
         binding.switchReportAlerts.isChecked = settings.reportAlertsEnabled
         binding.switchInterventionReminders.isChecked = settings.interventionRemindersEnabled
         binding.switchAvatarSpeech.isChecked = settings.avatarSpeechEnabled
+        binding.switchHapticsEnabled.isChecked = settings.hapticsEnabled
+        binding.switchAdaptiveSoundscape.isChecked = settings.adaptiveSoundscapeEnabled
+        when (HapticPatternMode.fromStorageValue(settings.preferredHapticMode)) {
+            HapticPatternMode.BREATH -> binding.chipHapticModeBreath.isChecked = true
+            HapticPatternMode.CALM_HEARTBEAT -> binding.chipHapticModeHeartbeat.isChecked = true
+        }
         bindingSwitches = false
     }
 
@@ -75,7 +82,10 @@ class NotificationSettingsFragment : Fragment() {
                         notificationsEnabled = binding.switchNotificationsEnabled.isChecked,
                         reportAlertsEnabled = binding.switchReportAlerts.isChecked,
                         interventionRemindersEnabled = binding.switchInterventionReminders.isChecked,
-                        avatarSpeechEnabled = binding.switchAvatarSpeech.isChecked
+                        avatarSpeechEnabled = binding.switchAvatarSpeech.isChecked,
+                        hapticsEnabled = binding.switchHapticsEnabled.isChecked,
+                        preferredHapticMode = resolveSelectedHapticMode().name,
+                        adaptiveSoundscapeEnabled = binding.switchAdaptiveSoundscape.isChecked
                     )
                 )
             }
@@ -84,6 +94,32 @@ class NotificationSettingsFragment : Fragment() {
         binding.switchReportAlerts.setOnCheckedChangeListener(listener)
         binding.switchInterventionReminders.setOnCheckedChangeListener(listener)
         binding.switchAvatarSpeech.setOnCheckedChangeListener(listener)
+        binding.switchHapticsEnabled.setOnCheckedChangeListener(listener)
+        binding.switchAdaptiveSoundscape.setOnCheckedChangeListener(listener)
+        binding.chipGroupHapticMode.setOnCheckedStateChangeListener { _, _ ->
+            if (!bindingSwitches) {
+                ProfileSettingsStore.saveNotificationSettings(
+                    requireContext(),
+                    NotificationSettings(
+                        notificationsEnabled = binding.switchNotificationsEnabled.isChecked,
+                        reportAlertsEnabled = binding.switchReportAlerts.isChecked,
+                        interventionRemindersEnabled = binding.switchInterventionReminders.isChecked,
+                        avatarSpeechEnabled = binding.switchAvatarSpeech.isChecked,
+                        hapticsEnabled = binding.switchHapticsEnabled.isChecked,
+                        preferredHapticMode = resolveSelectedHapticMode().name,
+                        adaptiveSoundscapeEnabled = binding.switchAdaptiveSoundscape.isChecked
+                    )
+                )
+            }
+        }
+    }
+
+    private fun resolveSelectedHapticMode(): HapticPatternMode {
+        return if (binding.chipHapticModeHeartbeat.isChecked) {
+            HapticPatternMode.CALM_HEARTBEAT
+        } else {
+            HapticPatternMode.BREATH
+        }
     }
 
     private fun refreshSystemStatus() {

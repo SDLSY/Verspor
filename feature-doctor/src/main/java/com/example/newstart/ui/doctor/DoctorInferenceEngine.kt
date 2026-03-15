@@ -31,7 +31,11 @@ object DoctorInferenceEngine {
 
     fun generateTurn(input: DoctorInferenceInput): DoctorTurnDecision {
         val conversationText = buildConversationBlock(
-            input.conversation + DoctorChatMessage.user(input.latestUserMessage)
+            if (input.stage == DoctorInquiryStage.ASSESSING) {
+                input.conversation
+            } else {
+                input.conversation + DoctorChatMessage.user(input.latestUserMessage)
+            }
         )
         val redFlags = DoctorDecisionEngine.detectRedFlags(conversationText)
         if (redFlags.isNotEmpty()) {
@@ -43,6 +47,18 @@ object DoctorInferenceEngine {
                     snapshot = input.snapshot,
                     riskSummary = input.riskSummary,
                     redFlags = redFlags
+                )
+            )
+        }
+
+        if (input.stage == DoctorInquiryStage.ASSESSING) {
+            return DoctorTurnDecision(
+                nextStage = DoctorInquiryStage.COMPLETED,
+                source = DoctorInferenceSource.LOCAL_RULE,
+                assessment = DoctorDecisionEngine.buildFallbackAssessment(
+                    historyText = conversationText,
+                    snapshot = input.snapshot,
+                    riskSummary = input.riskSummary
                 )
             )
         }

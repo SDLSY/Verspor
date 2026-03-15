@@ -172,6 +172,37 @@
                     android:layout_marginTop="6dp"
                     android:text="@string/intervention_center_breathing_body"
                     android:textAppearance="@style/TextAppearance.NewStart.PageSubtitle" />
+                </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_intervention_zen"
+            style="@style/Widget.NewStart.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/section_gap"
+            android:clickable="true"
+            android:focusable="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/card_padding">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/intervention_center_zen_title"
+                    android:textAppearance="@style/TextAppearance.NewStart.SectionTitle"
+                    android:textColor="@color/text_primary" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/intervention_center_zen_body"
+                    android:textAppearance="@style/TextAppearance.NewStart.PageSubtitle" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

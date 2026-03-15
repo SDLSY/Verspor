@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -129,7 +130,8 @@ class MedicationAnalyzeFragment : Fragment() {
                     append(state.evidenceText)
                 }
             }
-            binding.tvMedicationMetadata.text = state.metadataText
+            binding.tvMedicationEvidence.visibility =
+                if (binding.tvMedicationEvidence.text.isNullOrBlank()) View.GONE else View.VISIBLE
         }
 
         viewModel.toastEvent.observe(viewLifecycleOwner) { message ->
@@ -140,7 +142,7 @@ class MedicationAnalyzeFragment : Fragment() {
         }
     }
 
-    private fun syncText(view: android.widget.EditText, target: String) {
+    private fun syncText(view: EditText, target: String) {
         if (view.text?.toString().orEmpty() != target) {
             view.setText(target)
         }

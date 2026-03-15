@@ -237,10 +237,6 @@ class FoodAnalyzeViewModel(application: Application) : AndroidViewModel(applicat
                     app.getString(R.string.food_analyze_advice_placeholder)
                 },
                 confidence = payload.confidence,
-                metadataText = listOfNotNull(
-                    payload.metadata?.providerId,
-                    payload.metadata?.modelId
-                ).joinToString(" / "),
                 requiresManualReview = payload.requiresManualReview
             )
         )
@@ -279,6 +275,5 @@ data class FoodAnalyzeUiState(
     val dailyContribution: String = "",
     val advice: String = "",
     val confidence: Float = 0f,
-    val metadataText: String = "",
     val requiresManualReview: Boolean = false
 )

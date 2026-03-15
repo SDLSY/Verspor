@@ -5,9 +5,11 @@ import android.util.Log
 import com.example.newstart.database.AppDatabase
 import com.example.newstart.database.entity.DoctorAssessmentEntity
 import com.example.newstart.database.entity.HealthMetricsEntity
+import com.example.newstart.database.entity.InterventionExecutionEntity
 import com.example.newstart.database.entity.InterventionProfileSnapshotEntity
 import com.example.newstart.database.entity.InterventionTaskEntity
 import com.example.newstart.database.entity.MedicalMetricEntity
+import com.example.newstart.database.entity.RelaxSessionEntity
 import com.example.newstart.intervention.AssessmentCatalog
 import com.example.newstart.intervention.InterventionProfileSnapshot
 import com.example.newstart.intervention.InterventionProfileViewData
@@ -38,6 +40,7 @@ class InterventionProfileRepository(
     private val healthMetricsDao = db.healthMetricsDao()
     private val taskDao = db.interventionTaskDao()
     private val executionDao = db.interventionExecutionDao()
+    private val relaxSessionDao = db.relaxSessionDao()
     private val assessmentRepository = AssessmentRepository(context, db)
     private val medicalReportRepository = MedicalReportRepository(db.medicalReportDao(), db.medicalMetricDao())
     private val medicationAnalysisRepository = MedicationAnalysisRepository(context, db)
@@ -228,6 +231,7 @@ class InterventionProfileRepository(
         val latestHealthMetrics = healthMetricsDao.getLatestOnce()
         val recentTasks = taskDao.getRecent(10)
         val recentExecutions = executionDao.getRecent(10)
+        val recentRelaxSessions = relaxSessionDao.getRecent(12)
         val latestMedicationRecord = medicationAnalysisRepository.getLatest()
         val recentFoodRecords = foodAnalysisRepository.getRecentSince(now - DAY_MS)
 
@@ -298,7 +302,8 @@ class InterventionProfileRepository(
 
         val adherenceReadiness = buildAdherenceReadiness(
             recentTasks = recentTasks,
-            recentExecutionsCount = recentExecutions.size,
+            recentExecutions = recentExecutions,
+            recentRelaxSessions = recentRelaxSessions,
             evidence = evidence.getValue("adherenceReadiness")
         )
 
@@ -540,7 +545,8 @@ class InterventionProfileRepository(
 
     private fun buildAdherenceReadiness(
         recentTasks: List<InterventionTaskEntity>,
-        recentExecutionsCount: Int,
+        recentExecutions: List<InterventionExecutionEntity>,
+        recentRelaxSessions: List<RelaxSessionEntity>,
         evidence: MutableList<String>
     ): Int {
         if (recentTasks.isEmpty()) {
@@ -549,10 +555,33 @@ class InterventionProfileRepository(
         }
         val completedCount = recentTasks.count { it.status == "COMPLETED" }
         val completionRate = completedCount.toFloat() / recentTasks.size.toFloat()
-        val readiness = (completionRate * 100f).roundToInt().coerceIn(20, 95)
+        var readiness = (completionRate * 100f).roundToInt().coerceIn(20, 95)
         evidence += "近 ${recentTasks.size} 次任务完成率 ${(completionRate * 100).roundToInt()}%"
-        if (recentExecutionsCount > 0) {
-            evidence += "已有 ${recentExecutionsCount} 次完成回执"
+        if (recentExecutions.isNotEmpty()) {
+            evidence += "已有 ${recentExecutions.size} 次完成回执"
+        }
+        if (recentRelaxSessions.isNotEmpty()) {
+            val modalityBuckets = recentRelaxSessions.map { session ->
+                InterventionExperienceCodec.resolveModality(
+                    protocolType = session.protocolType,
+                    metadataJson = session.metadataJson
+                ) to session.effectScore
+            }.groupBy({ it.first }, { it.second })
+            val dominant = modalityBuckets.maxByOrNull { it.value.size }
+            val best = modalityBuckets.maxByOrNull { (_, scores) -> scores.average() }
+            dominant?.let { entry ->
+                evidence += "最近更常完成 ${modalityLabel(entry.key.name)}"
+            }
+            best?.let { entry ->
+                evidence += "平均效果更好的方式是 ${modalityLabel(entry.key.name)}"
+            }
+            val avgQuality = recentRelaxSessions.mapNotNull { session ->
+                InterventionExperienceCodec.fromJson(session.metadataJson)?.completionQuality?.takeIf { it > 0 }
+            }.average()
+            if (!avgQuality.isNaN()) {
+                readiness = (readiness + (avgQuality / 18f).roundToInt()).coerceIn(20, 98)
+                evidence += "最近恢复训练完成质量 ${avgQuality.roundToInt()} 分"
+            }
         }
         return readiness
     }
@@ -728,6 +757,18 @@ class InterventionProfileRepository(
     }
 
     private fun clamp(value: Int): Int = value.coerceIn(0, 100)
+
+    private fun modalityLabel(raw: String): String {
+        return when (raw.uppercase()) {
+            "BREATH_VISUAL" -> "视觉呼吸训练"
+            "HAPTIC" -> "触觉节拍"
+            "ZEN" -> "禅定轻交互"
+            "SOUNDSCAPE" -> "动态音景"
+            "AUDIO" -> "引导音频"
+            "TASK" -> "生活任务"
+            else -> "轻量恢复训练"
+        }
+    }
 
     private fun Float.formatCompact(): String {
         val rounded = (this * 10).roundToInt() / 10f

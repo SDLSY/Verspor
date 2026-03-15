@@ -1,0 +1,57 @@
+<resources>
+    <string name="relax_realtime_feedback_title">实时放松反馈</string>
+    <string name="relax_realtime_feedback_live">系统会根据最近的心率、HRV 和动作强度微调当前节律。</string>
+    <string name="relax_realtime_feedback_fallback">最近没有新的生理样本，已切回纯呼吸节律模式。</string>
+    <string name="relax_realtime_feedback_calm">状态正在放松，继续保持缓慢呼气。</string>
+    <string name="relax_realtime_feedback_steady">状态相对平稳，可以继续维持当前节律。</string>
+    <string name="relax_realtime_feedback_active">当前唤醒偏高，建议把注意力更多放在拉长呼气。</string>
+    <string name="relax_feedback_signal_format">放松信号 %1$d%% · HR %2$d · HRV %3$d</string>
+    <string name="relax_feedback_signal_motion_format">放松信号 %1$d%% · 动作 %2$.1f</string>
+
+    <string name="profile_notification_haptic_label">触觉辅助</string>
+    <string name="profile_notification_haptic_desc">在呼吸训练和部分干预中加入轻柔的节律震动。</string>
+    <string name="profile_notification_soundscape_label">动态音景</string>
+    <string name="profile_notification_soundscape_desc">在助眠音景中根据实时状态轻微调整各音轨比例。</string>
+    <string name="profile_notification_haptic_mode_title">触觉节拍偏好</string>
+    <string name="profile_notification_haptic_mode_desc">可以选择更贴近呼吸节律，或更像平静心跳的触感。</string>
+    <string name="profile_notification_haptic_mode_breath">跟随呼吸</string>
+    <string name="profile_notification_haptic_mode_heartbeat">跟随平静心跳</string>
+
+    <string name="intervention_center_zen_title">禅定轻交互</string>
+    <string name="intervention_center_zen_body">通过擦除迷雾或拨动波浪，把注意力从反复思考中拉回当下。</string>
+    <string name="zen_interaction_title">禅定轻交互</string>
+    <string name="zen_interaction_subtitle">用简单、重复、低负担的动作，让大脑慢慢安静下来。</string>
+    <string name="zen_interaction_mode_mist">擦除迷雾</string>
+    <string name="zen_interaction_mode_wave">拨动波浪</string>
+    <string name="zen_interaction_hint_mist">用手指慢慢擦开迷雾，只关注每一次滑动留下的清晰区域。</string>
+    <string name="zen_interaction_hint_wave">轻轻拨动波浪，让视线跟着线条的回弹和衰减慢下来。</string>
+    <string name="zen_interaction_start">开始交互</string>
+    <string name="zen_interaction_complete">完成记录</string>
+    <string name="zen_interaction_ready">准备开始</string>
+    <string name="zen_interaction_running">剩余 %1$02d:%2$02d</string>
+    <string name="zen_interaction_saved">本次禅定交互已写入恢复记录。</string>
+
+    <string name="soundscape_title">动态助眠音景</string>
+    <string name="soundscape_subtitle">用多轨音景遮蔽环境噪声，也让身体更容易跟上放松节律。</string>
+    <string name="soundscape_layer_rain">细雨层</string>
+    <string name="soundscape_layer_fire">温暖底噪</string>
+    <string name="soundscape_layer_night">夜间点缀</string>
+    <string name="soundscape_layer_low">低频环境</string>
+    <string name="soundscape_adaptive_toggle">根据实时状态自动微调</string>
+    <string name="soundscape_adaptive_hint">动作偏大时会增强连续掩蔽层，唤醒偏高时会补一点低频稳定层。</string>
+    <string name="soundscape_status_idle">音景待机中</string>
+    <string name="soundscape_status_playing">音景播放中</string>
+    <string name="soundscape_status_paused">音景已暂停</string>
+    <string name="soundscape_status_finished">音景已完成</string>
+    <string name="soundscape_hint_high_motion">动作波动偏大，系统已提高连续掩蔽层。</string>
+    <string name="soundscape_hint_calm">状态较稳，系统正在减少变化，避免过度刺激。</string>
+    <string name="soundscape_hint_default">可以先手动调一个舒服的比例，再交给系统轻微修正。</string>
+
+    <string name="relax_review_modality_title">干预模态表现</string>
+    <string name="relax_review_modality_empty">最近还没有足够的模态记录。</string>
+    <string name="relax_review_modality_item">%1$s · %2$d 次 · 平均效果 %3$d</string>
+    <string name="trend_intervention_modality_hint">近 %1$s 更有效的干预：%2$s</string>
+    <string name="morning_intervention_delta_positive">最近 24 小时恢复训练支持今日恢复 +%1$d</string>
+    <string name="morning_intervention_delta_negative">最近 24 小时恢复训练完成度不足 %1$d</string>
+    <string name="morning_intervention_delta_neutral">最近 24 小时暂无可计入的恢复训练贡献。</string>
+</resources>

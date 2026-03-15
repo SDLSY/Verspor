@@ -55,6 +55,14 @@ data class AuthData(
     val userId: String = "",
     @SerializedName("username")
     val username: String = "",
+    @SerializedName("demoRole")
+    val demoRole: String? = null,
+    @SerializedName("demoScenario")
+    val demoScenario: String? = null,
+    @SerializedName("demoSeedVersion")
+    val demoSeedVersion: String? = null,
+    @SerializedName("displayName")
+    val displayName: String? = null,
     @SerializedName("canResendConfirmation")
     val canResendConfirmation: Boolean = false
 )
@@ -294,7 +302,15 @@ data class UserProfile(
     @SerializedName("age")
     val age: Int?,
     @SerializedName("gender")
-    val gender: String?
+    val gender: String?,
+    @SerializedName("demoRole")
+    val demoRole: String? = null,
+    @SerializedName("demoScenario")
+    val demoScenario: String? = null,
+    @SerializedName("demoSeedVersion")
+    val demoSeedVersion: String? = null,
+    @SerializedName("displayName")
+    val displayName: String? = null
 )
 
 data class UserProfileRequest(
@@ -402,7 +418,9 @@ data class InterventionExecutionUpsertRequest(
     @SerializedName("effectScore")
     val effectScore: Float,
     @SerializedName("completionType")
-    val completionType: String
+    val completionType: String,
+    @SerializedName("metadataJson")
+    val metadataJson: String? = null
 )
 
 data class InterventionEffectTrendResponse(
@@ -1106,4 +1124,353 @@ data class RecommendationDailyTrendItem(
     val avgEffectScore: Float = 0f,
     @SerializedName("avgStressDrop")
     val avgStressDrop: Float = 0f
+)
+
+// ========== Demo bootstrap ==========
+data class DemoBootstrapResponse(
+    @SerializedName("code")
+    val code: Int,
+    @SerializedName("message")
+    val message: String,
+    @SerializedName("data")
+    val data: DemoBootstrapData?
+)
+
+data class DemoBootstrapData(
+    @SerializedName("demoRole")
+    val demoRole: String,
+    @SerializedName("demoScenario")
+    val demoScenario: String,
+    @SerializedName("demoSeedVersion")
+    val demoSeedVersion: String,
+    @SerializedName("displayName")
+    val displayName: String,
+    @SerializedName("snapshot")
+    val snapshot: DemoBootstrapSnapshot
+)
+
+data class DemoBootstrapSnapshot(
+    @SerializedName("devices")
+    val devices: List<DemoDeviceRecord> = emptyList(),
+    @SerializedName("sleepRecords")
+    val sleepRecords: List<DemoSleepRecord> = emptyList(),
+    @SerializedName("healthMetrics")
+    val healthMetrics: List<DemoHealthMetricsRecord> = emptyList(),
+    @SerializedName("recoveryScores")
+    val recoveryScores: List<DemoRecoveryScoreRecord> = emptyList(),
+    @SerializedName("doctorSessions")
+    val doctorSessions: List<DemoDoctorSessionRecord> = emptyList(),
+    @SerializedName("doctorMessages")
+    val doctorMessages: List<DemoDoctorMessageRecord> = emptyList(),
+    @SerializedName("doctorAssessments")
+    val doctorAssessments: List<DemoDoctorAssessmentRecord> = emptyList(),
+    @SerializedName("assessmentSessions")
+    val assessmentSessions: List<DemoAssessmentSessionRecord> = emptyList(),
+    @SerializedName("assessmentAnswers")
+    val assessmentAnswers: List<DemoAssessmentAnswerRecord> = emptyList(),
+    @SerializedName("interventionTasks")
+    val interventionTasks: List<DemoInterventionTaskRecord> = emptyList(),
+    @SerializedName("interventionExecutions")
+    val interventionExecutions: List<DemoInterventionExecutionRecord> = emptyList(),
+    @SerializedName("medicalReports")
+    val medicalReports: List<DemoMedicalReportRecord> = emptyList(),
+    @SerializedName("medicalMetrics")
+    val medicalMetrics: List<DemoMedicalMetricRecord> = emptyList(),
+    @SerializedName("relaxSessions")
+    val relaxSessions: List<DemoRelaxSessionRecord> = emptyList(),
+    @SerializedName("interventionProfileSnapshots")
+    val interventionProfileSnapshots: List<DemoInterventionProfileSnapshotRecord> = emptyList(),
+    @SerializedName("prescriptionBundles")
+    val prescriptionBundles: List<DemoPrescriptionBundleRecord> = emptyList(),
+    @SerializedName("prescriptionItems")
+    val prescriptionItems: List<DemoPrescriptionItemRecord> = emptyList(),
+    @SerializedName("medicationRecords")
+    val medicationRecords: List<DemoMedicationRecord> = emptyList(),
+    @SerializedName("foodRecords")
+    val foodRecords: List<DemoFoodRecord> = emptyList()
+)
+
+data class DemoDeviceRecord(
+    @SerializedName("deviceId") val deviceId: String,
+    @SerializedName("deviceName") val deviceName: String,
+    @SerializedName("macAddress") val macAddress: String,
+    @SerializedName("batteryLevel") val batteryLevel: Int,
+    @SerializedName("firmwareVersion") val firmwareVersion: String,
+    @SerializedName("connectionState") val connectionState: String,
+    @SerializedName("lastSyncTime") val lastSyncTime: Long,
+    @SerializedName("isPrimary") val isPrimary: Boolean,
+    @SerializedName("createdAt") val createdAt: Long,
+    @SerializedName("updatedAt") val updatedAt: Long
+)
+
+data class DemoSleepRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("date") val date: Long,
+    @SerializedName("bedTime") val bedTime: Long,
+    @SerializedName("wakeTime") val wakeTime: Long,
+    @SerializedName("totalSleepMinutes") val totalSleepMinutes: Int,
+    @SerializedName("deepSleepMinutes") val deepSleepMinutes: Int,
+    @SerializedName("lightSleepMinutes") val lightSleepMinutes: Int,
+    @SerializedName("remSleepMinutes") val remSleepMinutes: Int,
+    @SerializedName("awakeMinutes") val awakeMinutes: Int,
+    @SerializedName("sleepEfficiency") val sleepEfficiency: Float,
+    @SerializedName("fallAsleepMinutes") val fallAsleepMinutes: Int,
+    @SerializedName("awakeCount") val awakeCount: Int,
+    @SerializedName("createdAt") val createdAt: Long,
+    @SerializedName("updatedAt") val updatedAt: Long
+)
+
+data class DemoHealthMetricsRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("sleepRecordId") val sleepRecordId: String,
+    @SerializedName("timestamp") val timestamp: Long,
+    @SerializedName("heartRateSample") val heartRateSample: Int,
+    @SerializedName("bloodOxygenSample") val bloodOxygenSample: Int,
+    @SerializedName("temperatureSample") val temperatureSample: Float,
+    @SerializedName("stepsSample") val stepsSample: Int,
+    @SerializedName("accMagnitudeSample") val accMagnitudeSample: Float,
+    @SerializedName("heartRateCurrent") val heartRateCurrent: Int,
+    @SerializedName("heartRateAvg") val heartRateAvg: Int,
+    @SerializedName("heartRateMin") val heartRateMin: Int,
+    @SerializedName("heartRateMax") val heartRateMax: Int,
+    @SerializedName("heartRateTrend") val heartRateTrend: String,
+    @SerializedName("bloodOxygenCurrent") val bloodOxygenCurrent: Int,
+    @SerializedName("bloodOxygenAvg") val bloodOxygenAvg: Int,
+    @SerializedName("bloodOxygenMin") val bloodOxygenMin: Int,
+    @SerializedName("bloodOxygenStability") val bloodOxygenStability: String,
+    @SerializedName("temperatureCurrent") val temperatureCurrent: Float,
+    @SerializedName("temperatureAvg") val temperatureAvg: Float,
+    @SerializedName("temperatureStatus") val temperatureStatus: String,
+    @SerializedName("hrvCurrent") val hrvCurrent: Int,
+    @SerializedName("hrvBaseline") val hrvBaseline: Int,
+    @SerializedName("hrvRecoveryRate") val hrvRecoveryRate: Float,
+    @SerializedName("hrvTrend") val hrvTrend: String
+)
+
+data class DemoRecoveryScoreRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("sleepRecordId") val sleepRecordId: String,
+    @SerializedName("date") val date: Long,
+    @SerializedName("score") val score: Int,
+    @SerializedName("sleepEfficiencyScore") val sleepEfficiencyScore: Float,
+    @SerializedName("hrvRecoveryScore") val hrvRecoveryScore: Float,
+    @SerializedName("deepSleepScore") val deepSleepScore: Float,
+    @SerializedName("temperatureRhythmScore") val temperatureRhythmScore: Float,
+    @SerializedName("oxygenStabilityScore") val oxygenStabilityScore: Float,
+    @SerializedName("level") val level: String,
+    @SerializedName("createdAt") val createdAt: Long
+)
+
+data class DemoDoctorSessionRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("createdAt") val createdAt: Long,
+    @SerializedName("updatedAt") val updatedAt: Long,
+    @SerializedName("status") val status: String,
+    @SerializedName("domain") val domain: String,
+    @SerializedName("chiefComplaint") val chiefComplaint: String,
+    @SerializedName("riskLevel") val riskLevel: String
+)
+
+data class DemoDoctorMessageRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("sessionId") val sessionId: String,
+    @SerializedName("role") val role: String,
+    @SerializedName("messageType") val messageType: String,
+    @SerializedName("content") val content: String,
+    @SerializedName("timestamp") val timestamp: Long,
+    @SerializedName("payloadJson") val payloadJson: String? = null,
+    @SerializedName("actionProtocolType") val actionProtocolType: String? = null,
+    @SerializedName("actionDurationSec") val actionDurationSec: Int? = null
+)
+
+data class DemoDoctorAssessmentRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("sessionId") val sessionId: String,
+    @SerializedName("createdAt") val createdAt: Long,
+    @SerializedName("suspectedIssuesJson") val suspectedIssuesJson: String,
+    @SerializedName("symptomFactsJson") val symptomFactsJson: String,
+    @SerializedName("missingInfoJson") val missingInfoJson: String,
+    @SerializedName("redFlagsJson") val redFlagsJson: String,
+    @SerializedName("recommendedDepartment") val recommendedDepartment: String,
+    @SerializedName("doctorSummary") val doctorSummary: String,
+    @SerializedName("nextStepAdviceJson") val nextStepAdviceJson: String,
+    @SerializedName("disclaimer") val disclaimer: String
+)
+
+data class DemoAssessmentSessionRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("scaleCode") val scaleCode: String,
+    @SerializedName("startedAt") val startedAt: Long,
+    @SerializedName("completedAt") val completedAt: Long?,
+    @SerializedName("totalScore") val totalScore: Int,
+    @SerializedName("severityLevel") val severityLevel: String,
+    @SerializedName("freshnessUntil") val freshnessUntil: Long,
+    @SerializedName("source") val source: String
+)
+
+data class DemoAssessmentAnswerRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("sessionId") val sessionId: String,
+    @SerializedName("itemCode") val itemCode: String,
+    @SerializedName("itemOrder") val itemOrder: Int,
+    @SerializedName("answerValue") val answerValue: Int
+)
+
+data class DemoInterventionTaskRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("date") val date: Long,
+    @SerializedName("sourceType") val sourceType: String,
+    @SerializedName("triggerReason") val triggerReason: String,
+    @SerializedName("bodyZone") val bodyZone: String,
+    @SerializedName("protocolType") val protocolType: String,
+    @SerializedName("durationSec") val durationSec: Int,
+    @SerializedName("plannedAt") val plannedAt: Long,
+    @SerializedName("status") val status: String,
+    @SerializedName("createdAt") val createdAt: Long,
+    @SerializedName("updatedAt") val updatedAt: Long
+)
+
+data class DemoInterventionExecutionRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("taskId") val taskId: String,
+    @SerializedName("startedAt") val startedAt: Long,
+    @SerializedName("endedAt") val endedAt: Long,
+    @SerializedName("elapsedSec") val elapsedSec: Int,
+    @SerializedName("beforeStress") val beforeStress: Float,
+    @SerializedName("afterStress") val afterStress: Float,
+    @SerializedName("beforeHr") val beforeHr: Int,
+    @SerializedName("afterHr") val afterHr: Int,
+    @SerializedName("effectScore") val effectScore: Float,
+    @SerializedName("completionType") val completionType: String,
+    @SerializedName("metadataJson") val metadataJson: String? = null
+)
+
+data class DemoMedicalReportRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("reportDate") val reportDate: Long,
+    @SerializedName("reportType") val reportType: String,
+    @SerializedName("imageUri") val imageUri: String,
+    @SerializedName("ocrTextDigest") val ocrTextDigest: String,
+    @SerializedName("parseStatus") val parseStatus: String,
+    @SerializedName("riskLevel") val riskLevel: String,
+    @SerializedName("createdAt") val createdAt: Long
+)
+
+data class DemoMedicalMetricRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("reportId") val reportId: String,
+    @SerializedName("metricCode") val metricCode: String,
+    @SerializedName("metricName") val metricName: String,
+    @SerializedName("metricValue") val metricValue: Float,
+    @SerializedName("unit") val unit: String,
+    @SerializedName("refLow") val refLow: Float?,
+    @SerializedName("refHigh") val refHigh: Float?,
+    @SerializedName("isAbnormal") val isAbnormal: Boolean,
+    @SerializedName("confidence") val confidence: Float
+)
+
+data class DemoRelaxSessionRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("startTime") val startTime: Long,
+    @SerializedName("endTime") val endTime: Long,
+    @SerializedName("protocolType") val protocolType: String,
+    @SerializedName("durationSec") val durationSec: Int,
+    @SerializedName("preStress") val preStress: Float,
+    @SerializedName("postStress") val postStress: Float,
+    @SerializedName("preHr") val preHr: Int,
+    @SerializedName("postHr") val postHr: Int,
+    @SerializedName("preHrv") val preHrv: Int,
+    @SerializedName("postHrv") val postHrv: Int,
+    @SerializedName("preMotion") val preMotion: Float,
+    @SerializedName("postMotion") val postMotion: Float,
+    @SerializedName("effectScore") val effectScore: Float,
+    @SerializedName("metadataJson") val metadataJson: String? = null
+)
+
+data class DemoInterventionProfileSnapshotRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("generatedAt") val generatedAt: Long,
+    @SerializedName("triggerType") val triggerType: String,
+    @SerializedName("domainScoresJson") val domainScoresJson: String,
+    @SerializedName("evidenceFactsJson") val evidenceFactsJson: String,
+    @SerializedName("redFlagsJson") val redFlagsJson: String
+)
+
+data class DemoPrescriptionBundleRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("createdAt") val createdAt: Long,
+    @SerializedName("triggerType") val triggerType: String,
+    @SerializedName("profileSnapshotId") val profileSnapshotId: String,
+    @SerializedName("primaryGoal") val primaryGoal: String,
+    @SerializedName("riskLevel") val riskLevel: String,
+    @SerializedName("rationale") val rationale: String,
+    @SerializedName("evidenceJson") val evidenceJson: String,
+    @SerializedName("status") val status: String
+)
+
+data class DemoPrescriptionItemRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("bundleId") val bundleId: String,
+    @SerializedName("itemType") val itemType: String,
+    @SerializedName("protocolCode") val protocolCode: String,
+    @SerializedName("assetRef") val assetRef: String,
+    @SerializedName("durationSec") val durationSec: Int,
+    @SerializedName("sequenceOrder") val sequenceOrder: Int,
+    @SerializedName("timingSlot") val timingSlot: String,
+    @SerializedName("isRequired") val isRequired: Boolean,
+    @SerializedName("status") val status: String
+)
+
+data class DemoMedicationRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("capturedAt") val capturedAt: Long,
+    @SerializedName("imageUri") val imageUri: String,
+    @SerializedName("recognizedName") val recognizedName: String,
+    @SerializedName("dosageForm") val dosageForm: String,
+    @SerializedName("specification") val specification: String,
+    @SerializedName("activeIngredientsJson") val activeIngredientsJson: String,
+    @SerializedName("matchedSymptomsJson") val matchedSymptomsJson: String,
+    @SerializedName("usageSummary") val usageSummary: String,
+    @SerializedName("riskLevel") val riskLevel: String,
+    @SerializedName("riskFlagsJson") val riskFlagsJson: String,
+    @SerializedName("evidenceNotesJson") val evidenceNotesJson: String,
+    @SerializedName("advice") val advice: String,
+    @SerializedName("confidence") val confidence: Float,
+    @SerializedName("requiresManualReview") val requiresManualReview: Boolean,
+    @SerializedName("analysisMode") val analysisMode: String,
+    @SerializedName("providerId") val providerId: String? = null,
+    @SerializedName("modelId") val modelId: String? = null,
+    @SerializedName("traceId") val traceId: String? = null,
+    @SerializedName("syncState") val syncState: String,
+    @SerializedName("cloudRecordId") val cloudRecordId: String? = null,
+    @SerializedName("syncedAt") val syncedAt: Long? = null,
+    @SerializedName("createdAt") val createdAt: Long,
+    @SerializedName("updatedAt") val updatedAt: Long
+)
+
+data class DemoFoodRecord(
+    @SerializedName("id") val id: String,
+    @SerializedName("capturedAt") val capturedAt: Long,
+    @SerializedName("imageUri") val imageUri: String,
+    @SerializedName("mealType") val mealType: String,
+    @SerializedName("foodItemsJson") val foodItemsJson: String,
+    @SerializedName("estimatedCalories") val estimatedCalories: Int,
+    @SerializedName("carbohydrateGrams") val carbohydrateGrams: Float,
+    @SerializedName("proteinGrams") val proteinGrams: Float,
+    @SerializedName("fatGrams") val fatGrams: Float,
+    @SerializedName("nutritionRiskLevel") val nutritionRiskLevel: String,
+    @SerializedName("nutritionFlagsJson") val nutritionFlagsJson: String,
+    @SerializedName("dailyContribution") val dailyContribution: String,
+    @SerializedName("advice") val advice: String,
+    @SerializedName("confidence") val confidence: Float,
+    @SerializedName("requiresManualReview") val requiresManualReview: Boolean,
+    @SerializedName("analysisMode") val analysisMode: String,
+    @SerializedName("providerId") val providerId: String? = null,
+    @SerializedName("modelId") val modelId: String? = null,
+    @SerializedName("traceId") val traceId: String? = null,
+    @SerializedName("syncState") val syncState: String,
+    @SerializedName("cloudRecordId") val cloudRecordId: String? = null,
+    @SerializedName("syncedAt") val syncedAt: Long? = null,
+    @SerializedName("createdAt") val createdAt: Long,
+    @SerializedName("updatedAt") val updatedAt: Long
 )

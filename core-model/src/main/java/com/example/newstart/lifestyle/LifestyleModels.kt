@@ -53,5 +53,6 @@ data class FoodAnalysisRecord(
 data class DailyReadinessContribution(
     val medicationDelta: Int,
     val nutritionDelta: Int,
+    val interventionDelta: Int,
     val summary: String
 )

@@ -52,6 +52,8 @@
     <string name="doctor_open_video">打开视频</string>
 
     <string name="trend_page_title_clean">趋势周报</string>
+    <string name="trend_page_title_weekly">趋势周报</string>
+    <string name="trend_page_title_monthly">趋势月报</string>
     <string name="trend_primary_entry">进入干预中心</string>
     <string name="trend_page_subtitle_clean">用周报、核心指标和图表解释最近变化，再回到可执行动作。</string>
     <string name="trend_metrics_overview_title">核心指标摘要</string>

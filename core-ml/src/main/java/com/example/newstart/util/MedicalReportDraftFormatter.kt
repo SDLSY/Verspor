@@ -85,7 +85,8 @@ object MedicalReportDraftFormatter {
         riskLevel: String,
         metrics: List<ParsedMedicalMetric>,
         cloudSummary: String? = null,
-        rawOcrText: String = ""
+        rawOcrText: String = "",
+        ocrMarkdown: String = ""
     ): String {
         val lines = mutableListOf<String>()
         val normalizedSummary = cloudSummary.orEmpty().trim()
@@ -100,13 +101,13 @@ object MedicalReportDraftFormatter {
             lines += "关键指标"
             lines += buildMetricLines(metrics).mapIndexed { index, line -> "${index + 1}. $line" }
         } else {
-            val rawSummary = summarizeRawText(rawOcrText)
+            val rawSummary = summarizeSourceText(rawOcrText, ocrMarkdown)
             lines += ""
             lines += "当前结论"
             lines += "已识别到报告文本，但暂未稳定提取出结构化指标。"
             if (rawSummary.isNotBlank()) {
                 lines += ""
-                lines += "OCR 摘要"
+                lines += if (ocrMarkdown.isNotBlank()) "版式摘要" else "OCR 摘要"
                 lines += rawSummary
             }
             lines += ""
@@ -210,6 +211,20 @@ object MedicalReportDraftFormatter {
             .joinToString(separator = "\n")
             .take(220)
             .trim()
+    }
+
+    private fun summarizeSourceText(rawOcrText: String, ocrMarkdown: String): String {
+        val markdownSummary = markdownToPlainText(ocrMarkdown)
+            .lines()
+            .filter { it.isNotBlank() }
+            .take(6)
+            .joinToString(separator = "\n")
+            .take(320)
+            .trim()
+        if (markdownSummary.isNotBlank()) {
+            return markdownSummary
+        }
+        return summarizeRawText(rawOcrText)
     }
 
     private fun formatNumber(value: Float): String {
