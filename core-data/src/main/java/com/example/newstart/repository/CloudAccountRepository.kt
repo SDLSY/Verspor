@@ -174,17 +174,24 @@ class CloudAccountRepository {
         if (authData.authState != "SIGNED_IN") {
             return
         }
-        if (authData.token.isBlank() || authData.userId.isBlank()) {
+        val token = safeAuthValue(authData.token)
+        val refreshToken = safeAuthValue(authData.refreshToken)
+        val userId = safeAuthValue(authData.userId)
+        val email = safeAuthValue(authData.email)
+        val username = safeAuthValue(authData.username).ifBlank {
+            email.substringBefore("@", userId)
+        }
+
+        if (token.isBlank() || userId.isBlank()) {
             return
         }
-        val username = authData.username.ifBlank { authData.email.substringBefore("@", authData.userId) }
         ApiClient.setAuthSession(
             CloudSession(
-                token = authData.token,
-                refreshToken = authData.refreshToken,
-                userId = authData.userId,
+                token = token,
+                refreshToken = refreshToken,
+                userId = userId,
                 username = username,
-                email = authData.email
+                email = email
             )
         )
     }
@@ -243,5 +250,9 @@ class CloudAccountRepository {
             JsonParser.parseString(raw).asJsonObject.get("message")?.asString.orEmpty()
         }.getOrDefault("")
         return bodyMessage.ifBlank { fallback }
+    }
+
+    private fun safeAuthValue(value: String?): String {
+        return value?.trim().orEmpty()
     }
 }

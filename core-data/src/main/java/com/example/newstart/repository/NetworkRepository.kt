@@ -36,12 +36,16 @@ class NetworkRepository {
                     if (loginData.authState != "SIGNED_IN") {
                         return@withContext Result.success(loginData)
                     }
+                    val token = safeAuthValue(loginData.token)
+                    val refreshToken = safeAuthValue(loginData.refreshToken)
+                    val userId = safeAuthValue(loginData.userId)
+                    val resolvedUsername = safeAuthValue(loginData.username)
                     ApiClient.setAuthSession(
                         CloudSession(
-                            token = loginData.token,
-                            refreshToken = loginData.refreshToken,
-                            userId = loginData.userId,
-                            username = loginData.username,
+                            token = token,
+                            refreshToken = refreshToken,
+                            userId = userId,
+                            username = resolvedUsername,
                             email = email
                         )
                     )
@@ -98,12 +102,16 @@ class NetworkRepository {
             if (loginData.authState != "SIGNED_IN") {
                 Result.success(loginData)
             } else {
+            val token = safeAuthValue(loginData.token)
+            val refreshToken = safeAuthValue(loginData.refreshToken)
+            val userId = safeAuthValue(loginData.userId)
+            val resolvedUsername = safeAuthValue(loginData.username)
             ApiClient.setAuthSession(
                 CloudSession(
-                    token = loginData.token,
-                    refreshToken = loginData.refreshToken,
-                    userId = loginData.userId,
-                    username = loginData.username,
+                    token = token,
+                    refreshToken = refreshToken,
+                    userId = userId,
+                    username = resolvedUsername,
                     email = email
                 )
             )
@@ -727,5 +735,8 @@ class NetworkRepository {
             return "登录已过期，请重新登录"
         }
         return message
+    }
+    private fun safeAuthValue(value: String?): String {
+        return value?.trim().orEmpty()
     }
 }

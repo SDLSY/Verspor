@@ -34,7 +34,7 @@ export async function POST(req: Request) {
         authState: "SIGNED_IN",
         email,
         token: data.session.access_token,
-        refreshToken: data.session.refresh_token,
+        refreshToken: data.session.refresh_token ?? "",
         userId: data.user.id,
         username,
         canResendConfirmation: false,

@@ -146,19 +146,23 @@ object ApiClient {
         if (!response.isSuccessful || authData.authState != "SIGNED_IN") {
             return null
         }
-        if (authData.token.isBlank() || authData.userId.isBlank()) {
-            return null
+        val token = safeAuthValue(authData.token)
+        val refreshedToken = safeAuthValue(authData.refreshToken)
+        val userId = safeAuthValue(authData.userId)
+        val email = safeAuthValue(authData.email)
+        val username = safeAuthValue(authData.username).ifBlank {
+            email.substringBefore("@", userId)
         }
 
-        val username = authData.username.ifBlank {
-            authData.email.substringBefore("@", authData.userId)
+        if (token.isBlank() || userId.isBlank()) {
+            return null
         }
         return CloudSession(
-            token = authData.token,
-            refreshToken = authData.refreshToken.ifBlank { refreshToken },
-            userId = authData.userId,
+            token = token,
+            refreshToken = refreshedToken.ifBlank { refreshToken },
+            userId = userId,
             username = username,
-            email = authData.email
+            email = email
         )
     }
 
@@ -189,6 +193,10 @@ object ApiClient {
 
     private fun buildBearerToken(token: String): String {
         return "Bearer $token"
+    }
+
+    private fun safeAuthValue(value: String?): String {
+        return value?.trim().orEmpty()
     }
 
     /**
