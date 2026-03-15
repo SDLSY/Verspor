@@ -20,6 +20,9 @@ interface ApiService {
     @POST("api/auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
 
+    @POST("api/auth/refresh")
+    suspend fun refreshAuth(@Body request: RefreshTokenRequest): Response<AuthResponse>
+
     @POST("api/auth/resend-confirmation")
     suspend fun resendConfirmation(@Body request: EmailActionRequest): Response<ActionResponse>
 
@@ -108,6 +111,12 @@ interface ApiService {
     @POST("api/doctor/inquiry-summary/upsert")
     suspend fun upsertDoctorInquirySummary(@Body request: DoctorInquirySummaryUpsertRequest): Response<BaseResponse>
 
+    @POST("api/medication/records/upsert")
+    suspend fun upsertMedicationRecord(@Body request: MedicationRecordUpsertRequest): Response<BaseResponse>
+
+    @POST("api/food/records/upsert")
+    suspend fun upsertFoodRecord(@Body request: FoodRecordUpsertRequest): Response<BaseResponse>
+
     @GET("api/intervention/effect/trend")
     suspend fun getInterventionEffectTrend(
         @Query("days") days: Int
@@ -123,6 +132,20 @@ interface ApiService {
 
     @POST("api/report/understand")
     suspend fun understandMedicalReport(@Body request: ReportUnderstandingRequest): Response<ReportUnderstandingResponse>
+
+    @Multipart
+    @POST("api/medication/analyze")
+    suspend fun analyzeMedicationImage(
+        @Part file: MultipartBody.Part,
+        @Part("mimeType") mimeType: RequestBody
+    ): Response<MedicationAnalyzeResponse>
+
+    @Multipart
+    @POST("api/food/analyze")
+    suspend fun analyzeFoodImage(
+        @Part file: MultipartBody.Part,
+        @Part("mimeType") mimeType: RequestBody
+    ): Response<FoodAnalyzeResponse>
 
     @POST("api/ai/speech/transcribe")
     suspend fun transcribeSpeech(@Body request: SpeechTranscriptionRequest): Response<SpeechTranscriptionResponse>

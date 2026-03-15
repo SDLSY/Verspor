@@ -95,6 +95,7 @@ export async function POST(req: Request) {
         authState: "SIGNED_IN",
         email,
         token: session.access_token,
+        refreshToken: session.refresh_token,
         userId,
         username,
         canResendConfirmation: false,

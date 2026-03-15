@@ -24,6 +24,7 @@
     <string name="hrv_card_title">HRV 趋势</string>
     <string name="today_advice">今日建议</string>
     <string name="edge_advice_status_default">正在准备模型与建议</string>
+    <string name="morning_recovery_contribution_default">当前恢复分仍主要基于睡眠与生理数据计算。</string>
     <string name="edge_advice_regenerate">重新生成</string>
     <string name="label_total_sleep_duration">总睡眠时长</string>
     <string name="label_sleep_efficiency">睡眠效率</string>

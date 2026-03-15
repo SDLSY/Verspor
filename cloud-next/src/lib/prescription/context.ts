@@ -49,6 +49,22 @@ type DoctorInquirySummaryRow = {
   red_flags_json: unknown;
 };
 
+type MedicationAnalysisRow = {
+  recognized_name: string;
+  risk_level: string;
+  risk_flags_json: unknown;
+  requires_manual_review: boolean;
+  captured_at: string;
+};
+
+type FoodAnalysisRow = {
+  meal_type: string;
+  estimated_calories: number;
+  nutrition_risk_level: string;
+  nutrition_flags_json: unknown;
+  captured_at: string;
+};
+
 function toStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) {
     return [];
@@ -80,7 +96,7 @@ export async function buildPrescriptionServerContext(
   const fourteenDaysAgo = new Date(now - 14 * 24 * 60 * 60 * 1000).toISOString();
   const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [sleepRes, nightlyRes, taskRes, executionRes, reportRes, baselineRes, inquiryRes] = await Promise.all([
+  const [sleepRes, nightlyRes, taskRes, executionRes, reportRes, baselineRes, inquiryRes, medicationRes, foodRes] = await Promise.all([
     client
       .from("sleep_sessions")
       .select("session_date")
@@ -132,6 +148,20 @@ export async function buildPrescriptionServerContext(
       .order("assessed_at", { ascending: false })
       .limit(1)
       .maybeSingle<DoctorInquirySummaryRow>(),
+    client
+      .from("medication_analysis_records")
+      .select("recognized_name,risk_level,risk_flags_json,requires_manual_review,captured_at")
+      .eq("user_id", userId)
+      .order("captured_at", { ascending: false })
+      .limit(1)
+      .maybeSingle<MedicationAnalysisRow>(),
+    client
+      .from("food_analysis_records")
+      .select("meal_type,estimated_calories,nutrition_risk_level,nutrition_flags_json,captured_at")
+      .eq("user_id", userId)
+      .order("captured_at", { ascending: false })
+      .limit(3)
+      .returns<FoodAnalysisRow[]>(),
   ]);
 
   const sleepRows = sleepRes.error ? [] : sleepRes.data ?? [];
@@ -141,6 +171,8 @@ export async function buildPrescriptionServerContext(
   const latestReport = reportRes.error ? null : reportRes.data;
   const latestBaseline = baselineRes.error ? null : baselineRes.data;
   const latestInquiry = inquiryRes.error ? null : inquiryRes.data;
+  const latestMedication = medicationRes.error ? null : medicationRes.data;
+  const recentFood = foodRes.error ? [] : foodRes.data ?? [];
 
   let abnormalMetrics: MedicalMetricRow[] = [];
   if (latestReport?.report_id) {
@@ -273,6 +305,32 @@ export async function buildPrescriptionServerContext(
     }
   }
 
+  if (latestMedication) {
+    const medicationFacts = uniq([
+      latestMedication.recognized_name ? `最近药物记录 ${latestMedication.recognized_name}` : "",
+      latestMedication.requires_manual_review ? "药物识别结果仍需人工确认" : "",
+      ...toStringArray(latestMedication.risk_flags_json),
+    ]);
+    if (medicationFacts.length > 0) {
+      serverEvidenceFacts.medication = medicationFacts;
+    }
+    if (latestMedication.risk_level === "HIGH" || latestMedication.requires_manual_review) {
+      serverRedFlags.push("MEDICATION_REVIEW_REQUIRED");
+    }
+  }
+
+  if (recentFood.length > 0) {
+    const totalCalories = recentFood.reduce((sum, item) => sum + Number(item.estimated_calories ?? 0), 0);
+    const nutritionFlags = uniq(recentFood.flatMap((item) => toStringArray(item.nutrition_flags_json)));
+    serverEvidenceFacts.nutrition = uniq([
+      `最近饮食热量估算 ${Math.round(totalCalories)} kcal`,
+      ...nutritionFlags.slice(0, 3),
+    ]);
+    if (recentFood.some((item) => item.nutrition_risk_level === "HIGH")) {
+      serverRedFlags.push("NUTRITION_HIGH_RISK");
+    }
+  }
+
   if (latestInquiry?.risk_level === "HIGH") {
     serverRedFlags.push("HIGH_DOCTOR_RISK");
   }
@@ -301,6 +359,18 @@ export async function buildPrescriptionServerContext(
     latestSleepQuality: latestNightly?.sleep_quality ?? null,
     latestMedicalRiskLevel: latestReport?.risk_level ?? null,
     latestMedicalMetricLabels: uniq(abnormalMetrics.map((item) => item.metric_name)),
+    latestMedicationSummary:
+      latestMedication?.recognized_name?.trim()
+        ? `${latestMedication.recognized_name} / ${latestMedication.risk_level}`
+        : null,
+    recentMedicationRiskFlags: uniq(toStringArray(latestMedication?.risk_flags_json)),
+    latestNutritionSummary:
+      recentFood.length > 0
+        ? `${recentFood[0]?.meal_type ?? "UNSPECIFIED"} / ${Math.round(
+            recentFood.reduce((sum, item) => sum + Number(item.estimated_calories ?? 0), 0)
+          )} kcal`
+        : null,
+    nutritionRiskLevel: recentFood[0]?.nutrition_risk_level ?? null,
     recentInterventionSummary: uniq(latestTaskSummary),
     latestSleepSummary: uniq(serverEvidenceFacts.sleep ?? []),
     breathingFatigue,

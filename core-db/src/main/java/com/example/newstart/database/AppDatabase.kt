@@ -11,6 +11,7 @@ import com.example.newstart.database.dao.DeviceDao
 import com.example.newstart.database.dao.DoctorAssessmentDao
 import com.example.newstart.database.dao.DoctorMessageDao
 import com.example.newstart.database.dao.DoctorSessionDao
+import com.example.newstart.database.dao.FoodAnalysisDao
 import com.example.newstart.database.dao.HealthMetricsDao
 import com.example.newstart.database.dao.AssessmentAnswerDao
 import com.example.newstart.database.dao.AssessmentSessionDao
@@ -18,6 +19,7 @@ import com.example.newstart.database.dao.InterventionExecutionDao
 import com.example.newstart.database.dao.InterventionProfileSnapshotDao
 import com.example.newstart.database.dao.InterventionTaskDao
 import com.example.newstart.database.dao.MedicalMetricDao
+import com.example.newstart.database.dao.MedicationAnalysisDao
 import com.example.newstart.database.dao.MedicalReportDao
 import com.example.newstart.database.dao.PpgSampleDao
 import com.example.newstart.database.dao.PrescriptionBundleDao
@@ -31,11 +33,13 @@ import com.example.newstart.database.entity.DeviceEntity
 import com.example.newstart.database.entity.DoctorAssessmentEntity
 import com.example.newstart.database.entity.DoctorMessageEntity
 import com.example.newstart.database.entity.DoctorSessionEntity
+import com.example.newstart.database.entity.FoodAnalysisEntity
 import com.example.newstart.database.entity.HealthMetricsEntity
 import com.example.newstart.database.entity.InterventionExecutionEntity
 import com.example.newstart.database.entity.InterventionProfileSnapshotEntity
 import com.example.newstart.database.entity.InterventionTaskEntity
 import com.example.newstart.database.entity.MedicalMetricEntity
+import com.example.newstart.database.entity.MedicationAnalysisEntity
 import com.example.newstart.database.entity.MedicalReportEntity
 import com.example.newstart.database.entity.PpgSampleEntity
 import com.example.newstart.database.entity.PrescriptionBundleEntity
@@ -63,9 +67,11 @@ import com.example.newstart.database.entity.SleepDataEntity
         MedicalMetricEntity::class,
         InterventionProfileSnapshotEntity::class,
         PrescriptionBundleEntity::class,
-        PrescriptionItemEntity::class
+        PrescriptionItemEntity::class,
+        MedicationAnalysisEntity::class,
+        FoodAnalysisEntity::class
     ],
-    version = 10,
+    version = 11,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -89,6 +95,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun interventionProfileSnapshotDao(): InterventionProfileSnapshotDao
     abstract fun prescriptionBundleDao(): PrescriptionBundleDao
     abstract fun prescriptionItemDao(): PrescriptionItemDao
+    abstract fun medicationAnalysisDao(): MedicationAnalysisDao
+    abstract fun foodAnalysisDao(): FoodAnalysisDao
 
     companion object {
         @Volatile
@@ -359,6 +367,80 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS medication_analysis_records (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        capturedAt INTEGER NOT NULL,
+                        imageUri TEXT NOT NULL,
+                        recognizedName TEXT NOT NULL,
+                        dosageForm TEXT NOT NULL,
+                        specification TEXT NOT NULL,
+                        activeIngredientsJson TEXT NOT NULL,
+                        matchedSymptomsJson TEXT NOT NULL,
+                        usageSummary TEXT NOT NULL,
+                        riskLevel TEXT NOT NULL,
+                        riskFlagsJson TEXT NOT NULL,
+                        evidenceNotesJson TEXT NOT NULL,
+                        advice TEXT NOT NULL,
+                        confidence REAL NOT NULL,
+                        requiresManualReview INTEGER NOT NULL,
+                        analysisMode TEXT NOT NULL,
+                        providerId TEXT,
+                        modelId TEXT,
+                        traceId TEXT,
+                        syncState TEXT NOT NULL,
+                        cloudRecordId TEXT,
+                        syncedAt INTEGER,
+                        createdAt INTEGER NOT NULL,
+                        updatedAt INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_medication_analysis_records_capturedAt ON medication_analysis_records(capturedAt)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_medication_analysis_records_riskLevel ON medication_analysis_records(riskLevel)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_medication_analysis_records_syncState ON medication_analysis_records(syncState)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_medication_analysis_records_requiresManualReview ON medication_analysis_records(requiresManualReview)")
+
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS food_analysis_records (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        capturedAt INTEGER NOT NULL,
+                        imageUri TEXT NOT NULL,
+                        mealType TEXT NOT NULL,
+                        foodItemsJson TEXT NOT NULL,
+                        estimatedCalories INTEGER NOT NULL,
+                        carbohydrateGrams REAL NOT NULL,
+                        proteinGrams REAL NOT NULL,
+                        fatGrams REAL NOT NULL,
+                        nutritionRiskLevel TEXT NOT NULL,
+                        nutritionFlagsJson TEXT NOT NULL,
+                        dailyContribution TEXT NOT NULL,
+                        advice TEXT NOT NULL,
+                        confidence REAL NOT NULL,
+                        requiresManualReview INTEGER NOT NULL,
+                        analysisMode TEXT NOT NULL,
+                        providerId TEXT,
+                        modelId TEXT,
+                        traceId TEXT,
+                        syncState TEXT NOT NULL,
+                        cloudRecordId TEXT,
+                        syncedAt INTEGER,
+                        createdAt INTEGER NOT NULL,
+                        updatedAt INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_food_analysis_records_capturedAt ON food_analysis_records(capturedAt)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_food_analysis_records_nutritionRiskLevel ON food_analysis_records(nutritionRiskLevel)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_food_analysis_records_syncState ON food_analysis_records(syncState)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_food_analysis_records_requiresManualReview ON food_analysis_records(requiresManualReview)")
+            }
+        }
+
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -370,6 +452,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(MIGRATION_7_8)
                     .addMigrations(MIGRATION_8_9)
                     .addMigrations(MIGRATION_9_10)
+                    .addMigrations(MIGRATION_10_11)
                     .build()
                 INSTANCE = instance
                 instance

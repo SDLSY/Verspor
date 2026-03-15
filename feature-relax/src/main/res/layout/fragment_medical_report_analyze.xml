@@ -130,6 +130,19 @@
                     android:textSize="17sp"
                     android:textStyle="bold" />
 
+                <LinearLayout
+                    android:id="@+id/layout_medical_summary_cards"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical" />
+
+                <FrameLayout
+                    android:id="@+id/container_medical_risk_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp" />
+
                 <TextView
                     android:id="@+id/tv_medical_readable"
                     android:layout_width="match_parent"
@@ -192,6 +205,13 @@
                     android:orientation="vertical"
                     android:visibility="gone">
 
+                    <LinearLayout
+                        android:id="@+id/layout_medical_metric_cards"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical" />
+
                     <TextView
                         android:id="@+id/tv_medical_metrics"
                         android:layout_width="match_parent"
@@ -200,6 +220,13 @@
                         android:text="@string/medical_report_metric_empty"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
+
+                    <LinearLayout
+                        android:id="@+id/layout_medical_action_cards"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

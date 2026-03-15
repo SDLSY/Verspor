@@ -17,7 +17,7 @@ class SleepStagesProgressView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    // 鐫＄湢闃舵鏁版嵁 (鐧惧垎姣旓紝鎬诲拰搴斾负 1.0)
+    // 睡眠阶段数据（百分比，总和应为 1.0）
     data class SleepStages(
         val deep: Float = 0f,
         val rem: Float = 0f,
@@ -86,7 +86,7 @@ class SleepStagesProgressView @JvmOverloads constructor(
 
         var currentX = paddingStart.toFloat()
 
-        // 缁樺埗鍥涗釜闃舵
+        // 绘制四个阶段
         val stages = listOf(
             Pair(currentStages.deep, deepColor),
             Pair(currentStages.rem, remColor),
@@ -109,15 +109,15 @@ class SleepStagesProgressView @JvmOverloads constructor(
     }
 
     /**
-     * 璁剧疆鐫＄湢闃舵鏁版嵁
-     * @param deep 娣辩潯鍗犳瘮 (0-1)
-     * @param rem REM鍗犳瘮 (0-1)
-     * @param light 娴呯潯鍗犳瘮 (0-1)
-     * @param awake 娓呴啋鍗犳瘮 (0-1)
-     * @param animate 鏄惁鍔ㄧ敾杩囨浮
+     * 设置睡眠阶段数据
+     * @param deep 深睡占比 (0-1)
+     * @param rem REM 占比 (0-1)
+     * @param light 浅睡占比 (0-1)
+     * @param awake 清醒占比 (0-1)
+     * @param animate 是否启用过渡动画
      */
     fun setStages(deep: Float, rem: Float, light: Float, awake: Float = 0f, animate: Boolean = true) {
-        // 褰掍竴鍖栫‘淇濇€诲拰涓?1
+        // 归一化，确保总和为 1
         val total = deep + rem + light + awake
         val normalizedDeep = if (total > 0) deep / total else 0f
         val normalizedRem = if (total > 0) rem / total else 0f
@@ -149,7 +149,8 @@ class SleepStagesProgressView @JvmOverloads constructor(
     }
 
     /**
-     * 浣跨敤鍒嗛挓鏁拌缃紙鑷姩璁＄畻鍗犳瘮锛?     */
+     * 使用分钟数设置睡眠阶段（自动计算占比）
+     */
     fun setStagesFromMinutes(deepMinutes: Int, remMinutes: Int, lightMinutes: Int, awakeMinutes: Int = 0, animate: Boolean = true) {
         val total = (deepMinutes + remMinutes + lightMinutes + awakeMinutes).toFloat()
         if (total <= 0) return

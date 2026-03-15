@@ -18,7 +18,7 @@ import com.github.mikephil.charting.data.PieEntry
 object ChartStyleConfig {
 
     /**
-     * 搴旂敤缁熶竴鐨?LineChart 鏍峰紡
+     * 应用统一的 LineChart 样式
      */
     fun applyLineChartStyle(chart: LineChart, context: Context) {
         val textColor = ContextCompat.getColor(context, R.color.text_secondary)
@@ -54,7 +54,7 @@ object ChartStyleConfig {
     }
 
     /**
-     * 搴旂敤缁熶竴鐨?PieChart 鏍峰紡
+     * 应用统一的 PieChart 样式
      */
     fun applyPieChartStyle(chart: PieChart, context: Context, centerText: String = "") {
         val primaryTextColor = ContextCompat.getColor(context, R.color.text_primary)
@@ -90,7 +90,7 @@ object ChartStyleConfig {
     }
 
     /**
-     * 鍒涘缓娓愬彉濉厖鐨?LineDataSet
+     * 创建带渐变填充的 LineDataSet
      */
     fun createGradientLineDataSet(
         entries: List<Entry>,
@@ -125,7 +125,8 @@ object ChartStyleConfig {
     }
 
     /**
-     * 鍒涘缓鐫＄湢闃舵楗煎浘鏁版嵁闆?     */
+     * 创建睡眠阶段饼图数据集
+     */
     fun createSleepStagesPieDataSet(
         deep: Float, rem: Float, light: Float, awake: Float,
         context: Context
@@ -134,7 +135,7 @@ object ChartStyleConfig {
         val colors = ArrayList<Int>()
 
         if (deep > 0) {
-            entries.add(PieEntry(deep, "娣辩潯"))
+            entries.add(PieEntry(deep, "深睡"))
             colors.add(ContextCompat.getColor(context, R.color.sleep_stage_deep))
         }
         if (rem > 0) {
@@ -146,7 +147,7 @@ object ChartStyleConfig {
             colors.add(ContextCompat.getColor(context, R.color.sleep_stage_light))
         }
         if (awake > 0) {
-            entries.add(PieEntry(awake, "娓呴啋"))
+            entries.add(PieEntry(awake, "清醒"))
             colors.add(ContextCompat.getColor(context, R.color.sleep_stage_awake))
         }
 

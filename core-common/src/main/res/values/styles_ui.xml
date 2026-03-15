@@ -28,6 +28,23 @@
         <item name="android:textSize">12sp</item>
     </style>
 
+    <style name="TextAppearance.NewStart.CardTitle" parent="TextAppearance.Material3.TitleSmall">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextAppearance.NewStart.CardValue" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextAppearance.NewStart.CardNote" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
     <style name="TextAppearance.NewStart.StatusPill" parent="TextAppearance.Material3.LabelMedium">
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">10sp</item>

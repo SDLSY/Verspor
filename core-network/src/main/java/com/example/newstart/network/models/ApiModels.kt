@@ -49,6 +49,8 @@ data class AuthData(
     val email: String,
     @SerializedName("token")
     val token: String = "",
+    @SerializedName("refreshToken")
+    val refreshToken: String = "",
     @SerializedName("userId")
     val userId: String = "",
     @SerializedName("username")
@@ -60,6 +62,11 @@ data class AuthData(
 data class EmailActionRequest(
     @SerializedName("email")
     val email: String
+)
+
+data class RefreshTokenRequest(
+    @SerializedName("refreshToken")
+    val refreshToken: String
 )
 
 data class ActionResponse(
@@ -448,6 +455,88 @@ data class DoctorInquirySummaryUpsertRequest(
     val doctorSummary: String
 )
 
+data class MedicationRecordUpsertRequest(
+    @SerializedName("recordId")
+    val recordId: String,
+    @SerializedName("capturedAt")
+    val capturedAt: Long,
+    @SerializedName("imageUri")
+    val imageUri: String,
+    @SerializedName("recognizedName")
+    val recognizedName: String,
+    @SerializedName("dosageForm")
+    val dosageForm: String,
+    @SerializedName("specification")
+    val specification: String,
+    @SerializedName("activeIngredients")
+    val activeIngredients: List<String>,
+    @SerializedName("matchedSymptoms")
+    val matchedSymptoms: List<String>,
+    @SerializedName("usageSummary")
+    val usageSummary: String,
+    @SerializedName("riskLevel")
+    val riskLevel: String,
+    @SerializedName("riskFlags")
+    val riskFlags: List<String>,
+    @SerializedName("evidenceNotes")
+    val evidenceNotes: List<String>,
+    @SerializedName("advice")
+    val advice: String,
+    @SerializedName("confidence")
+    val confidence: Float,
+    @SerializedName("requiresManualReview")
+    val requiresManualReview: Boolean,
+    @SerializedName("analysisMode")
+    val analysisMode: String,
+    @SerializedName("providerId")
+    val providerId: String? = null,
+    @SerializedName("modelId")
+    val modelId: String? = null,
+    @SerializedName("traceId")
+    val traceId: String? = null
+)
+
+data class FoodRecordUpsertRequest(
+    @SerializedName("recordId")
+    val recordId: String,
+    @SerializedName("capturedAt")
+    val capturedAt: Long,
+    @SerializedName("imageUri")
+    val imageUri: String,
+    @SerializedName("mealType")
+    val mealType: String,
+    @SerializedName("foodItems")
+    val foodItems: List<String>,
+    @SerializedName("estimatedCalories")
+    val estimatedCalories: Int,
+    @SerializedName("carbohydrateGrams")
+    val carbohydrateGrams: Float,
+    @SerializedName("proteinGrams")
+    val proteinGrams: Float,
+    @SerializedName("fatGrams")
+    val fatGrams: Float,
+    @SerializedName("nutritionRiskLevel")
+    val nutritionRiskLevel: String,
+    @SerializedName("nutritionFlags")
+    val nutritionFlags: List<String>,
+    @SerializedName("dailyContribution")
+    val dailyContribution: String,
+    @SerializedName("advice")
+    val advice: String,
+    @SerializedName("confidence")
+    val confidence: Float,
+    @SerializedName("requiresManualReview")
+    val requiresManualReview: Boolean,
+    @SerializedName("analysisMode")
+    val analysisMode: String,
+    @SerializedName("providerId")
+    val providerId: String? = null,
+    @SerializedName("modelId")
+    val modelId: String? = null,
+    @SerializedName("traceId")
+    val traceId: String? = null
+)
+
 // ========== Period summary ==========
 data class PeriodSummaryResponse(
     @SerializedName("code")
@@ -613,6 +702,86 @@ data class ReportUnderstandingData(
     val summary: String,
     @SerializedName("metrics")
     val metrics: List<MedicalMetricUpsertItem>,
+    @SerializedName("metadata")
+    val metadata: AiMetadata?
+)
+
+data class MedicationAnalyzeResponse(
+    @SerializedName("code")
+    val code: Int,
+    @SerializedName("message")
+    val message: String,
+    @SerializedName("data")
+    val data: MedicationAnalyzeData?
+)
+
+data class MedicationAnalyzeData(
+    @SerializedName("recognizedName")
+    val recognizedName: String,
+    @SerializedName("dosageForm")
+    val dosageForm: String,
+    @SerializedName("specification")
+    val specification: String,
+    @SerializedName("activeIngredients")
+    val activeIngredients: List<String>,
+    @SerializedName("matchedSymptoms")
+    val matchedSymptoms: List<String>,
+    @SerializedName("usageSummary")
+    val usageSummary: String,
+    @SerializedName("riskLevel")
+    val riskLevel: String,
+    @SerializedName("riskFlags")
+    val riskFlags: List<String>,
+    @SerializedName("evidenceNotes")
+    val evidenceNotes: List<String>,
+    @SerializedName("advice")
+    val advice: String,
+    @SerializedName("confidence")
+    val confidence: Float,
+    @SerializedName("requiresManualReview")
+    val requiresManualReview: Boolean,
+    @SerializedName("analysisMode")
+    val analysisMode: String,
+    @SerializedName("metadata")
+    val metadata: AiMetadata?
+)
+
+data class FoodAnalyzeResponse(
+    @SerializedName("code")
+    val code: Int,
+    @SerializedName("message")
+    val message: String,
+    @SerializedName("data")
+    val data: FoodAnalyzeData?
+)
+
+data class FoodAnalyzeData(
+    @SerializedName("mealType")
+    val mealType: String,
+    @SerializedName("foodItems")
+    val foodItems: List<String>,
+    @SerializedName("estimatedCalories")
+    val estimatedCalories: Int,
+    @SerializedName("carbohydrateGrams")
+    val carbohydrateGrams: Float,
+    @SerializedName("proteinGrams")
+    val proteinGrams: Float,
+    @SerializedName("fatGrams")
+    val fatGrams: Float,
+    @SerializedName("nutritionRiskLevel")
+    val nutritionRiskLevel: String,
+    @SerializedName("nutritionFlags")
+    val nutritionFlags: List<String>,
+    @SerializedName("dailyContribution")
+    val dailyContribution: String,
+    @SerializedName("advice")
+    val advice: String,
+    @SerializedName("confidence")
+    val confidence: Float,
+    @SerializedName("requiresManualReview")
+    val requiresManualReview: Boolean,
+    @SerializedName("analysisMode")
+    val analysisMode: String,
     @SerializedName("metadata")
     val metadata: AiMetadata?
 )
@@ -786,6 +955,10 @@ data class VideoJobData(
 data class AiMetadata(
     @SerializedName("providerId")
     val providerId: String? = null,
+    @SerializedName("modelId")
+    val modelId: String? = null,
+    @SerializedName("traceId")
+    val traceId: String? = null,
     @SerializedName("fallbackUsed")
     val fallbackUsed: Boolean = false,
     @SerializedName("modelProfile")

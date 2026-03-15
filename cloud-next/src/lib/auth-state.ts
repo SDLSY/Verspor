@@ -7,6 +7,7 @@ export type AuthPayload = {
   authState: AuthState;
   email: string;
   token?: string;
+  refreshToken?: string;
   userId?: string;
   username?: string;
   canResendConfirmation: boolean;

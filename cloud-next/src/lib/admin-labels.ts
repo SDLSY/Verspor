@@ -153,6 +153,8 @@ export function formatResourceTypeLabel(value: string | null | undefined): strin
     SLEEP_WINDOWS: "睡眠窗口",
     MEDICAL_REPORTS: "医疗报告",
     MEDICAL_METRICS: "医疗指标",
+    MEDICATION_ANALYSIS_RECORDS: "药物识别记录",
+    FOOD_ANALYSIS_RECORDS: "饮食分析记录",
     AUTH: "认证",
     PROFILE: "用户资料",
     SYNC: "同步记录",
@@ -171,6 +173,8 @@ export function formatTimelineTypeLabel(value: string): string {
     INTERVENTION_TASK: "干预任务",
     INTERVENTION_EXECUTION: "干预执行",
     MEDICAL_REPORT: "医疗报告",
+    MEDICATION_ANALYSIS: "药物识别",
+    FOOD_ANALYSIS: "饮食分析",
     AUDIT_EVENT: "审计事件",
   };
   return labels[normalized] ?? value;

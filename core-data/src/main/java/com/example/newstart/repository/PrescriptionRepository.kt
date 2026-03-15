@@ -128,6 +128,8 @@ class PrescriptionRepository(
         val recovery = snapshot.domainScores["recoveryCapacity"] ?: 50
         val anxiety = snapshot.domainScores["anxietyRisk"] ?: 0
         val depression = snapshot.domainScores["depressiveRisk"] ?: 0
+        val medication = snapshot.domainScores["medicationRisk"] ?: 0
+        val nutrition = snapshot.domainScores["nutritionRisk"] ?: 0
         val breathingFatigue = hasBreathingFatigue()
         val hasBloodPressureEvidence = snapshot.evidenceFacts.values.flatten().any {
             it.contains("血压")
@@ -146,6 +148,17 @@ class PrescriptionRepository(
                     lifestyleCodes = listOf("TASK_DOCTOR_PRIORITY", "TASK_WORRY_LIST")
                 )
             }
+            medication >= 70 -> {
+                createSpec(
+                    primaryGoal = "先核对药物风险，再安排温和恢复",
+                    riskLevel = "HIGH",
+                    rationale = "最近一次药物识别提示风险较高或仍需人工确认，今天的建议先把医生或药师确认前置。",
+                    evidence = allEvidence.take(4) + listOf("药物识别结果需要优先核对"),
+                    primaryCode = "BODY_SCAN_NSDR_10M",
+                    secondaryCode = "COGNITIVE_OFFLOAD_5M",
+                    lifestyleCodes = listOf("TASK_DOCTOR_PRIORITY", "TASK_WORRY_LIST")
+                )
+            }
             sleep >= 65 && stress >= 60 -> {
                 createSpec(
                     primaryGoal = "降低睡前唤醒并改善入睡准备",
@@ -155,6 +168,17 @@ class PrescriptionRepository(
                     primaryCode = "SLEEP_WIND_DOWN_15M",
                     secondaryCode = "BODY_SCAN_NSDR_10M",
                     lifestyleCodes = listOf("TASK_SCREEN_CURFEW", "TASK_CAFFEINE_CUTOFF")
+                )
+            }
+            nutrition >= 65 -> {
+                createSpec(
+                    primaryGoal = "先稳定恢复节律并校正饮食负担",
+                    riskLevel = "MEDIUM",
+                    rationale = "近 24 小时饮食结构或总热量偏离较大，今天优先安排轻恢复与白天节律任务，避免继续堆叠负荷。",
+                    evidence = allEvidence.take(5),
+                    primaryCode = "RECOVERY_WALK_10M",
+                    secondaryCode = "GUIDED_STRETCH_MOBILITY_8M",
+                    lifestyleCodes = listOf("TASK_DAYLIGHT_WALK", "TASK_CAFFEINE_CUTOFF")
                 )
             }
             fatigue >= 65 || recovery <= 40 -> {

@@ -114,7 +114,7 @@ object XfyunConfig {
 
     val defaultVoiceName: String
         get() = BuildConfig.XFYUN_TTS_VOICE_NAME.ifBlank {
-            BuildConfig.XFYUN_VH_VOICE_NAME.ifBlank { "x4_lingxiaoyao_em" }
+            BuildConfig.XFYUN_VH_VOICE_NAME.ifBlank { "x4_yezi" }
         }
 
     val defaultAvatarId: String

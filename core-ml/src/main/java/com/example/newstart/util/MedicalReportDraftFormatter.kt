@@ -5,6 +5,14 @@ import java.util.Locale
 object MedicalReportDraftFormatter {
 
     private val multiSpaceRegex = Regex("[\\t\\u00A0 ]+")
+    private val markdownTableSeparatorRegex = Regex("^\\s*\\|?(?:\\s*:?-{3,}:?\\s*\\|)+\\s*$")
+    private val markdownHeadingRegex = Regex("^#{1,6}\\s*")
+    private val htmlBreakRegex = Regex("(?i)<\\s*br\\s*/?\\s*>")
+    private val htmlClosingBlockRegex = Regex("(?i)</\\s*(p|div|li|tr|td|th|h[1-6]|ul|ol|table|section|article)\\s*>")
+    private val htmlOpeningListItemRegex = Regex("(?i)<\\s*li\\b[^>]*>")
+    private val htmlTagRegex = Regex("(?is)<[^>]+>")
+    private val decimalHtmlEntityRegex = Regex("&#(\\d+);")
+    private val hexHtmlEntityRegex = Regex("&#x([0-9a-fA-F]+);")
 
     fun normalizeRawText(rawText: String): String {
         return rawText
@@ -14,6 +22,49 @@ object MedicalReportDraftFormatter {
             .map { it.replace(multiSpaceRegex, " ").trim() }
             .filter { it.isNotEmpty() }
             .joinToString(separator = "\n")
+            .trim()
+    }
+
+    fun markdownToPlainText(markdown: String): String {
+        if (markdown.isBlank()) return ""
+        return cleanOcrMarkup(markdown)
+            .replace("\r\n", "\n")
+            .replace('\r', '\n')
+            .lines()
+            .mapNotNull { rawLine ->
+                val line = rawLine.trim()
+                when {
+                    line.isBlank() -> null
+                    markdownTableSeparatorRegex.matches(line) -> null
+                    else -> line
+                        .replace(markdownHeadingRegex, "")
+                        .replace("|", " ")
+                        .replace("**", "")
+                        .replace("*", "")
+                        .replace("`", "")
+                        .replace(multiSpaceRegex, " ")
+                        .trim()
+                        .takeIf { it.isNotBlank() }
+                }
+            }
+            .joinToString(separator = "\n")
+            .let(::normalizeRawText)
+    }
+
+    fun cleanOcrMarkup(content: String): String {
+        if (content.isBlank()) return ""
+        return decodeHtmlEntities(content)
+            .replace("\r\n", "\n")
+            .replace('\r', '\n')
+            .replace(htmlBreakRegex, "\n")
+            .replace(htmlOpeningListItemRegex, "\n- ")
+            .replace(htmlClosingBlockRegex, "\n")
+            .replace(htmlTagRegex, " ")
+            .replace(multiSpaceRegex, " ")
+            .lines()
+            .map { it.trim() }
+            .joinToString(separator = "\n")
+            .replace(Regex("\n{3,}"), "\n\n")
             .trim()
     }
 
@@ -167,5 +218,31 @@ object MedicalReportDraftFormatter {
         } else {
             String.format(Locale.US, "%.2f", value).trimEnd('0').trimEnd('.')
         }
+    }
+
+    private fun decodeHtmlEntities(input: String): String {
+        val namedDecoded = input
+            .replace("&nbsp;", " ")
+            .replace("&ensp;", " ")
+            .replace("&emsp;", " ")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&amp;", "&")
+            .replace("&quot;", "\"")
+            .replace("&#39;", "'")
+        val decimalDecoded = decimalHtmlEntityRegex.replace(namedDecoded) { matchResult ->
+            matchResult.groupValues[1].toIntOrNull()?.let { codePoint ->
+                codePointToStringOrNull(codePoint)
+            } ?: matchResult.value
+        }
+        return hexHtmlEntityRegex.replace(decimalDecoded) { matchResult ->
+            matchResult.groupValues[1].toIntOrNull(16)?.let { codePoint ->
+                codePointToStringOrNull(codePoint)
+            } ?: matchResult.value
+        }
+    }
+
+    private fun codePointToStringOrNull(codePoint: Int): String? {
+        return runCatching { String(Character.toChars(codePoint)) }.getOrNull()
     }
 }

@@ -34,8 +34,11 @@ import com.example.newstart.intervention.PrescriptionBundleDetails
 import com.example.newstart.intervention.PrescriptionItemDetails
 import com.example.newstart.intervention.PrescriptionItemType
 import com.example.newstart.intervention.ProfileTriggerType
+import com.example.newstart.lifestyle.DailyReadinessContribution
 import com.example.newstart.repository.InterventionProfileRepository
 import com.example.newstart.repository.InterventionRepository
+import com.example.newstart.repository.FoodAnalysisRepository
+import com.example.newstart.repository.MedicationAnalysisRepository
 import com.example.newstart.repository.NetworkRepository
 import com.example.newstart.repository.PrescriptionRepository
 import com.example.newstart.repository.SleepRepository
@@ -45,6 +48,7 @@ import com.example.newstart.util.HRVAnalyzer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -61,6 +65,8 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
     private val interventionRepository: InterventionRepository
     private val interventionProfileRepository: InterventionProfileRepository
     private val prescriptionRepository: PrescriptionRepository
+    private val medicationAnalysisRepository: MedicationAnalysisRepository
+    private val foodAnalysisRepository: FoodAnalysisRepository
     private val networkRepository = NetworkRepository()
     private val anomalyDetector = LocalAnomalyDetectionService(application)
     private val app = getApplication<Application>()
@@ -79,6 +85,8 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
         )
         interventionProfileRepository = InterventionProfileRepository(application, database)
         prescriptionRepository = PrescriptionRepository(application, database, interventionProfileRepository)
+        medicationAnalysisRepository = MedicationAnalysisRepository(application, database)
+        foodAnalysisRepository = FoodAnalysisRepository(application, database)
     }
 
     private val _recoveryScore = MutableLiveData<RecoveryScore>()
@@ -95,6 +103,11 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
 
     private val _cloudLoopMessage = MutableLiveData<String>()
     val cloudLoopMessage: LiveData<String> = _cloudLoopMessage
+
+    private val _recoveryContributionSummary = MutableLiveData(
+        app.getString(R.string.morning_recovery_contribution_default)
+    )
+    val recoveryContributionSummary: LiveData<String> = _recoveryContributionSummary
 
     private val _aiCredibility = MutableLiveData(AiCredibilityState.default())
     val aiCredibility: LiveData<AiCredibilityState> = _aiCredibility
@@ -126,9 +139,12 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
             _healthMetrics.value = localMetrics
 
             val localAnomaly = detectLocalAnomaly(localMetrics)
-            val localRecovery = buildRecoveryFromData(localSleep, localMetrics, null, localAnomaly)
-            _recoveryScore.value = localRecovery
-            repository.saveRecoveryScore(localSleep.id, localRecovery)
+            val baseRecovery = buildRecoveryFromData(localSleep, localMetrics, null, localAnomaly)
+            val readinessContribution = buildDailyReadinessContribution()
+            val adjustedRecovery = applyDailyReadinessContribution(baseRecovery, readinessContribution)
+            _recoveryScore.value = adjustedRecovery
+            _recoveryContributionSummary.value = readinessContribution.summary
+            repository.saveRecoveryScore(localSleep.id, adjustedRecovery)
 
             refreshMorningPrescription(forceGenerate = false)
             refreshInterventionSummary()
@@ -213,8 +229,11 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
                 cloudScoreOverride = analysis.recoveryScore,
                 anomalyResult = edgeAnomaly
             )
-            _recoveryScore.postValue(cloudRecovery)
-            repository.saveRecoveryScore(sleep.id, cloudRecovery)
+            val readinessContribution = buildDailyReadinessContribution()
+            val adjustedRecovery = applyDailyReadinessContribution(cloudRecovery, readinessContribution)
+            _recoveryScore.postValue(adjustedRecovery)
+            _recoveryContributionSummary.postValue(readinessContribution.summary)
+            repository.saveRecoveryScore(sleep.id, adjustedRecovery)
 
             refreshMorningPrescription(forceGenerate = true)
 
@@ -334,7 +353,7 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
                     confidenceLabel = "可信度不足",
                     sourceLabel = "端侧推理不可用",
                     summary = "本次未完成有效推理，恢复分仅基于基础规则计算。",
-                    primaryFactor = "鏃犳硶璇嗗埆涓诲鍥犲瓙",
+                    primaryFactor = "无法识别主导因子",
                     reason = "建议检查模型文件或端侧运行环境后重试。",
                     inferenceHint = "推理耗时：--",
                     indicatorLevel = CredibilityLevel.LOW,
@@ -478,9 +497,82 @@ class MorningReportViewModel(application: Application) : AndroidViewModel(applic
 
         val mockAnomaly = detectLocalAnomaly(mockHealthMetrics)
         val mockRecoveryScore = buildRecoveryFromData(mockSleepData, mockHealthMetrics, null, mockAnomaly)
-        _recoveryScore.value = mockRecoveryScore
+        val readinessContribution = buildDailyReadinessContribution()
+        _recoveryScore.value = applyDailyReadinessContribution(mockRecoveryScore, readinessContribution)
+        _recoveryContributionSummary.value = readinessContribution.summary
 
         refreshMorningPrescription(forceGenerate = false)
+    }
+
+    private suspend fun buildDailyReadinessContribution(
+        now: Long = System.currentTimeMillis()
+    ): DailyReadinessContribution = withContext(Dispatchers.IO) {
+        val medication = medicationAnalysisRepository.getLatest()
+        val foodRecords = foodAnalysisRepository.getRecentSince(now - 24L * 60L * 60L * 1000L)
+
+        var medicationDelta = 0
+        val contributionNotes = mutableListOf<String>()
+        medication?.let { record ->
+            medicationDelta = when {
+                record.requiresManualReview -> -8
+                record.riskLevel.equals("HIGH", ignoreCase = true) -> -6
+                record.riskLevel.equals("MEDIUM", ignoreCase = true) -> -3
+                record.confidence >= 0.8f -> 1
+                else -> 0
+            }
+            contributionNotes += if (medicationDelta < 0) {
+                "药物识别提示谨慎 ${medicationDelta}"
+            } else {
+                "药物记录已纳入参考 +$medicationDelta"
+            }
+        }
+
+        var nutritionDelta = 0
+        if (foodRecords.isNotEmpty()) {
+            val totalCalories = foodRecords.sumOf { it.estimatedCalories }
+            val highRisk = foodRecords.any { it.nutritionRiskLevel.equals("HIGH", ignoreCase = true) }
+            val mediumRisk = foodRecords.any { it.nutritionRiskLevel.equals("MEDIUM", ignoreCase = true) }
+            nutritionDelta = when {
+                highRisk -> -7
+                mediumRisk -> -3
+                totalCalories in 1100..2200 -> 4
+                totalCalories in 1..799 || totalCalories > 2600 -> -5
+                else -> 1
+            }
+            contributionNotes += if (nutritionDelta < 0) {
+                "饮食结构与热量拖累恢复 ${nutritionDelta}"
+            } else {
+                "最近饮食状态支持恢复 +$nutritionDelta"
+            }
+        }
+
+        val summary = contributionNotes.joinToString("，").ifBlank {
+            app.getString(R.string.morning_recovery_contribution_default)
+        }
+        DailyReadinessContribution(
+            medicationDelta = medicationDelta,
+            nutritionDelta = nutritionDelta,
+            summary = summary
+        )
+    }
+
+    private fun applyDailyReadinessContribution(
+        baseRecovery: RecoveryScore,
+        contribution: DailyReadinessContribution
+    ): RecoveryScore {
+        val finalScore = (
+            baseRecovery.score +
+                contribution.medicationDelta +
+                contribution.nutritionDelta
+            ).coerceIn(0, 100)
+
+        val finalLevel = when {
+            finalScore >= 80 -> RecoveryLevel.EXCELLENT
+            finalScore >= 60 -> RecoveryLevel.GOOD
+            finalScore >= 40 -> RecoveryLevel.FAIR
+            else -> RecoveryLevel.POOR
+        }
+        return baseRecovery.copy(score = finalScore, level = finalLevel)
     }
 
     private suspend fun refreshMorningPrescription(forceGenerate: Boolean): PrescriptionBundleDetails? {

@@ -64,11 +64,11 @@ val xfyunKeys = listOf(
     "XFYUN_VH_VOICE_NAME"
 )
 val xfyunDefaults = mapOf(
-    "XFYUN_TTS_VOICE_NAME" to "x4_lingxiaoyao_em",
+    "XFYUN_TTS_VOICE_NAME" to "x4_yezi",
     "XFYUN_SPARK_LITE_DOMAIN" to "lite",
     "XFYUN_SPARK_X_DOMAIN" to "x1",
     "XFYUN_AIUI_SCENE" to "sos_app",
-    "XFYUN_VH_VOICE_NAME" to "x4_lingxiaoyao_em"
+    "XFYUN_VH_VOICE_NAME" to "x4_yezi"
 )
 
 if (localPropertiesFile.exists()) {

@@ -42,6 +42,12 @@ class InterventionCenterFragment : Fragment() {
         binding.cardInterventionReport.setOnClickListener {
             findNavController().navigate(R.id.navigation_medical_report_analyze)
         }
+        binding.cardInterventionMedication.setOnClickListener {
+            findNavController().navigate(R.id.navigation_medication_analyze)
+        }
+        binding.cardInterventionFood.setOnClickListener {
+            findNavController().navigate(R.id.navigation_food_analyze)
+        }
         binding.cardInterventionReview.setOnClickListener {
             findNavController().navigate(R.id.navigation_relax_review)
         }

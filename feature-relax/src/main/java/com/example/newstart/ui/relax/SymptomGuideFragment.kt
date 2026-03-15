@@ -15,6 +15,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.newstart.core.common.R
+import com.example.newstart.core.common.ui.cards.ActionGroupCardModel
+import com.example.newstart.core.common.ui.cards.CardTone
+import com.example.newstart.core.common.ui.cards.EvidenceCardModel
+import com.example.newstart.core.common.ui.cards.MedicalCardRenderer
+import com.example.newstart.core.common.ui.cards.RiskSummaryCardModel
 import com.example.newstart.feature.relax.databinding.FragmentSymptomGuideBinding
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
@@ -271,6 +276,81 @@ class SymptomGuideFragment : Fragment() {
             SymptomRiskLevel.LOW -> color(R.color.status_positive)
         }
         binding.tvOutcomeRiskBadge.backgroundTintList = ColorStateList.valueOf(badgeColor)
+        val tone = when (outcome.riskLevel) {
+            SymptomRiskLevel.HIGH -> CardTone.NEGATIVE
+            SymptomRiskLevel.MEDIUM -> CardTone.WARNING
+            SymptomRiskLevel.LOW -> CardTone.POSITIVE
+        }
+
+        binding.containerSymptomOutcomeRiskCard?.let { container ->
+            MedicalCardRenderer.renderRiskSummaryCard(
+                container,
+                RiskSummaryCardModel(
+                    badgeText = outcome.riskTitle,
+                    title = "风险分层与处理方向",
+                    summary = outcome.riskSummary,
+                    supportingText = outcome.disclaimer,
+                    bullets = outcome.nextSteps,
+                    tone = tone
+                )
+            )
+        }
+
+        binding.layoutSymptomOutcomeEvidenceCards?.let { container ->
+            MedicalCardRenderer.renderEvidenceCards(
+                container,
+                listOf(
+                    EvidenceCardModel(
+                        title = "判断依据",
+                        value = outcome.evidenceSummary.lineSequence().firstOrNull()?.toString().orEmpty(),
+                        note = outcome.deviceEvidence,
+                        badgeText = "已聚合",
+                        tone = CardTone.INFO
+                    ),
+                    EvidenceCardModel(
+                        title = "建议科室",
+                        value = outcome.suggestedDepartment,
+                        note = outcome.suggestedChecks,
+                        badgeText = "下一步",
+                        tone = tone
+                    )
+                )
+            )
+        }
+
+        binding.layoutSymptomOutcomeActionCards?.let { container ->
+            MedicalCardRenderer.renderActionGroupCards(
+                container,
+                listOf(
+                    ActionGroupCardModel(
+                        category = "继续问诊",
+                        headline = "补全病史与伴随表现",
+                        supportingText = outcome.doctorPrefill,
+                        actionLabel = getString(R.string.symptom_action_doctor),
+                        actionId = "doctor",
+                        tone = CardTone.INFO
+                    ),
+                    ActionGroupCardModel(
+                        category = "康复辅助",
+                        headline = outcome.supportAction.label,
+                        supportingText = outcome.supportAction.reason,
+                        detailLines = listOf(
+                            "协议：${outcome.supportAction.protocolType}",
+                            "时长：${(outcome.supportAction.durationSec / 60).coerceAtLeast(1)} 分钟"
+                        ),
+                        actionLabel = outcome.supportAction.label,
+                        actionId = "support",
+                        enabled = outcome.supportAction.enabled,
+                        tone = if (outcome.supportAction.enabled) CardTone.POSITIVE else CardTone.WARNING
+                    )
+                )
+            ) { card ->
+                when (card.actionId) {
+                    "doctor" -> binding.btnOutcomeContinueDoctor.performClick()
+                    "support" -> binding.btnOutcomeSupport.performClick()
+                }
+            }
+        }
 
         bindSuspectedDirection(
             titleView = binding.tvSuspected1Title,
@@ -314,7 +394,7 @@ class SymptomGuideFragment : Fragment() {
     }
 
     private fun markerLabel(marker: SelectedBodyMarker): String {
-        return "${surfaceLabel(marker.surfaceSide)}${zoneLabel(marker.zone)} 路 ${marker.symptomLabel}"
+        return "${surfaceLabel(marker.surfaceSide)}${zoneLabel(marker.zone)} · ${marker.symptomLabel}"
     }
 
     private fun surfaceLabel(side: SurfaceSide): String {

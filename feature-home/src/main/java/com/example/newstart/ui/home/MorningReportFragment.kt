@@ -17,16 +17,23 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.newstart.core.common.R
+import com.example.newstart.core.common.ui.cards.ActionGroupCardModel
+import com.example.newstart.core.common.ui.cards.CardTone
+import com.example.newstart.core.common.ui.cards.EvidenceCardModel
+import com.example.newstart.core.common.ui.cards.MedicalCardRenderer
+import com.example.newstart.core.common.ui.cards.MiniTrendCardModel
+import com.example.newstart.core.common.ui.cards.RiskSummaryCardModel
+import com.example.newstart.data.HealthMetrics
 import com.example.newstart.data.RecoveryLevel
 import com.example.newstart.data.Trend
 import com.example.newstart.feature.home.databinding.FragmentMorningReportBinding
 import com.example.newstart.intervention.PersonalizationLevel
 import com.example.newstart.intervention.PersonalizationMissingInput
+import com.example.newstart.intervention.PrescriptionItemType
 import com.example.newstart.ml.AnomalyLevel
 import com.example.newstart.ui.intervention.InterventionActionNavigator
 import com.example.newstart.ui.intervention.InterventionActionUiModel
 import com.example.newstart.ui.widget.addScaleEffect
-import com.google.android.material.button.MaterialButton
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -45,6 +52,10 @@ class MorningReportFragment : Fragment() {
 
     private val viewModel: MorningReportViewModel by viewModels()
     private var latestPersonalizationState: MorningPersonalizationUiState? = null
+    private var latestHealthMetrics: HealthMetrics? = null
+    private var latestAiCredibilityState: AiCredibilityState? = null
+    private var latestRecommendationInsightState: MorningRecommendationInsightUiState? = null
+    private var latestAdviceList: List<InterventionActionUiModel> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -122,6 +133,7 @@ class MorningReportFragment : Fragment() {
 
         viewModel.healthMetrics.observe(viewLifecycleOwner) { metrics ->
             metrics ?: return@observe
+            latestHealthMetrics = metrics
             binding.tvHeartRate.text = getString(R.string.morning_heart_rate_format, metrics.heartRate.current)
             binding.tvHeartRateTrend.text = metrics.heartRate.trend.getSymbol()
             binding.tvHeartRateTrend.setTextColor(getTrendColor(metrics.heartRate.trend))
@@ -143,9 +155,11 @@ class MorningReportFragment : Fragment() {
                 R.string.morning_hrv_status_format,
                 metrics.hrv.recoveryRate.toDouble()
             )
+            bindRecommendationCards()
         }
 
         viewModel.adviceList.observe(viewLifecycleOwner) { adviceList ->
+            latestAdviceList = adviceList
             displayAdviceList(adviceList)
         }
 
@@ -157,12 +171,18 @@ class MorningReportFragment : Fragment() {
             bindInterventionSummary(summary)
         }
 
+        viewModel.recoveryContributionSummary.observe(viewLifecycleOwner) { summary ->
+            binding.tvRecoveryContribution.text = summary
+        }
+
         viewModel.personalizationState.observe(viewLifecycleOwner) { state ->
             latestPersonalizationState = state
             bindPersonalizationState(state)
+            bindRecommendationCards()
         }
 
         viewModel.aiCredibility.observe(viewLifecycleOwner) { state ->
+            latestAiCredibilityState = state
             binding.tvAiSummary.text = state.summary
             binding.tvAiSource.text = state.sourceLabel
             binding.tvAiConfidenceValue.text = "${state.confidencePercent}%"
@@ -179,18 +199,13 @@ class MorningReportFragment : Fragment() {
             }
             binding.progressAiConfidence.setIndicatorColor(indicatorColor)
             renderAiRiskState(state)
+            bindRecommendationCards()
         }
 
         viewModel.recommendationInsight.observe(viewLifecycleOwner) { state ->
+            latestRecommendationInsightState = state
             binding.tvRecommendationExplanationSummary.text = state.summary
-            binding.tvRecommendationExplanationMeta.text = state.metaLabel
-            binding.tvRecommendationExplanationReasons.text = if (state.reasons.isEmpty()) {
-                getString(R.string.morning_recommendation_explanation_reasons_empty)
-            } else {
-                state.reasons.joinToString("\n") { "• $it" }
-            }
-            binding.tvRecommendationEffectsHeadline.text = state.effectHeadline
-            binding.tvRecommendationEffectsDetail.text = state.effectDetail
+            bindRecommendationCards()
         }
 
         viewModel.cloudLoopMessage.observe(viewLifecycleOwner) { message ->
@@ -302,17 +317,24 @@ class MorningReportFragment : Fragment() {
     }
 
     private fun displayAdviceList(adviceList: List<InterventionActionUiModel>) {
-        binding.layoutAdviceList.removeAllViews()
-        adviceList.forEach { advice ->
-            val adviceButton = layoutInflater.inflate(
-                R.layout.item_advice,
-                binding.layoutAdviceList,
-                false
-            ) as MaterialButton
-            adviceButton.text = advice.title
-            adviceButton.addScaleEffect()
-            adviceButton.setOnClickListener { onAdviceClicked(advice) }
-            binding.layoutAdviceList.addView(adviceButton)
+        val cards = adviceList.map { advice ->
+            ActionGroupCardModel(
+                category = adviceCategory(advice.itemType),
+                headline = advice.title,
+                supportingText = advice.subtitle,
+                detailLines = listOf(
+                    "时长：${(advice.durationSec / 60).coerceAtLeast(1)} 分钟",
+                    "协议：${advice.protocolCode}"
+                ),
+                actionLabel = getString(R.string.home_primary_action_intervention),
+                actionId = "${advice.protocolCode}:${advice.title}",
+                tone = adviceTone(advice.itemType)
+            )
+        }
+        MedicalCardRenderer.renderActionGroupCards(binding.layoutAdviceList, cards) { model ->
+            latestAdviceList.firstOrNull {
+                model.actionId == "${it.protocolCode}:${it.title}"
+            }?.let(::onAdviceClicked)
         }
     }
 
@@ -333,6 +355,152 @@ class MorningReportFragment : Fragment() {
     private fun onAdviceClicked(advice: InterventionActionUiModel) {
         if (!InterventionActionNavigator.navigate(this, advice, "morningPrescription")) {
             Toast.makeText(requireContext(), advice.subtitle, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun bindRecommendationCards() {
+        val insight = latestRecommendationInsightState ?: return
+        val ai = latestAiCredibilityState ?: return
+        val metrics = latestHealthMetrics
+        val personalization = latestPersonalizationState
+        val tone = riskTone(ai.riskLevel)
+
+        val evidenceCards = buildList {
+            add(
+                EvidenceCardModel(
+                    title = "主导因子",
+                    value = ai.primaryFactor.removePrefix("主导因子：").ifBlank { ai.primaryFactor },
+                    note = ai.reason,
+                    badgeText = ai.confidenceLabel,
+                    tone = tone
+                )
+            )
+            add(
+                EvidenceCardModel(
+                    title = "建议来源",
+                    value = insight.metaLabel,
+                    note = insight.reasons.takeIf { it.isNotEmpty() }?.joinToString("；")
+                        ?: getString(R.string.morning_recommendation_explanation_reasons_empty),
+                    badgeText = "证据 ${insight.reasons.size}",
+                    tone = if (insight.reasons.isEmpty()) CardTone.WARNING else CardTone.INFO
+                )
+            )
+            if (personalization != null) {
+                add(
+                    EvidenceCardModel(
+                        title = "数据准备度",
+                        value = if (personalization.isPreview) "部分就绪" else "完整就绪",
+                        note = personalization.detail,
+                        badgeText = personalization.label,
+                        tone = if (personalization.isPreview) CardTone.WARNING else CardTone.POSITIVE
+                    )
+                )
+            }
+        }
+        MedicalCardRenderer.renderEvidenceCards(binding.layoutRecommendationEvidenceCards, evidenceCards)
+
+        MedicalCardRenderer.renderMiniTrendCards(
+            binding.layoutRecommendationTrendCards,
+            metrics?.let { buildTrendCards(it) }.orEmpty()
+        )
+
+        MedicalCardRenderer.renderRiskSummaryCard(
+            binding.containerRecommendationRiskCard,
+            RiskSummaryCardModel(
+                badgeText = riskBadge(ai.riskLevel),
+                title = "今日建议依据",
+                summary = ai.summary,
+                supportingText = insight.effectDetail,
+                bullets = buildList {
+                    add(ai.inferenceHint)
+                    if (insight.effectHeadline.isNotBlank()) add(insight.effectHeadline)
+                    if (personalization?.isPreview == true) add(personalization.detail)
+                },
+                tone = tone
+            )
+        )
+    }
+
+    private fun buildTrendCards(metrics: HealthMetrics): List<MiniTrendCardModel> {
+        return listOf(
+            MiniTrendCardModel(
+                title = "心率",
+                valueText = "${metrics.heartRate.current} bpm",
+                trendText = "趋势：${trendLabel(metrics.heartRate.trend)}",
+                supportingText = "区间 ${metrics.heartRate.min}-${metrics.heartRate.max} bpm",
+                progressPercent = (((metrics.heartRate.current - 40).coerceIn(0, 60) / 60f) * 100).roundToInt(),
+                tone = toneForTrend(metrics.heartRate.trend)
+            ),
+            MiniTrendCardModel(
+                title = "血氧",
+                valueText = "${metrics.bloodOxygen.current}%",
+                trendText = "稳定度：${metrics.bloodOxygen.stability}",
+                supportingText = "夜间最低 ${metrics.bloodOxygen.min}%",
+                progressPercent = metrics.bloodOxygen.current.coerceIn(0, 100),
+                tone = if (metrics.bloodOxygen.current >= 95) CardTone.POSITIVE else CardTone.WARNING
+            ),
+            MiniTrendCardModel(
+                title = "HRV",
+                valueText = "${metrics.hrv.current} ms",
+                trendText = "恢复率：${String.format(Locale.getDefault(), "%.1f", metrics.hrv.recoveryRate)}%",
+                supportingText = "基线 ${metrics.hrv.baseline} ms",
+                progressPercent = metrics.hrv.current.coerceIn(0, 100),
+                tone = toneForTrend(metrics.hrv.trend)
+            )
+        )
+    }
+
+    private fun adviceCategory(type: PrescriptionItemType): String {
+        return when (type) {
+            PrescriptionItemType.PRIMARY -> "主干预"
+            PrescriptionItemType.SECONDARY -> "辅助干预"
+            PrescriptionItemType.LIFESTYLE -> "生活任务"
+        }
+    }
+
+    private fun adviceTone(type: PrescriptionItemType): CardTone {
+        return when (type) {
+            PrescriptionItemType.PRIMARY -> CardTone.INFO
+            PrescriptionItemType.SECONDARY -> CardTone.POSITIVE
+            PrescriptionItemType.LIFESTYLE -> CardTone.WARNING
+        }
+    }
+
+    private fun riskTone(level: AnomalyLevel): CardTone {
+        return when (level) {
+            AnomalyLevel.CRITICAL,
+            AnomalyLevel.ERROR -> CardTone.NEGATIVE
+            AnomalyLevel.WARNING,
+            AnomalyLevel.MILD -> CardTone.WARNING
+            AnomalyLevel.NORMAL -> CardTone.POSITIVE
+            AnomalyLevel.UNKNOWN -> CardTone.NEUTRAL
+        }
+    }
+
+    private fun riskBadge(level: AnomalyLevel): String {
+        return when (level) {
+            AnomalyLevel.CRITICAL -> "高风险"
+            AnomalyLevel.WARNING -> "中风险"
+            AnomalyLevel.MILD -> "轻度风险"
+            AnomalyLevel.ERROR,
+            AnomalyLevel.UNKNOWN -> "待确认"
+            AnomalyLevel.NORMAL -> "低风险"
+        }
+    }
+
+    private fun toneForTrend(trend: Trend): CardTone {
+        return when (trend) {
+            Trend.UP -> CardTone.INFO
+            Trend.DOWN -> CardTone.POSITIVE
+            Trend.STABLE -> CardTone.NEUTRAL
+        }
+    }
+
+    private fun trendLabel(trend: Trend): String {
+        return when (trend) {
+            Trend.UP -> "上升"
+            Trend.DOWN -> "下降"
+            Trend.STABLE -> "稳定"
         }
     }
 

@@ -245,6 +245,18 @@
     </fragment>
 
     <fragment
+        android:id="@+id/navigation_medication_analyze"
+        android:name="com.example.newstart.ui.relax.MedicationAnalyzeFragment"
+        android:label="@string/medication_analyze_title"
+        tools:layout="@layout/fragment_medication_analyze" />
+
+    <fragment
+        android:id="@+id/navigation_food_analyze"
+        android:name="com.example.newstart.ui.relax.FoodAnalyzeFragment"
+        android:label="@string/food_analyze_title"
+        tools:layout="@layout/fragment_food_analyze" />
+
+    <fragment
         android:id="@+id/navigation_assessment_baseline"
         android:name="com.example.newstart.ui.intervention.AssessmentBaselineFragment"
         android:label="@string/assessment_baseline_title"

@@ -14,6 +14,10 @@
     <string name="intervention_center_breathing_body">直接进入呼吸节律训练，适合压力高、睡前难放松或恢复慢的场景。</string>
     <string name="intervention_center_report_title">医检解析</string>
     <string name="intervention_center_report_body">上传或解析医检报告，用指标解释和风险标签辅助判断。</string>
+    <string name="intervention_center_medication_title">药物识别</string>
+    <string name="intervention_center_medication_body">拍照识别药盒或药板，结合当前症状生成保守建议并进入画像。</string>
+    <string name="intervention_center_food_title">饮食分析</string>
+    <string name="intervention_center_food_body">记录当前餐食热量和营养结构，把饮食状态纳入今日恢复分。</string>
     <string name="intervention_center_review_title">执行复盘</string>
     <string name="intervention_center_review_body">查看完成情况和体感反馈，作为第二天干预的依据。</string>
 

@@ -39,6 +39,7 @@ class NetworkRepository {
                     ApiClient.setAuthSession(
                         CloudSession(
                             token = loginData.token,
+                            refreshToken = loginData.refreshToken,
                             userId = loginData.userId,
                             username = loginData.username,
                             email = email
@@ -100,6 +101,7 @@ class NetworkRepository {
             ApiClient.setAuthSession(
                 CloudSession(
                     token = loginData.token,
+                    refreshToken = loginData.refreshToken,
                     userId = loginData.userId,
                     username = loginData.username,
                     email = email
@@ -362,6 +364,40 @@ class NetworkRepository {
         }
     }
 
+    suspend fun upsertMedicationRecord(request: MedicationRecordUpsertRequest): Result<Boolean> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = apiService.upsertMedicationRecord(request)
+                if (response.isSuccessful && response.body()?.code == 0) {
+                    Result.success(true)
+                } else {
+                    Result.failure(Exception(response.body()?.message ?: "upsert medication record failed"))
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun upsertFoodRecord(request: FoodRecordUpsertRequest): Result<Boolean> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = apiService.upsertFoodRecord(request)
+                if (response.isSuccessful && response.body()?.code == 0) {
+                    Result.success(true)
+                } else {
+                    Result.failure(Exception(response.body()?.message ?: "upsert food record failed"))
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
     suspend fun getInterventionEffectTrend(days: Int): Result<List<InterventionEffectTrendItem>> {
         return withContext(Dispatchers.IO) {
             try {
@@ -420,12 +456,87 @@ class NetworkRepository {
                 if (response.isSuccessful && response.body()?.data != null) {
                     Result.success(response.body()!!.data!!)
                 } else {
-                    Result.failure(Exception(response.body()?.message ?: "understand medical report failed"))
+                    Result.failure(
+                        Exception(
+                            extractAuthenticatedErrorMessage(
+                                response,
+                                response.body()?.message ?: "understand medical report failed"
+                            )
+                        )
+                    )
                 }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 Result.failure(e)
+            }
+        }
+    }
+
+    suspend fun analyzeMedicationImage(
+        file: File,
+        mimeType: String = "image/jpeg"
+    ): Result<MedicationAnalyzeData> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val mediaType = mimeType.toMediaType()
+                val filePart = MultipartBody.Part.createFormData(
+                    "file",
+                    file.name,
+                    file.asRequestBody(mediaType)
+                )
+                val mimeBody = mimeType.toRequestBody("text/plain".toMediaType())
+                val response = apiService.analyzeMedicationImage(filePart, mimeBody)
+                if (response.isSuccessful && response.body()?.data != null) {
+                    Result.success(response.body()!!.data!!)
+                } else {
+                    Result.failure(
+                        Exception(
+                            extractAuthenticatedErrorMessage(
+                                response,
+                                response.body()?.message ?: "analyze medication image failed"
+                            )
+                        )
+                    )
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Result.failure(Exception(mapExceptionMessage(e)))
+            }
+        }
+    }
+
+    suspend fun analyzeFoodImage(
+        file: File,
+        mimeType: String = "image/jpeg"
+    ): Result<FoodAnalyzeData> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val mediaType = mimeType.toMediaType()
+                val filePart = MultipartBody.Part.createFormData(
+                    "file",
+                    file.name,
+                    file.asRequestBody(mediaType)
+                )
+                val mimeBody = mimeType.toRequestBody("text/plain".toMediaType())
+                val response = apiService.analyzeFoodImage(filePart, mimeBody)
+                if (response.isSuccessful && response.body()?.data != null) {
+                    Result.success(response.body()!!.data!!)
+                } else {
+                    Result.failure(
+                        Exception(
+                            extractAuthenticatedErrorMessage(
+                                response,
+                                response.body()?.message ?: "analyze food image failed"
+                            )
+                        )
+                    )
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Result.failure(Exception(mapExceptionMessage(e)))
             }
         }
     }
@@ -607,5 +718,14 @@ class NetworkRepository {
         }.getOrDefault("")
 
         return bodyMsg.ifBlank { fallback }
+    }
+
+    private fun <T> extractAuthenticatedErrorMessage(response: Response<T>, fallback: String): String {
+        val message = extractErrorMessage(response, fallback)
+        if (response.code() == 401) {
+            ApiClient.clearAuthToken()
+            return "登录已过期，请重新登录"
+        }
+        return message
     }
 }

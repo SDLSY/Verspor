@@ -106,7 +106,7 @@
                     app:layout_constraintTop_toBottomOf="@id/tv_recovery_emoji" />
 
                 <TextView
-                    android:id="@+id/tv_intervention_summary"
+                    android:id="@+id/tv_recovery_contribution"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
@@ -115,6 +115,17 @@
                     app:layout_constraintEnd_toStartOf="@id/circularProgress"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_intervention_summary_headline" />
+
+                <TextView
+                    android:id="@+id/tv_intervention_summary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textColor="#D5F1FFFF"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toStartOf="@id/circularProgress"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_recovery_contribution" />
 
                 <com.example.newstart.ui.widget.CircularProgressView
                     android:id="@+id/circularProgress"
@@ -759,9 +770,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/home_advice_panel_title"
-                        android:textColor="@color/text_primary"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:textAppearance="@style/TextAppearance.NewStart.SectionTitle"
+                        android:textColor="@color/text_primary" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_regenerate_advice"
@@ -776,8 +786,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.NewStart.PageSubtitle" />
 
                 <LinearLayout
                     android:id="@+id/layout_advice_list"
@@ -804,57 +813,35 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/morning_recommendation_explanation_title"
-                    android:textColor="@color/text_primary"
-                    android:textSize="17sp"
-                    android:textStyle="bold" />
+                    android:textAppearance="@style/TextAppearance.NewStart.SectionTitle"
+                    android:textColor="@color/text_primary" />
 
                 <TextView
                     android:id="@+id/tv_recommendation_explanation_summary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:textColor="@color/text_primary"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:layout_marginTop="8dp"
+                    android:textAppearance="@style/TextAppearance.NewStart.PageSubtitle" />
 
-                <TextView
-                    android:id="@+id/tv_recommendation_explanation_meta"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/tv_recommendation_explanation_reasons"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@color/card_stroke" />
-
-                <TextView
-                    android:id="@+id/tv_recommendation_effects_headline"
+                <LinearLayout
+                    android:id="@+id/layout_recommendation_evidence_cards"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:textColor="@color/text_primary"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:orientation="vertical" />
 
-                <TextView
-                    android:id="@+id/tv_recommendation_effects_detail"
+                <LinearLayout
+                    android:id="@+id/layout_recommendation_trend_cards"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical" />
+
+                <FrameLayout
+                    android:id="@+id/container_recommendation_risk_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

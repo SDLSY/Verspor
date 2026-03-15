@@ -207,6 +207,8 @@ export type AdminTimelineEvent = {
     | "intervention_task"
     | "intervention_execution"
     | "medical_report"
+    | "medication_analysis"
+    | "food_analysis"
     | "audit_event";
   occurredAt: number;
   title: string;
@@ -734,7 +736,7 @@ export async function getAdminPatientTimeline(userId: string, filters: { types?:
     );
   }
 
-  const [taskRows, executionRows, medicalRows, auditRows] = await Promise.all([
+  const [taskRows, executionRows, medicalRows, medicationRows, foodRows, auditRows] = await Promise.all([
     resolveOptionalData(
       client
         .from("intervention_tasks")
@@ -761,6 +763,26 @@ export async function getAdminPatientTimeline(userId: string, filters: { types?:
         .select("report_id,report_type,risk_level,report_date")
         .eq("user_id", userId)
         .order("report_date", { ascending: false })
+        .limit(20)
+        .returns<Row[]>(),
+      []
+    ),
+    resolveOptionalData(
+      client
+        .from("medication_analysis_records")
+        .select("record_id,recognized_name,risk_level,requires_manual_review,captured_at")
+        .eq("user_id", userId)
+        .order("captured_at", { ascending: false })
+        .limit(20)
+        .returns<Row[]>(),
+      []
+    ),
+    resolveOptionalData(
+      client
+        .from("food_analysis_records")
+        .select("record_id,meal_type,estimated_calories,nutrition_risk_level,captured_at")
+        .eq("user_id", userId)
+        .order("captured_at", { ascending: false })
         .limit(20)
         .returns<Row[]>(),
       []
@@ -848,6 +870,33 @@ export async function getAdminPatientTimeline(userId: string, filters: { types?:
       title: "已导入医疗报告",
       description: `${formatReportTypeLabel(getString(row.report_type))} / ${formatRiskLabel(getString(row.risk_level))}`,
       tone: getString(row.risk_level).trim().toUpperCase() === "HIGH" ? "warning" : "info",
+    });
+  });
+  medicationRows.forEach((row) => {
+    const occurredAt = toTimestamp(getString(row.captured_at));
+    if (!occurredAt) return;
+    const requiresManualReview = Boolean(row.requires_manual_review);
+    const riskLevel = getString(row.risk_level).trim().toUpperCase();
+    events.push({
+      id: `medication:${getString(row.record_id)}`,
+      type: "medication_analysis",
+      occurredAt,
+      title: "已完成药物识别",
+      description: `${getString(row.recognized_name) || "待确认药物"} / ${requiresManualReview ? "需人工确认" : formatRiskLabel(riskLevel)}`,
+      tone: requiresManualReview || riskLevel === "HIGH" ? "warning" : "info",
+    });
+  });
+  foodRows.forEach((row) => {
+    const occurredAt = toTimestamp(getString(row.captured_at));
+    if (!occurredAt) return;
+    const riskLevel = getString(row.nutrition_risk_level).trim().toUpperCase();
+    events.push({
+      id: `food:${getString(row.record_id)}`,
+      type: "food_analysis",
+      occurredAt,
+      title: "已完成饮食分析",
+      description: `${getString(row.meal_type) || "UNSPECIFIED"} / ${getNumber(row.estimated_calories) ?? 0} kcal / ${formatRiskLabel(riskLevel)}`,
+      tone: riskLevel === "HIGH" ? "warning" : "success",
     });
   });
   auditRows.forEach((row) => {

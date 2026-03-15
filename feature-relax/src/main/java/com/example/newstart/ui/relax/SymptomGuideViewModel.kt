@@ -341,12 +341,12 @@ class SymptomGuideViewModel(application: Application) : AndroidViewModel(applica
             SymptomBodyZone.HEAD -> listOf(
                 SymptomSuspectedDirection(
                     title = "紧张性头痛或睡眠不足",
-                    reason = "头部不适常和压力、睡眠不足、长时间盯屏或节律紊乱叠加出现，可继续补充起始时间和加重场景。",
+                    reason = "头部不适常与压力、睡眠不足、长时间盯屏或作息紊乱叠加出现，可继续补充起始时间和加重场景。",
                     confidenceLabel = if (stressTrigger) "依据较强" else "可继续补充"
                 ),
                 SymptomSuspectedDirection(
                     title = "上呼吸道或鼻窦刺激",
-                    reason = "若伴随鼻塞、咽部不适、发热或晨起更明显，需要进一步区分感冒、过敏或鼻窦相关问题。",
+                    reason = "如果伴随鼻塞、咽部不适、发热或晨起更明显，需要继续区分感冒、过敏或鼻窦相关问题。",
                     confidenceLabel = "可继续补充"
                 ),
                 SymptomSuspectedDirection(
@@ -368,12 +368,12 @@ class SymptomGuideViewModel(application: Application) : AndroidViewModel(applica
                 ),
                 SymptomSuspectedDirection(
                     title = "上呼吸道刺激或轻度气道不适",
-                    reason = "若伴随咳嗽、发热、夜间加重或活动后气促，需要继续补充呼吸道相关症状。",
+                    reason = "如果伴随咳嗽、发热、夜间加重或活动后气促，需要继续补充呼吸道相关症状。",
                     confidenceLabel = "可继续补充"
                 ),
                 SymptomSuspectedDirection(
                     title = "压力相关自主神经波动",
-                    reason = "如果本次不适和压力、睡眠差或情绪波动同步出现，可继续通过 AI 问诊区分身心因素与器质性问题。",
+                    reason = "如果本次不适与压力、睡眠差或情绪波动同时出现，可继续通过 AI 问诊区分身心因素与器质性问题。",
                     confidenceLabel = if (stressTrigger) "依据较强" else "需结合问诊"
                 )
             )
@@ -386,7 +386,7 @@ class SymptomGuideViewModel(application: Application) : AndroidViewModel(applica
                 ),
                 SymptomSuspectedDirection(
                     title = "饮食相关刺激",
-                    reason = "若和进食、熬夜、辛辣或酒精相关，建议优先记录最近饮食和症状发生顺序。",
+                    reason = "如果和进食、油腻、辛辣或酒精相关，建议优先记录最近饮食和症状发生顺序。",
                     confidenceLabel = if (foodTrigger) "依据较强" else "可继续补充"
                 ),
                 SymptomSuspectedDirection(
@@ -404,7 +404,7 @@ class SymptomGuideViewModel(application: Application) : AndroidViewModel(applica
                 ),
                 SymptomSuspectedDirection(
                     title = "关节或软组织轻度劳损",
-                    reason = "若活动时更明显、休息后缓解，可继续补充受力动作、扭转、负重或重复使用情况。",
+                    reason = "如果活动时更明显、休息后缓解，可继续补充受力动作、扭转、负重或重复使用情况。",
                     confidenceLabel = "可继续补充"
                 ),
                 SymptomSuspectedDirection(
@@ -434,7 +434,7 @@ class SymptomGuideViewModel(application: Application) : AndroidViewModel(applica
                 label = app.getString(R.string.symptom_action_support),
                 protocolType = "BREATH_4_7_8",
                 durationSec = 240,
-                reason = "头部不适场景下，先用低负担呼吸节律降低紧张与唤醒水平。"
+                reason = "头部不适场景下，可先用低负担呼吸节律降低紧张和警觉水平。"
             )
             SymptomBodyZone.CHEST -> SymptomSupportAction(
                 enabled = true,
@@ -448,14 +448,14 @@ class SymptomGuideViewModel(application: Application) : AndroidViewModel(applica
                 label = app.getString(R.string.symptom_action_support),
                 protocolType = "BOX",
                 durationSec = 240,
-                reason = "腹部不适优先选低负担节律训练，避免过快或过深呼吸造成刺激。"
+                reason = "腹部不适优先选择低负担节律训练，避免过快或过深呼吸造成刺激。"
             )
             SymptomBodyZone.LIMB -> SymptomSupportAction(
                 enabled = true,
                 label = app.getString(R.string.symptom_action_support),
                 protocolType = "BREATH_4_6",
                 durationSec = 180,
-                reason = "四肢酸痛或疲劳可先配合缓和呼吸，降低整体紧张和恢复负荷。"
+                reason = "四肢酸痛或疲劳可先配合缓和呼吸，降低整体紧张和恢复负担。"
             )
         }
     }
@@ -571,7 +571,7 @@ class SymptomGuideViewModel(application: Application) : AndroidViewModel(applica
                 }
             )
             SymptomRiskLevel.LOW -> listOf(
-                "可先居家观察 24 至 48 小时，记录诱因和变化。",
+                "可先居家观察 24 到 48 小时，记录诱因和变化。",
                 "优先选择低负担放松或康复动作，避免高刺激训练。",
                 "如症状未缓解、范围扩大或出现红旗症状，及时转入线下评估。"
             )

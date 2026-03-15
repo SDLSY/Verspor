@@ -238,7 +238,7 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
         )
         _statusMessage.value = "已断开连接"
         
-        // 鍋滄鏁版嵁閲囬泦
+        // 停止数据采集
         stopDataCollection()
         stopBackgroundCollection()
         resetPpgWaveState()
@@ -288,7 +288,7 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
     }
     
     /**
-     * 鍋滄鎵弿
+     * 停止扫描
      */
     fun stopScan() {
         bleConnectionManager.stopScan()
@@ -329,7 +329,7 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
                     )
                     _currentDevice.value = connectedDevice
                     _statusMessage.value = "连接成功"
-                    _scannedDevices.value = emptyList()  // 娓呯┖鎵弿鍒楄〃
+                    _scannedDevices.value = emptyList()  // 清空扫描列表
                     
                     // 淇濆瓨鍒版暟鎹簱
                     saveDeviceToDb(connectedDevice)
@@ -386,15 +386,15 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
     }
     
     /**
-     * 鍋滄鏁版嵁閲囬泦
+     * 停止数据采集
      */
     private fun stopDataCollection() {
-        // 娓呯┖鏁版嵁鍥炶皟
+        // 清空数据回调
         bleConnectionManager.setOnDataReceived { }
     }
 
     /**
-     * 鍚姩鍚庡彴閲囬泦鏈嶅姟锛堟樉寮忚Е鍙戯紝閬垮厤涓庡墠鍙拌繛鎺ユ姠鍗狅級
+     * 启动后台采集服务（显式触发，避免与前台连接抢占）
      */
     fun startBackgroundCollection() {
         if (DemoConfig.isDemoMode) {
@@ -424,7 +424,7 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     /**
-     * 鍋滄鍚庡彴閲囬泦鏈嶅姟
+     * 停止后台采集服务
      */
     fun stopBackgroundCollection() {
         val intent = DataCollectionServiceContract.createStopIntent(getApplication())

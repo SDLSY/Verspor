@@ -69,6 +69,10 @@ export type PrescriptionServerContext = {
   latestSleepQuality: string | null;
   latestMedicalRiskLevel: string | null;
   latestMedicalMetricLabels: string[];
+  latestMedicationSummary: string | null;
+  recentMedicationRiskFlags: string[];
+  latestNutritionSummary: string | null;
+  nutritionRiskLevel: string | null;
   recentInterventionSummary: string[];
   latestSleepSummary: string[];
   breathingFatigue: boolean;

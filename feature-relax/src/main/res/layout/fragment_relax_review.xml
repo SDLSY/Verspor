@@ -66,6 +66,19 @@
                 android:text="@string/relax_review_last_30_days" />
         </com.google.android.material.chip.ChipGroup>
 
+        <LinearLayout
+            android:id="@+id/layout_relax_review_summary_cards"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:orientation="vertical" />
+
+        <FrameLayout
+            android:id="@+id/container_relax_review_risk_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp" />
+
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.NewStart.Card"
             android:layout_width="match_parent"
@@ -409,5 +422,12 @@
                     android:visibility="gone" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:id="@+id/layout_relax_review_action_cards"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical" />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

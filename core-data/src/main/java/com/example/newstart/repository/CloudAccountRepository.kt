@@ -103,7 +103,7 @@ class CloudAccountRepository {
                 } else {
                     Result.failure(
                         Exception(
-                            extractErrorMessage(
+                            extractAuthenticatedErrorMessage(
                                 response,
                                 response.body()?.message ?: "获取个人资料失败"
                             )
@@ -129,7 +129,7 @@ class CloudAccountRepository {
                 } else {
                     Result.failure(
                         Exception(
-                            extractErrorMessage(
+                            extractAuthenticatedErrorMessage(
                                 response,
                                 response.body()?.message ?: "保存个人资料失败"
                             )
@@ -181,6 +181,7 @@ class CloudAccountRepository {
         ApiClient.setAuthSession(
             CloudSession(
                 token = authData.token,
+                refreshToken = authData.refreshToken,
                 userId = authData.userId,
                 username = username,
                 email = authData.email
@@ -199,6 +200,15 @@ class CloudAccountRepository {
                 email = profile.email
             )
         )
+    }
+
+    private fun <T> extractAuthenticatedErrorMessage(response: Response<T>, fallback: String): String {
+        val message = extractErrorMessage(response, fallback)
+        if (response.code() == 401) {
+            ApiClient.clearAuthToken()
+            return "登录已过期，请重新登录"
+        }
+        return message
     }
 
     private fun isTransientNetworkError(error: Throwable): Boolean {

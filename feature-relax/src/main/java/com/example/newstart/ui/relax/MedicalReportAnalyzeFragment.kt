@@ -16,12 +16,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.newstart.core.common.R
+import com.example.newstart.core.common.ui.cards.MedicalCardRenderer
 import com.example.newstart.feature.relax.databinding.FragmentMedicalReportAnalyzeBinding
+import com.example.newstart.util.MedicalReportDraftFormatter
 import com.example.newstart.util.PerformanceTelemetry
 import com.example.newstart.xfyun.ocr.XfyunOcrClient
 import com.example.newstart.xfyun.ocr.XfyunOcrResult
@@ -132,6 +135,11 @@ class MedicalReportAnalyzeFragment : Fragment() {
             binding.progressMedicalAnalyze.visibility = if (state.isAnalyzing) View.VISIBLE else View.GONE
             binding.tvMedicalStatus.text = state.statusText
             binding.tvMedicalMetrics.text = state.metricsText
+            MedicalCardRenderer.renderEvidenceCards(binding.layoutMedicalSummaryCards, state.summaryCards)
+            MedicalCardRenderer.renderMetricRangeCards(binding.layoutMedicalMetricCards, state.metricCards)
+            MedicalCardRenderer.renderRiskSummaryCard(binding.containerMedicalRiskCard, state.riskSummaryCard)
+            MedicalCardRenderer.renderActionGroupCards(binding.layoutMedicalActionCards, state.actionCards)
+            binding.tvMedicalMetrics.isVisible = state.metricsText.isNotBlank()
             binding.tvMedicalReadable.text = state.readableReportText.ifBlank {
                 getString(R.string.medical_report_readable_empty)
             }
@@ -199,12 +207,13 @@ class MedicalReportAnalyzeFragment : Fragment() {
                     startElapsedMs = ocrStartElapsedMs,
                     attributes = mapOf("success" to "true")
                 )
+                val cleanedMarkdown = MedicalReportDraftFormatter.cleanOcrMarkup(result.markdown)
                 val imageTag = "camera_preview_${System.currentTimeMillis()}"
                 viewModel.onOcrTextReady(
                     ocrText = result.bestEffortText,
                     imageTag = imageTag,
                     reportType = "PHOTO",
-                    ocrMarkdown = result.markdown
+                    ocrMarkdown = cleanedMarkdown
                 )
             }.onFailure { error ->
                 PerformanceTelemetry.recordDuration(
@@ -284,18 +293,19 @@ class MedicalReportAnalyzeFragment : Fragment() {
     private suspend fun extractTextFromImageUri(uri: Uri): DocumentOcrPayload {
         val bitmap = loadBitmapFromUri(uri)
         val result = ocrClient.recognizeDetailed(bitmap)
+        val cleanedMarkdown = MedicalReportDraftFormatter.cleanOcrMarkup(result.markdown)
         return DocumentOcrPayload(
             text = result.bestEffortText,
-            markdown = result.markdown
+            markdown = cleanedMarkdown
         )
     }
 
     private suspend fun extractTextFromPdf(uri: Uri): DocumentOcrPayload {
         val resolver = requireContext().contentResolver
         return runCatching {
-            val markdown = pdfOcrClient.recognize(resolver, uri)
+            val markdown = MedicalReportDraftFormatter.cleanOcrMarkup(pdfOcrClient.recognize(resolver, uri))
             DocumentOcrPayload(
-                text = markdown,
+                text = MedicalReportDraftFormatter.markdownToPlainText(markdown),
                 markdown = markdown
             )
         }.getOrElse {
@@ -319,8 +329,9 @@ class MedicalReportAnalyzeFragment : Fragment() {
                         if (pageText.isNotBlank()) {
                             pageTexts += pageText
                         }
-                        if (pageResult.markdown.isNotBlank()) {
-                            pageMarkdowns += pageResult.markdown.trim()
+                        val cleanedMarkdown = MedicalReportDraftFormatter.cleanOcrMarkup(pageResult.markdown)
+                        if (cleanedMarkdown.isNotBlank()) {
+                            pageMarkdowns += cleanedMarkdown
                         }
                     }
                 }

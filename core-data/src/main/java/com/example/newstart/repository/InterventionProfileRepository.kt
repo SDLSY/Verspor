@@ -15,6 +15,8 @@ import com.example.newstart.intervention.PersonalizationLevel
 import com.example.newstart.intervention.PersonalizationMissingInput
 import com.example.newstart.intervention.PersonalizationStatus
 import com.example.newstart.intervention.ProfileTriggerType
+import com.example.newstart.lifestyle.FoodAnalysisRecord
+import com.example.newstart.lifestyle.MedicationAnalysisRecord
 import com.example.newstart.network.models.AssessmentBaselineSummaryUpsertRequest
 import com.example.newstart.network.models.DoctorInquirySummaryUpsertRequest
 import com.google.gson.Gson
@@ -38,6 +40,8 @@ class InterventionProfileRepository(
     private val executionDao = db.interventionExecutionDao()
     private val assessmentRepository = AssessmentRepository(context, db)
     private val medicalReportRepository = MedicalReportRepository(db.medicalReportDao(), db.medicalMetricDao())
+    private val medicationAnalysisRepository = MedicationAnalysisRepository(context, db)
+    private val foodAnalysisRepository = FoodAnalysisRepository(context, db)
     private val networkRepository = NetworkRepository()
     private val doctorRepository = DoctorConversationRepository(
         db.doctorSessionDao(),
@@ -224,6 +228,8 @@ class InterventionProfileRepository(
         val latestHealthMetrics = healthMetricsDao.getLatestOnce()
         val recentTasks = taskDao.getRecent(10)
         val recentExecutions = executionDao.getRecent(10)
+        val latestMedicationRecord = medicationAnalysisRepository.getLatest()
+        val recentFoodRecords = foodAnalysisRepository.getRecentSince(now - DAY_MS)
 
         val evidence = linkedMapOf<String, MutableList<String>>(
             "sleepDisturbance" to mutableListOf(),
@@ -232,7 +238,9 @@ class InterventionProfileRepository(
             "recoveryCapacity" to mutableListOf(),
             "anxietyRisk" to mutableListOf(),
             "depressiveRisk" to mutableListOf(),
-            "adherenceReadiness" to mutableListOf()
+            "adherenceReadiness" to mutableListOf(),
+            "medicationRisk" to mutableListOf(),
+            "nutritionRisk" to mutableListOf()
         )
 
         val averageSleep1 = sleepDao.getAverageSleepDuration(1)
@@ -294,6 +302,16 @@ class InterventionProfileRepository(
             evidence = evidence.getValue("adherenceReadiness")
         )
 
+        val medicationRisk = buildMedicationRisk(
+            latestMedicationRecord = latestMedicationRecord,
+            evidence = evidence.getValue("medicationRisk")
+        )
+
+        val nutritionRisk = buildNutritionRisk(
+            recentFoodRecords = recentFoodRecords,
+            evidence = evidence.getValue("nutritionRisk")
+        )
+
         val redFlags = collectRedFlags(
             latestDoctorAssessment = latestDoctorAssessment,
             phq9Answers = assessmentRepository.getLatestScaleAnswers("PHQ9")
@@ -310,7 +328,9 @@ class InterventionProfileRepository(
             "recoveryCapacity" to recoveryCapacity,
             "anxietyRisk" to anxietyRisk,
             "depressiveRisk" to depressiveRisk,
-            "adherenceReadiness" to adherenceReadiness
+            "adherenceReadiness" to adherenceReadiness,
+            "medicationRisk" to medicationRisk,
+            "nutritionRisk" to nutritionRisk
         )
 
         return InterventionProfileSnapshot(
@@ -535,6 +555,69 @@ class InterventionProfileRepository(
             evidence += "已有 ${recentExecutionsCount} 次完成回执"
         }
         return readiness
+    }
+
+    private fun buildMedicationRisk(
+        latestMedicationRecord: MedicationAnalysisRecord?,
+        evidence: MutableList<String>
+    ): Int {
+        latestMedicationRecord ?: run {
+            evidence += "暂无药物识别记录"
+            return 20
+        }
+        evidence += "最近一次药物识别：${latestMedicationRecord.recognizedName.ifBlank { "待确认药物" }}"
+        if (latestMedicationRecord.specification.isNotBlank()) {
+            evidence += "规格：${latestMedicationRecord.specification}"
+        }
+        evidence += latestMedicationRecord.riskFlags.take(3)
+        if (latestMedicationRecord.requiresManualReview) {
+            evidence += "该药物识别仍需人工确认"
+        }
+
+        var score = when (latestMedicationRecord.riskLevel.uppercase()) {
+            "HIGH" -> 78
+            "MEDIUM" -> 58
+            else -> 26
+        }
+        if (latestMedicationRecord.requiresManualReview) {
+            score += 12
+        }
+        if (latestMedicationRecord.confidence < 0.55f) {
+            score += 8
+        }
+        return clamp(score)
+    }
+
+    private fun buildNutritionRisk(
+        recentFoodRecords: List<FoodAnalysisRecord>,
+        evidence: MutableList<String>
+    ): Int {
+        if (recentFoodRecords.isEmpty()) {
+            evidence += "最近 24 小时暂无饮食分析记录"
+            return 35
+        }
+
+        val totalCalories = recentFoodRecords.sumOf { it.estimatedCalories }
+        val allFlags = recentFoodRecords.flatMap { it.nutritionFlags }.distinct()
+        val highRiskCount = recentFoodRecords.count { it.nutritionRiskLevel.equals("HIGH", ignoreCase = true) }
+        evidence += "最近 24 小时饮食热量约 ${totalCalories} kcal"
+        if (allFlags.isNotEmpty()) {
+            evidence += allFlags.take(3)
+        }
+
+        var score = when {
+            highRiskCount > 0 -> 72
+            recentFoodRecords.any { it.nutritionRiskLevel.equals("MEDIUM", ignoreCase = true) } -> 55
+            else -> 28
+        }
+        if (totalCalories in 1100..2200) {
+            score -= 8
+            evidence += "总热量仍处于相对可接受区间"
+        } else if (totalCalories in 1..799 || totalCalories > 2600) {
+            score += 10
+            evidence += "总热量偏离较大"
+        }
+        return clamp(score)
     }
 
     private fun collectRedFlags(

@@ -10,6 +10,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.newstart.core.common.ui.cards.ActionGroupCardModel
+import com.example.newstart.core.common.ui.cards.CardTone
+import com.example.newstart.core.common.ui.cards.EvidenceCardModel
+import com.example.newstart.core.common.ui.cards.MedicalCardRenderer
+import com.example.newstart.core.common.ui.cards.RiskSummaryCardModel
 import com.example.newstart.core.common.R as CommonR
 import com.example.newstart.feature.relax.databinding.FragmentRelaxReviewBinding
 import com.github.mikephil.charting.charts.LineChart
@@ -115,10 +120,10 @@ class RelaxReviewFragment : Fragment() {
                     }
                 )
                 binding.tvRelaxReviewRecoveryGain.setTextColor(gainColor)
-                binding.tvRelaxReviewRecoveryLinkSubtitle.text = getString(
-                    CommonR.string.relax_review_recovery_samples_format,
-                    state.recoveryLinkedDays
-                )
+            binding.tvRelaxReviewRecoveryLinkSubtitle.text = getString(
+                CommonR.string.relax_review_recovery_samples_format,
+                state.recoveryLinkedDays
+            )
             } else {
                 binding.tvRelaxReviewRecoverySameDay.text = "--"
                 binding.tvRelaxReviewRecoveryNextDay.text = "--"
@@ -136,6 +141,7 @@ class RelaxReviewFragment : Fragment() {
                 values = state.trendValues
             )
             renderProtocolRows(state.protocolRows)
+            renderReviewCards(state)
 
             binding.tvRelaxReviewEmpty.visibility = if (state.hasData) View.GONE else View.VISIBLE
         }
@@ -229,6 +235,125 @@ class RelaxReviewFragment : Fragment() {
             ).progress = row.progress
 
             binding.layoutRelaxProtocolRankList.addView(itemView)
+        }
+    }
+
+    private fun renderReviewCards(state: RelaxReviewUiState) {
+        val summaryCards = listOf(
+            EvidenceCardModel(
+                title = "训练次数",
+                value = state.totalSessions.toString(),
+                note = if (state.range == RelaxReviewRange.LAST_7_DAYS) "近 7 天累计执行次数" else "近 30 天累计执行次数",
+                badgeText = "执行",
+                tone = if (state.totalSessions > 0) CardTone.INFO else CardTone.NEUTRAL
+            ),
+            EvidenceCardModel(
+                title = "累计分钟",
+                value = state.totalMinutes.toString(),
+                note = "当前统计窗口内的总训练时长",
+                badgeText = "时长",
+                tone = if (state.totalMinutes >= 30) CardTone.POSITIVE else CardTone.NEUTRAL
+            ),
+            EvidenceCardModel(
+                title = "平均效果",
+                value = "${state.avgEffectScore}",
+                note = getString(CommonR.string.relax_review_avg_drop_format, state.avgStressDrop),
+                badgeText = "效果",
+                tone = when {
+                    state.avgEffectScore >= 75 -> CardTone.POSITIVE
+                    state.avgEffectScore >= 50 -> CardTone.INFO
+                    state.avgEffectScore > 0 -> CardTone.WARNING
+                    else -> CardTone.NEUTRAL
+                }
+            )
+        )
+        MedicalCardRenderer.renderEvidenceCards(binding.layoutRelaxReviewSummaryCards, summaryCards)
+
+        val riskCard = if (!state.hasData) {
+            RiskSummaryCardModel(
+                badgeText = "待积累",
+                title = "还没有形成稳定复盘结论",
+                summary = "先继续完成训练和恢复记录，再判断哪种方案更有效。",
+                supportingText = "当前没有足够的执行样本和恢复样本。",
+                bullets = listOf("先从放松中心继续执行主方案", "至少积累 3 到 5 次记录再回来看趋势"),
+                tone = CardTone.NEUTRAL
+            )
+        } else {
+            val gain = state.recoveryGainVsControl
+            val badge = when {
+                gain >= 0.8f && state.avgEffectScore >= 70 -> "明显改善"
+                gain >= 0f -> "持续观察"
+                else -> "有待加强"
+            }
+            val tone = when {
+                gain >= 0.8f && state.avgEffectScore >= 70 -> CardTone.POSITIVE
+                gain >= 0f -> CardTone.INFO
+                else -> CardTone.WARNING
+            }
+            RiskSummaryCardModel(
+                badgeText = badge,
+                title = if (tone == CardTone.POSITIVE) {
+                    "当前方案对恢复有正向帮助"
+                } else {
+                    "当前方案仍需继续观察和微调"
+                },
+                summary = "最佳方案是 ${state.topProtocolName}，平均效果 ${state.avgEffectScore}，关联增益 ${String.format("%.1f", gain)}。",
+                supportingText = if (state.recoveryLinkedDays > 0) {
+                    "恢复联动样本 ${state.recoveryLinkedDays} 天，对照样本 ${state.recoveryControlDays} 天。"
+                } else {
+                    "当前恢复联动样本不足，结论以趋势观察为主。"
+                },
+                bullets = listOf(
+                    "最佳方案：${state.topProtocolName}",
+                    "平均下降：${String.format("%.1f", state.avgStressDrop)}",
+                    "次日恢复增益：${String.format("%+.1f", state.recoveryDelta)}"
+                ),
+                tone = tone
+            )
+        }
+        MedicalCardRenderer.renderRiskSummaryCard(binding.containerRelaxReviewRiskCard, riskCard)
+
+        val actionCards = buildList {
+            add(
+                ActionGroupCardModel(
+                    category = "继续执行",
+                    headline = if (state.hasData) "再次执行最佳方案：${state.topProtocolName}" else "先回到放松中心开始训练",
+                    supportingText = if (state.hasData) {
+                        state.topProtocolDetail
+                    } else {
+                        "先形成基础样本，再回来看复盘趋势会更有意义。"
+                    },
+                    detailLines = listOf(
+                        if (state.hasData) "当前窗口内累计 ${state.totalSessions} 次训练" else "当前暂无可用复盘样本"
+                    ),
+                    actionLabel = "进入放松中心",
+                    enabled = true,
+                    tone = if (state.hasData) CardTone.POSITIVE else CardTone.INFO
+                )
+            )
+            add(
+                ActionGroupCardModel(
+                    category = "趋势对照",
+                    headline = "继续查看睡眠与恢复趋势",
+                    supportingText = "把训练复盘和趋势页一起看，更容易判断是否真的有效。",
+                    detailLines = listOf(
+                        if (state.recoveryLinkedDays > 0) {
+                            "当前已有 ${state.recoveryLinkedDays} 天恢复联动样本"
+                        } else {
+                            "恢复联动样本不足时，优先看近期总体趋势"
+                        }
+                    ),
+                    actionLabel = "查看趋势",
+                    enabled = true,
+                    tone = CardTone.INFO
+                )
+            )
+        }
+        MedicalCardRenderer.renderActionGroupCards(binding.layoutRelaxReviewActionCards, actionCards) { card ->
+            when (card.headline) {
+                "继续查看睡眠与恢复趋势" -> findNavController().navigate(CommonR.id.navigation_trend)
+                else -> findNavController().navigate(CommonR.id.navigation_relax_hub)
+            }
         }
     }
 
