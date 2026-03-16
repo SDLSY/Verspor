@@ -1,4 +1,4 @@
-﻿import type { Route } from "next";
+import type { Route } from "next";
 import Link from "next/link";
 import { AdminShell } from "@/components/admin-shell";
 import {
@@ -14,6 +14,7 @@ import {
   toPillTone,
 } from "@/components/admin-ui";
 import { requireAdminPage } from "@/lib/admin-auth";
+import { adminDemoScenarios } from "@/lib/admin-story";
 import { listAdminPatients } from "@/lib/admin-patients";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -75,70 +76,131 @@ export default async function PatientsPage({
     pageSize: pickNumber(resolved.pageSize),
     q: pickFirst(resolved.q) || undefined,
     riskLevel: pickFirst(resolved.riskLevel) || undefined,
+    scenarioCode: pickFirst(resolved.scenarioCode) || undefined,
+    demoOnly: pickBoolean(resolved.demoOnly),
     pendingOnly: pickBoolean(resolved.pendingOnly),
     failedOnly: pickBoolean(resolved.failedOnly),
     recentSleepOnly: pickBoolean(resolved.recentSleepOnly),
     recentSleepDays: pickNumber(resolved.recentSleepDays),
   });
 
-  const priorityPatients = data.items.filter((item) => item.latestRiskLevel === "HIGH").slice(0, 5);
-  const recentActivityPatients = data.items.slice(0, 8);
-  const reminders = [
-    data.summary.pendingInterventions > 0
-      ? `有 ${data.summary.pendingInterventions} 条待处理干预任务需要安排执行或回访。`
-      : null,
-    data.summary.staleSleepReports > 0
-      ? `有 ${data.summary.staleSleepReports} 名患者最近有睡眠记录但缺少最新夜间报告。`
-      : null,
-    data.summary.failedJobPatients > 0
-      ? `有 ${data.summary.failedJobPatients} 名患者最近受到失败作业影响，建议优先排查。`
-      : null,
-  ].filter(Boolean) as string[];
+  const demoPatients = data.items.filter((item) => item.isDemoUser);
+  const priorityPatients = data.items.filter((item) => item.latestRiskLevel === "HIGH").slice(0, 4);
 
   return (
     <AdminShell
       section="patients"
       activePath="/patients"
-      title="患者运营工作台"
-      subtitle="围绕高风险、待处理干预、报告状态和最近建议异常组织患者运营主线。"
+      title="患者工作台"
+      subtitle="先讲 demo 闭环患者，再下钻完整患者池和日常运营动作。"
       actions={
-        <Link href={"/recommendations" as Route} className="admin-secondary-button link-button">
-          查看建议轨迹
-        </Link>
+        <div className="admin-button-row">
+          <Link href={"/story" as Route} className="admin-secondary-button link-button">
+            返回闭环故事
+          </Link>
+          <Link href={"/patients?demoOnly=1" as Route} className="admin-primary-button link-button">
+            只看演示患者
+          </Link>
+        </div>
       }
     >
       <section className="admin-stat-grid four-up">
         <AdminStatCard
+          label="演示患者"
+          value={String(data.summary.demoPatients)}
+          detail="用于答辩与固定闭环演示"
+          tone="info"
+        />
+        <AdminStatCard
           label="高风险患者"
           value={String(data.summary.highRiskPatients)}
-          detail="基于恢复分、异常分和医疗风险的综合判断"
+          detail="优先进入人工处理视角"
           tone="danger"
         />
         <AdminStatCard
           label="待处理干预"
           value={String(data.summary.pendingInterventions)}
-          detail="待执行或待人工处理的任务总量"
+          detail="待执行或待跟进任务"
           tone="warning"
         />
         <AdminStatCard
-          label="待刷新夜间报告"
-          value={String(data.summary.staleSleepReports)}
-          detail="最近有睡眠记录但未生成最新报告"
-          tone="info"
-        />
-        <AdminStatCard
-          label="受失败作业影响"
+          label="失败作业影响"
           value={String(data.summary.failedJobPatients)}
-          detail="近 24 小时内受推理失败影响的患者数"
+          detail="近 24 小时需要排查患者"
           tone="danger"
         />
       </section>
 
-      <AdminSectionCard title="筛选条件" description="按风险、待处理状态和最近睡眠活跃度筛选患者。">
-        <form method="get" className="admin-filter-grid">
+      <section className="admin-grid two-up">
+        <AdminSectionCard title="闭环患者池" description="直接展示演示账号，对应每条故事线的讲解入口。">
+          {demoPatients.length === 0 ? (
+            <EmptyState title="暂无演示患者" description="请先 seed demo 账号，或检查当前筛选条件。" />
+          ) : (
+            <div className="admin-stack">
+              {demoPatients.map((item) => (
+                <article key={item.userId} className="admin-alert-card">
+                  <div className="admin-button-row left-align">
+                    <div className="admin-table-primary">{item.displayName}</div>
+                    {item.scenarioLabel ? <AdminPill tone="info">{item.scenarioLabel}</AdminPill> : null}
+                    <AdminPill tone={toPillTone(item.latestRiskLevel, "risk")}>
+                      {formatRiskLabel(item.latestRiskLevel)}
+                    </AdminPill>
+                  </div>
+                  <p>{item.storyStage ?? "演示场景"}</p>
+                  <span>{item.actionSummary ?? "打开患者工作台，按证据 -> 建议 -> 回写顺序讲解。"}</span>
+                  <div className="admin-button-row left-align">
+                    <Link href={`/patients/${item.userId}` as Route} className="admin-inline-link">
+                      打开工作台
+                    </Link>
+                    <Link href={item.recommendedPath as Route} className="admin-inline-link">
+                      直达讲解入口
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </AdminSectionCard>
+
+        <AdminSectionCard title="重点跟进患者" description="优先处理高风险、任务积压或失败作业影响患者。">
+          {priorityPatients.length === 0 ? (
+            <EmptyState title="暂无重点患者" description="当前筛选结果里没有高风险患者。" />
+          ) : (
+            <div className="admin-stack">
+              {priorityPatients.map((item) => (
+                <div key={item.userId} className="admin-alert-card danger">
+                  <div className="admin-button-row left-align">
+                    <div className="admin-table-primary">{item.displayName}</div>
+                    <AdminPill tone={toPillTone(item.latestRiskLevel, "risk")}>
+                      {formatRiskLabel(item.latestRiskLevel)}
+                    </AdminPill>
+                  </div>
+                  <p>
+                    恢复分 {formatScore(item.latestRecoveryScore)} / 待处理任务 {item.pendingInterventionCount} / 失败作业{" "}
+                    {item.hasRecentFailedJob ? "是" : "否"}
+                  </p>
+                  <div className="admin-button-row left-align">
+                    <Link href={`/patients/${item.userId}` as Route} className="admin-inline-link">
+                      打开患者详情
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </AdminSectionCard>
+      </section>
+
+      <AdminSectionCard title="筛选条件" description="统一使用枚举和开关筛患者，不依赖自由输入才能操作。">
+        <form method="get" className="admin-filter-grid compact">
           <label className="admin-field">
             <span>关键字</span>
-            <input className="admin-input" name="q" defaultValue={data.filters.q} placeholder="邮箱、展示名或用户 ID" />
+            <input
+              className="admin-input"
+              name="q"
+              defaultValue={data.filters.q}
+              placeholder="邮箱、显示名或用户 ID"
+            />
           </label>
 
           <label className="admin-field">
@@ -152,6 +214,18 @@ export default async function PatientsPage({
           </label>
 
           <label className="admin-field">
+            <span>演示场景</span>
+            <select className="admin-select" name="scenarioCode" defaultValue={data.filters.scenarioCode}>
+              <option value="ALL">全部</option>
+              {adminDemoScenarios.map((scenario) => (
+                <option key={scenario.code} value={scenario.code}>
+                  {scenario.shortTitle}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="admin-field">
             <span>最近睡眠窗口（天）</span>
             <input
               className="admin-input"
@@ -161,6 +235,11 @@ export default async function PatientsPage({
               max={30}
               defaultValue={data.filters.recentSleepDays}
             />
+          </label>
+
+          <label className="admin-check">
+            <input name="demoOnly" type="checkbox" value="1" defaultChecked={data.filters.demoOnly} />
+            <span>只看演示患者</span>
           </label>
 
           <label className="admin-check">
@@ -194,162 +273,121 @@ export default async function PatientsPage({
         </form>
       </AdminSectionCard>
 
-      <section className="admin-grid two-up">
-        <AdminSectionCard
-          title="患者池"
-          description={`共 ${data.pagination.total} 位患者，第 ${data.pagination.page} / ${data.pagination.totalPages} 页。`}
-        >
-          {data.items.length === 0 ? (
-            <EmptyState title="没有匹配的患者" description="当前筛选条件下没有结果，请调整筛选条件。" />
-          ) : (
-            <>
-              <div className="admin-table-wrap">
-                <table className="admin-table">
-                  <thead>
-                    <tr>
-                      <th>患者</th>
-                      <th>最近睡眠</th>
-                      <th>恢复分</th>
-                      <th>风险</th>
-                      <th>待处理任务</th>
-                      <th>最新作业</th>
-                      <th>异常指标</th>
-                      <th>操作</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.items.map((item) => (
-                      <tr key={item.userId}>
-                        <td>
-                          <div className="admin-table-primary">{item.displayName}</div>
-                          <div className="admin-table-secondary">{item.email || item.userId}</div>
-                          <div className="admin-table-tertiary">{item.userId}</div>
-                        </td>
-                        <td>
-                          <div className="admin-table-primary">{formatDate(item.latestSleepDate)}</div>
-                          <div className="admin-table-secondary">最近活跃：{formatDateTime(item.lastActiveAt)}</div>
-                        </td>
-                        <td>{formatScore(item.latestRecoveryScore)}</td>
-                        <td>
-                          <AdminPill tone={toPillTone(item.latestRiskLevel, "risk")}>
-                            {formatRiskLabel(item.latestRiskLevel)}
-                          </AdminPill>
-                        </td>
-                        <td>{item.pendingInterventionCount}</td>
-                        <td>
+      <AdminSectionCard
+        title="完整患者池"
+        description={`共 ${data.pagination.total} 位患者，第 ${data.pagination.page} / ${data.pagination.totalPages} 页。`}
+      >
+        {data.items.length === 0 ? (
+          <EmptyState title="没有匹配的患者" description="当前筛选条件下没有结果，请调整筛选条件。" />
+        ) : (
+          <>
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>患者</th>
+                    <th>场景</th>
+                    <th>最近睡眠</th>
+                    <th>恢复分</th>
+                    <th>风险</th>
+                    <th>待处理任务</th>
+                    <th>讲解入口</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.items.map((item) => (
+                    <tr key={item.userId}>
+                      <td>
+                        <div className="admin-table-primary">{item.displayName}</div>
+                        <div className="admin-table-secondary">{item.email || item.userId}</div>
+                        <div className="admin-table-tertiary">{item.userId}</div>
+                      </td>
+                      <td>
+                        {item.scenarioLabel ? (
+                          <div className="admin-stack compact">
+                            <AdminPill tone="info">{item.scenarioLabel}</AdminPill>
+                            <span className="admin-table-secondary">{item.storyStage ?? "-"}</span>
+                          </div>
+                        ) : (
+                          <span className="admin-table-secondary">常规患者</span>
+                        )}
+                      </td>
+                      <td>
+                        <div className="admin-table-primary">{formatDate(item.latestSleepDate)}</div>
+                        <div className="admin-table-secondary">最近活跃：{formatDateTime(item.lastActiveAt)}</div>
+                      </td>
+                      <td>{formatScore(item.latestRecoveryScore)}</td>
+                      <td>
+                        <AdminPill tone={toPillTone(item.latestRiskLevel, "risk")}>
+                          {formatRiskLabel(item.latestRiskLevel)}
+                        </AdminPill>
+                      </td>
+                      <td>
+                        <div className="admin-stack compact">
+                          <span>{item.pendingInterventionCount}</span>
                           {item.latestJobStatus ? (
                             <AdminPill tone={toPillTone(item.latestJobStatus)}>
                               {formatStatusLabel(item.latestJobStatus)}
                             </AdminPill>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-                        <td>{item.latestAbnormalMetricCount}</td>
-                        <td>
-                          <div className="admin-action-links">
-                            <Link href={`/patients/${item.userId}` as Route} className="admin-inline-link">
-                              查看详情
-                            </Link>
-                            <Link href={`/patients/${item.userId}?compose=1#interventions` as Route} className="admin-inline-link">
-                              创建任务
+                          ) : null}
+                        </div>
+                      </td>
+                      <td>
+                        {item.scenarioLabel ? (
+                          <div className="admin-stack compact">
+                            <span className="admin-table-secondary">
+                              {item.actionSummary ?? "打开详情后开始讲解"}
+                            </span>
+                            <Link href={item.recommendedPath as Route} className="admin-inline-link">
+                              直达讲解入口
                             </Link>
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="admin-pagination">
-                <Link
-                  href={buildHref(resolved, {
-                    page: data.pagination.page > 1 ? String(data.pagination.page - 1) : undefined,
-                  })}
-                  className={`admin-secondary-button link-button${data.pagination.page <= 1 ? " is-disabled" : ""}`}
-                >
-                  上一页
-                </Link>
-                <span>
-                  第 {data.pagination.page} / {data.pagination.totalPages} 页
-                </span>
-                <Link
-                  href={buildHref(resolved, {
-                    page:
-                      data.pagination.page < data.pagination.totalPages
-                        ? String(data.pagination.page + 1)
-                        : undefined,
-                  })}
-                  className={`admin-secondary-button link-button${
-                    data.pagination.page >= data.pagination.totalPages ? " is-disabled" : ""
-                  }`}
-                >
-                  下一页
-                </Link>
-              </div>
-            </>
-          )}
-        </AdminSectionCard>
-
-        <div className="admin-stack">
-          <AdminSectionCard title="重点跟进患者" description="优先处理高风险、异常指标高或任务积压的患者。">
-            {priorityPatients.length === 0 ? (
-              <EmptyState title="暂无高风险患者" description="当前筛选结果里没有高风险患者。" />
-            ) : (
-              <div className="admin-stack">
-                {priorityPatients.map((item) => (
-                  <div key={item.userId} className="admin-alert-card danger">
-                    <div className="admin-table-primary">{item.displayName}</div>
-                    <div className="admin-table-secondary">{item.email || item.userId}</div>
-                    <p>
-                      风险 {formatRiskLabel(item.latestRiskLevel)} / 恢复分 {formatScore(item.latestRecoveryScore)} /
-                      待处理任务 {item.pendingInterventionCount}
-                    </p>
-                    <div className="admin-action-links">
-                      <Link href={`/patients/${item.userId}` as Route} className="admin-inline-link">
-                        打开工作台
-                      </Link>
-                      <Link href={`/patients/${item.userId}?compose=1#interventions` as Route} className="admin-inline-link">
-                        直接建任务
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </AdminSectionCard>
-
-          <AdminSectionCard title="运营提醒" description="把待补量表、报告滞后和作业失败作为首屏提醒。">
-            {reminders.length === 0 ? (
-              <EmptyState title="暂无运营提醒" description="当前患者池没有需要立即处理的运营事项。" />
-            ) : (
-              <ul className="admin-bullet-list">
-                {reminders.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            )}
-          </AdminSectionCard>
-
-          <AdminSectionCard title="最近活跃患者" description="优先查看最近有数据更新的患者，适合快速回顾。">
-            {recentActivityPatients.length === 0 ? (
-              <EmptyState title="暂无活跃患者" description="当前筛选下没有可用患者。" />
-            ) : (
-              <div className="admin-stack">
-                {recentActivityPatients.map((item) => (
-                  <div key={item.userId} className="admin-alert-card">
-                    <div className="admin-table-primary">{item.displayName}</div>
-                    <div className="admin-table-secondary">{formatDateTime(item.lastActiveAt)}</div>
-                    <p>
-                      最近睡眠：{formatDate(item.latestSleepDate)} / 最近报告：{formatDateTime(item.latestReportAt)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </AdminSectionCard>
-        </div>
-      </section>
+                        ) : (
+                          <span className="admin-table-secondary">查看详情后按证据顺序讲解</span>
+                        )}
+                      </td>
+                      <td>
+                        <div className="admin-action-links">
+                          <Link href={`/patients/${item.userId}` as Route} className="admin-inline-link">
+                            查看详情
+                          </Link>
+                          <Link href={`/patients/${item.userId}?compose=1#interventions` as Route} className="admin-inline-link">
+                            创建任务
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="admin-pagination">
+              <Link
+                href={buildHref(resolved, {
+                  page: data.pagination.page > 1 ? String(data.pagination.page - 1) : undefined,
+                })}
+                className={`admin-secondary-button link-button${data.pagination.page <= 1 ? " is-disabled" : ""}`}
+              >
+                上一页
+              </Link>
+              <span>
+                第 {data.pagination.page} / {data.pagination.totalPages} 页
+              </span>
+              <Link
+                href={buildHref(resolved, {
+                  page: data.pagination.page < data.pagination.totalPages ? String(data.pagination.page + 1) : undefined,
+                })}
+                className={`admin-secondary-button link-button${
+                  data.pagination.page >= data.pagination.totalPages ? " is-disabled" : ""
+                }`}
+              >
+                下一页
+              </Link>
+            </div>
+          </>
+        )}
+      </AdminSectionCard>
     </AdminShell>
   );
 }

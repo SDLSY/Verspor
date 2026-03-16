@@ -216,6 +216,10 @@ code {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.admin-grid.three-up {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .admin-grid.single-column {
   grid-template-columns: 1fr;
 }
@@ -423,7 +427,8 @@ code {
   pointer-events: none;
 }
 
-.admin-table-wrap {
+.admin-table-wrap,
+.admin-table-wrapper {
   overflow-x: auto;
 }
 
@@ -502,6 +507,10 @@ code {
   gap: 14px;
 }
 
+.admin-definition-list.compact {
+  gap: 10px;
+}
+
 .admin-definition-list div {
   display: grid;
   gap: 4px;
@@ -571,6 +580,66 @@ code {
   border-radius: var(--radius-soft);
   border: 1px solid var(--line-soft);
   background: var(--bg-panel-strong);
+}
+
+.admin-story-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.admin-story-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 24px;
+  border: 1px solid var(--line-soft);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(244, 246, 238, 0.92));
+  box-shadow: var(--shadow-soft);
+}
+
+.admin-story-card.featured {
+  background:
+    radial-gradient(circle at top right, rgba(42, 123, 88, 0.14), transparent 35%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(244, 246, 238, 0.96));
+}
+
+.admin-story-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.admin-story-card-top.compact {
+  align-items: center;
+}
+
+.admin-story-card-top h3,
+.admin-story-card-top p {
+  margin: 0;
+}
+
+.admin-story-index {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-secondary);
+  font-weight: 700;
+}
+
+.admin-story-summary {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.admin-story-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
 }
 
 .admin-alert-card p {
@@ -674,11 +743,13 @@ code {
   }
 
   .admin-grid.two-up,
+  .admin-grid.three-up,
   .admin-stat-grid.four-up,
   .admin-stat-grid.three-up,
   .admin-form-grid,
   .admin-filter-grid,
-  .admin-filter-grid.compact {
+  .admin-filter-grid.compact,
+  .admin-story-grid {
     grid-template-columns: 1fr;
   }
 }

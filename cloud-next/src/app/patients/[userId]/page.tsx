@@ -25,6 +25,7 @@ import {
   formatTimelineTypeLabel,
 } from "@/lib/admin-labels";
 import { requireAdminPage } from "@/lib/admin-auth";
+import { getAdminScenarioInfo } from "@/lib/admin-story";
 import {
   getAdminPatientInterventions,
   getAdminPatientMedical,
@@ -113,6 +114,13 @@ function formatBaselineStatus(completedCount: number | null, freshnessUntil: num
   return "建议重新完成量表";
 }
 
+function formatExecutionFeedback(executionCount: number, avgEffectScore: number | null | undefined): string {
+  if (executionCount <= 0) {
+    return "尚无执行回写，适合在演示时现场补一条干预动作。";
+  }
+  return `执行 ${executionCount} 次 / 平均效果 ${formatScore(avgEffectScore)}`;
+}
+
 export default async function PatientDetailPage({
   params,
   searchParams,
@@ -168,12 +176,14 @@ export default async function PatientDetailPage({
   const patientTitle = overview.identity.displayName || overview.identity.email || overview.identity.userId;
   const latestSleepRecord = sleep.records[0] ?? null;
   const trendPreview = sleep.trend.slice(-7);
+  const scenarioInfo = getAdminScenarioInfo({ email: overview.identity.email, user_metadata: null });
 
   return (
     <AdminShell
       section="patients"
       activePath="/patients"
       title={patientTitle}
+      subtitle={scenarioInfo.summary ?? "围绕当前判断、关键证据、建议与回写结果组织患者工作台。"}
       actions={
         <div className="admin-button-row">
           <Link href={("/patients" as Route)} className="admin-secondary-button link-button">
@@ -213,16 +223,16 @@ export default async function PatientDetailPage({
       </section>
 
       <nav className="admin-subnav" aria-label="患者工作台章节">
-        <a href="#overview" className="admin-subnav-link is-active">概览</a>
-        <a href="#evidence" className="admin-subnav-link">证据</a>
-        <a href="#recommendations" className="admin-subnav-link">建议轨迹</a>
-        <a href="#interventions" className="admin-subnav-link">干预执行</a>
+        <a href="#overview" className="admin-subnav-link is-active">当前判断</a>
+        <a href="#evidence" className="admin-subnav-link">关键证据</a>
         <a href="#reports" className="admin-subnav-link">报告与问诊</a>
+        <a href="#recommendations" className="admin-subnav-link">建议与干预</a>
+        <a href="#interventions" className="admin-subnav-link">结果回写</a>
         <a href="#timeline" className="admin-subnav-link">时间线</a>
       </nav>
 
       <div className="admin-stack">
-        <AdminSectionCard title="概览" actions={<span id="overview" className="admin-table-secondary">{overview.identity.userId}</span>}>
+        <AdminSectionCard title="当前判断" actions={<span id="overview" className="admin-table-secondary">{overview.identity.userId}</span>}>
           <section className="admin-grid two-up">
             <div className="admin-panel subtle">
               <div className="admin-panel-header">
@@ -243,10 +253,16 @@ export default async function PatientDetailPage({
               <div className="admin-panel-header">
                 <div>
                   <h3>当前待处理事项</h3>
-                  <p>先看风险、量表完整度和最近失败作业。</p>
+                  <p>先看风险、量表完整度，再决定讲报告、建议还是高级运维。</p>
                 </div>
               </div>
               <div className="admin-stack compact">
+                {scenarioInfo.scenarioLabel ? (
+                  <div className="admin-inline-row between">
+                    <span className="admin-table-secondary">演示场景</span>
+                    <AdminPill tone="info">{scenarioInfo.scenarioLabel}</AdminPill>
+                  </div>
+                ) : null}
                 <div className="admin-inline-row between">
                   <span className="admin-table-secondary">量表状态</span>
                   <AdminPill tone={baselineCompletedCount && baselineCompletedCount > 0 ? "info" : "warning"}>
@@ -272,7 +288,7 @@ export default async function PatientDetailPage({
           </section>
         </AdminSectionCard>
 
-        <AdminSectionCard title="证据" actions={<span id="evidence" className="admin-table-secondary">统一查看睡眠、量表、医检与问诊</span>}>
+        <AdminSectionCard title="关键证据" actions={<span id="evidence" className="admin-table-secondary">统一查看睡眠、量表、医检与问诊</span>}>
           <section className="admin-grid three-up">
             <div className="admin-panel subtle">
               <div className="admin-panel-header"><div><h3>睡眠证据</h3><p>最近一晚与近 7 天趋势。</p></div></div>
@@ -333,18 +349,17 @@ export default async function PatientDetailPage({
           </section>
         </AdminSectionCard>
 
-        <AdminSectionCard title="建议轨迹" actions={<span id="recommendations" className="admin-table-secondary">近 30 天 explanation 与模式轨迹</span>}>
+        <AdminSectionCard title="建议与干预" actions={<span id="recommendations" className="admin-table-secondary">先讲建议内容，再按需展开技术细节</span>}>
           {traces.items.length > 0 ? (
             <div className="admin-table-wrapper">
               <table className="admin-table">
                 <thead>
                   <tr>
                     <th>时间</th>
-                    <th>类型</th>
-                    <th>模式</th>
-                    <th>依据摘要</th>
-                    <th>配置</th>
-                    <th>状态</th>
+                    <th>建议是什么</th>
+                    <th>为什么给出</th>
+                    <th>执行结果</th>
+                    <th>技术详情</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -353,35 +368,44 @@ export default async function PatientDetailPage({
                       <td>{formatDateTime(item.createdAt)}</td>
                       <td>
                         <div className="admin-stack compact">
-                          <strong>{item.traceType}</strong>
-                          <span className="admin-table-secondary">{item.traceId ?? item.id}</span>
+                          <strong>{item.summary}</strong>
+                          <div className="admin-pill-row wrap">
+                            {item.scenarioLabel ? <AdminPill tone="info">{item.scenarioLabel}</AdminPill> : null}
+                            <AdminPill tone="info">{item.recommendationMode ?? "-"}</AdminPill>
+                          </div>
+                          {item.nextStep ? <span className="admin-table-secondary">下一步：{item.nextStep}</span> : null}
                         </div>
                       </td>
                       <td>
-                        <div className="admin-pill-row wrap">
+                        <div className="admin-stack compact">
+                          {item.reasons.length > 0 ? <span>{item.reasons.join("；")}</span> : <span>-</span>}
                           <AdminPill tone="info">{item.recommendationMode ?? "-"}</AdminPill>
                           {item.safetyGate ? <AdminPill tone={toPillTone(item.safetyGate, "risk")}>{item.safetyGate}</AdminPill> : null}
                         </div>
                       </td>
                       <td>
                         <div className="admin-stack compact">
-                          <strong>{item.summary}</strong>
-                          {item.reasons.length > 0 ? <span className="admin-table-secondary">{item.reasons.join("；")}</span> : null}
-                          {item.nextStep ? <span className="admin-table-secondary">下一步：{item.nextStep}</span> : null}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="admin-stack compact">
-                          <span>{item.profileCode ?? item.modelVersion ?? "-"}</span>
-                          <span className="admin-table-secondary">{item.configSource ?? "-"}</span>
-                          <span className="admin-table-secondary">{item.providerId ?? "-"}</span>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="admin-pill-row wrap">
                           <AdminPill tone={toPillTone(item.riskLevel, "risk")}>{formatRiskLabel(item.riskLevel)}</AdminPill>
-                          {item.isFallback ? <AdminPill tone="warning">Fallback</AdminPill> : <AdminPill tone="success">Primary</AdminPill>}
+                          <span className="admin-table-secondary">{formatExecutionFeedback(item.executionCount, item.avgEffectScore)}</span>
                         </div>
+                      </td>
+                      <td>
+                        <details className="admin-disclosure-card">
+                          <summary>
+                            <span>查看技术详情</span>
+                            <AdminPill tone={item.isFallback ? "warning" : "success"}>
+                              {item.isFallback ? "Fallback" : "Primary"}
+                            </AdminPill>
+                          </summary>
+                          <div className="admin-disclosure-content">
+                            <div className="admin-stack compact">
+                              <span>trace：{item.traceId ?? item.id}</span>
+                              <span>provider：{item.providerId ?? "-"}</span>
+                              <span>profile：{item.profileCode ?? item.modelVersion ?? "-"}</span>
+                              <span>source：{item.configSource ?? "-"}</span>
+                            </div>
+                          </div>
+                        </details>
                       </td>
                     </tr>
                   ))}
@@ -389,13 +413,13 @@ export default async function PatientDetailPage({
               </table>
             </div>
           ) : (
-            <EmptyState title="暂无建议轨迹" description="该患者近 30 天还没有可用的 recommendation trace。" />
+            <EmptyState title="暂无建议轨迹" description="该患者近 30 天还没有可用的建议闭环记录。" />
           )}
         </AdminSectionCard>
 
         <AdminSectionCard
-          title="干预执行"
-          actions={<span id="interventions" className="admin-table-secondary">人工干预任务与执行回看</span>}
+          title="结果回写"
+          actions={<span id="interventions" className="admin-table-secondary">人工干预任务、执行结果与回写证据</span>}
         >
           {noticeSaved ? <div className="admin-alert success">干预任务已保存，患者工作台已刷新。</div> : null}
           {noticeError ? <div className="admin-alert danger">{noticeError}</div> : null}
@@ -408,7 +432,11 @@ export default async function PatientDetailPage({
               </label>
               <label>
                 <span>来源类型</span>
-                <input type="text" name="sourceType" defaultValue="RULE_ENGINE" />
+                <select name="sourceType" defaultValue="RULE_ENGINE">
+                  <option value="RULE_ENGINE">规则引擎</option>
+                  <option value="ML_ENGINE">模型引擎</option>
+                  <option value="MANUAL">人工录入</option>
+                </select>
               </label>
               <label>
                 <span>触发原因</span>
@@ -416,11 +444,23 @@ export default async function PatientDetailPage({
               </label>
               <label>
                 <span>身体部位</span>
-                <input type="text" name="bodyZone" defaultValue="LIMB" />
+                <select name="bodyZone" defaultValue="LIMB">
+                  <option value="HEAD">头部</option>
+                  <option value="CHEST">胸部</option>
+                  <option value="BACK">背部</option>
+                  <option value="ABDOMEN">腹部</option>
+                  <option value="LIMB">四肢</option>
+                </select>
               </label>
               <label>
                 <span>方案类型</span>
-                <input type="text" name="protocolType" defaultValue="LOW_ACTIVITY" />
+                <select name="protocolType" defaultValue="LOW_ACTIVITY">
+                  <option value="LOW_ACTIVITY">低强度方案</option>
+                  <option value="HIGH_ACTIVITY">高强度方案</option>
+                  <option value="BREATHING">呼吸训练</option>
+                  <option value="RELAXATION">放松方案</option>
+                  <option value="RECOVERY">恢复方案</option>
+                </select>
               </label>
               <label>
                 <span>时长（秒）</span>
@@ -432,7 +472,11 @@ export default async function PatientDetailPage({
               </label>
               <label>
                 <span>任务状态</span>
-                <input type="text" name="status" defaultValue="PENDING" />
+                <select name="status" defaultValue="PENDING">
+                  <option value="PENDING">待处理</option>
+                  <option value="RUNNING">运行中</option>
+                  <option value="COMPLETED">已完成</option>
+                </select>
               </label>
               <div className="admin-form-actions full-span">
                 <button type="submit" className="admin-primary-button">保存任务</button>

@@ -25,8 +25,16 @@ async function resolveOrigin(): Promise<string> {
   return `${protocol}://${host}`;
 }
 
+function hasConfirmation(formData: FormData): boolean {
+  const raw = formData.get("confirmRisk");
+  return raw === "1" || raw === "true" || raw === "on";
+}
+
 export async function triggerWorkerAction(formData: FormData) {
   try {
+    if (!hasConfirmation(formData)) {
+      redirect(`/system/jobs?error=${encodeURIComponent("请先确认这是一次高级运维操作。")}` as Route);
+    }
     const origin = await resolveOrigin();
     const result = await triggerAdminWorker(origin, readLimit(formData));
     const processed = typeof result.processed === "number" ? result.processed : 0;

@@ -1,6 +1,7 @@
 ﻿import { createServiceClient } from "@/lib/supabase";
 import { getAdminJobs, getAdminModels } from "@/lib/admin-system";
 import { listAdminPatients } from "@/lib/admin-patients";
+import { adminDemoScenarios } from "@/lib/admin-story";
 import { listRecommendationModelProfiles } from "@/lib/recommendation-model/admin";
 
 type Row = Record<string, unknown>;
@@ -18,11 +19,22 @@ export type DashboardSummaryView = {
   patientSummary: {
     totalPatients: number;
     highRiskPatients: number;
+    demoPatients: number;
     pendingInterventions: number;
     staleSleepReports: number;
     failedJobPatients: number;
     items: Awaited<ReturnType<typeof listAdminPatients>>["items"];
   };
+  storyCards: Array<{
+    scenarioCode: string;
+    scenarioLabel: string;
+    storyStage: string;
+    summary: string;
+    actionSummary: string;
+    recommendedPath: string;
+    patientCount: number;
+    evidenceCount: number;
+  }>;
   recommendationSummary: {
     recentTraceCount: number;
     fallbackTraceCount: number;
@@ -52,7 +64,7 @@ export async function getAdminDashboardSummary(): Promise<DashboardSummaryView> 
   const client = createServiceClient();
   const [patients, jobs, models, profiles, recentTracesRes, effectRes, reportRes, metricsRes] =
     await Promise.all([
-      listAdminPatients({ page: 1, pageSize: 6, recentSleepDays: 7 }),
+      listAdminPatients({ page: 1, pageSize: 50, recentSleepDays: 7 }),
       getAdminJobs({ page: 1, pageSize: 6, status: "ALL" }),
       getAdminModels(),
       listRecommendationModelProfiles({ modelCode: "SRM_V2" }).catch(() => []),
@@ -109,12 +121,26 @@ export async function getAdminDashboardSummary(): Promise<DashboardSummaryView> 
   }).length;
 
   const activeModel = models.items.find((item) => item.isActive) ?? null;
+  const storyCards = adminDemoScenarios.map((scenario) => {
+    const related = patients.items.filter((item) => item.scenarioCode === scenario.code);
+    return {
+      scenarioCode: scenario.code,
+      scenarioLabel: scenario.label,
+      storyStage: scenario.storyStage,
+      summary: scenario.summary,
+      actionSummary: scenario.actionSummary,
+      recommendedPath: scenario.buildPath(related[0]?.userId ?? null),
+      patientCount: related.length,
+      evidenceCount: related.reduce((sum, item) => sum + item.evidenceCount, 0),
+    };
+  });
 
   return {
     patientSummary: {
       ...patients.summary,
       items: patients.items,
     },
+    storyCards,
     recommendationSummary: {
       recentTraceCount: recentTracesRes.count ?? recentTraces.length,
       fallbackTraceCount,

@@ -1,4 +1,4 @@
-﻿alter table if exists public.prescription_snapshots
+alter table if exists public.prescription_snapshots
   add column if not exists personalization_level text not null default 'PREVIEW';
 
 alter table if exists public.prescription_snapshots

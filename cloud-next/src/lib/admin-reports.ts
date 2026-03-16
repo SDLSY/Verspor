@@ -1,4 +1,5 @@
-﻿import { listDirectoryUsers, normalizeDisplayName, toTimestamp } from "@/lib/admin-core";
+import { listDirectoryUsers, normalizeDisplayName, toTimestamp } from "@/lib/admin-core";
+import { getAdminScenarioInfo } from "@/lib/admin-story";
 import { createServiceClient } from "@/lib/supabase";
 
 type Row = Record<string, unknown>;
@@ -34,6 +35,8 @@ export type AdminReportsView = {
     userId: string;
     email: string;
     displayName: string;
+    scenarioCode: string | null;
+    scenarioLabel: string | null;
     reportDate: number | null;
     reportType: string;
     parseStatus: string;
@@ -136,11 +139,14 @@ export async function listAdminReports(query: AdminReportsQuery = {}): Promise<A
       const userId = getString(row.user_id);
       const userInfo = directory.get(userId) ?? { email: "", displayName: userId.slice(0, 8) };
       const doctorSummary = latestDoctorByUser.get(userId);
+      const scenarioInfo = getAdminScenarioInfo({ email: userInfo.email, user_metadata: null });
       return {
         reportId: getString(row.report_id),
         userId,
         email: userInfo.email,
         displayName: userInfo.displayName,
+        scenarioCode: scenarioInfo.scenarioCode,
+        scenarioLabel: scenarioInfo.scenarioLabel,
         reportDate: toTimestamp(getString(row.report_date)),
         reportType: getString(row.report_type),
         parseStatus: getString(row.parse_status),
@@ -166,6 +172,7 @@ export async function listAdminReports(query: AdminReportsQuery = {}): Promise<A
         item.email,
         item.displayName,
         item.latestDoctorSummary ?? "",
+        item.scenarioLabel ?? "",
       ]
         .join(" ")
         .toLowerCase()

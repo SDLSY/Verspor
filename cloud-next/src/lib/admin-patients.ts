@@ -15,6 +15,11 @@ import {
   toTimestamp,
 } from "@/lib/admin-core";
 import {
+  buildScenarioEvidenceCount,
+  buildScenarioPath,
+  getAdminScenarioInfo,
+} from "@/lib/admin-story";
+import {
   formatAuditActionLabel,
   formatBodyZoneLabel,
   formatProtocolTypeLabel,
@@ -35,6 +40,8 @@ export type AdminPatientsQuery = {
   pageSize?: number;
   q?: string;
   riskLevel?: string;
+  scenarioCode?: string;
+  demoOnly?: boolean;
   pendingOnly?: boolean;
   failedOnly?: boolean;
   recentSleepOnly?: boolean;
@@ -55,11 +62,20 @@ export type AdminPatientListItem = {
   latestSleepRecordId: string | null;
   latestReportAt: number | null;
   hasRecentFailedJob: boolean;
+  isDemoUser: boolean;
+  scenarioCode: string | null;
+  scenarioLabel: string | null;
+  storyTitle: string | null;
+  storyStage: string | null;
+  actionSummary: string | null;
+  recommendedPath: string;
+  evidenceCount: number;
 };
 
 export type AdminPatientsResponse = {
   summary: {
     highRiskPatients: number;
+    demoPatients: number;
     pendingInterventions: number;
     staleSleepReports: number;
     failedJobPatients: number;
@@ -74,6 +90,8 @@ export type AdminPatientsResponse = {
   filters: {
     q: string;
     riskLevel: string;
+    scenarioCode: string;
+    demoOnly: boolean;
     pendingOnly: boolean;
     failedOnly: boolean;
     recentSleepOnly: boolean;
@@ -295,11 +313,16 @@ export async function listAdminPatients(query: AdminPatientsQuery = {}): Promise
   const recentSleepDays = clampInteger(query.recentSleepDays, 7, 1, 30);
   const q = (query.q ?? "").trim().toLowerCase();
   const riskLevel = (query.riskLevel ?? "ALL").trim().toUpperCase();
+  const scenarioCode = (query.scenarioCode ?? "ALL").trim();
+  const demoOnly = Boolean(query.demoOnly);
   const pendingOnly = Boolean(query.pendingOnly);
   const failedOnly = Boolean(query.failedOnly);
   const recentSleepOnly = Boolean(query.recentSleepOnly);
 
-  const users = await listDirectoryUsers();
+  const users = (await listDirectoryUsers()).filter((user) => {
+    const metadata = (user.user_metadata ?? {}) as Record<string, unknown>;
+    return String(metadata.demoRole ?? "").trim() !== "demo_admin";
+  });
   const userIds = users.map((user) => user.id);
   const [sleepSessions, nightlyReports, anomalies, jobs, tasks, medicalReports, medicalMetrics] = await Promise.all([
     fetchRows("sleep_sessions", "user_id,sleep_record_id,session_date,total_sleep_minutes", userIds, "session_date"),
@@ -332,6 +355,7 @@ export async function listAdminPatients(query: AdminPatientsQuery = {}): Promise
   const recentSleepThreshold = Date.now() - recentSleepDays * 24 * 60 * 60 * 1000;
 
   const items = users.map<AdminPatientListItem>((user) => {
+    const scenarioInfo = getAdminScenarioInfo(user);
     const latestSleep = latestSleepByUser.get(user.id);
     const latestNightly = latestNightlyByUser.get(user.id);
     const latestAnomaly = latestAnomalyByUser.get(user.id);
@@ -352,6 +376,9 @@ export async function listAdminPatients(query: AdminPatientsQuery = {}): Promise
       toTimestamp(getString(latestJob?.created_at)) ?? 0,
       toTimestamp(getString(latestMedical?.report_date)) ?? 0
     );
+    const latestAbnormalMetricCount = abnormalMetricCountByReport.get(latestMedicalKey) ?? 0;
+    const pendingInterventionCount = pendingTaskCountByUser.get(user.id) ?? 0;
+    const latestJobStatus = getString(latestJob?.status) || null;
 
     return {
       userId: user.id,
@@ -361,12 +388,26 @@ export async function listAdminPatients(query: AdminPatientsQuery = {}): Promise
       latestSleepDate: toTimestamp(getString(latestSleep?.session_date)),
       latestRecoveryScore,
       latestRiskLevel,
-      pendingInterventionCount: pendingTaskCountByUser.get(user.id) ?? 0,
-      latestJobStatus: getString(latestJob?.status) || null,
-      latestAbnormalMetricCount: abnormalMetricCountByReport.get(latestMedicalKey) ?? 0,
+      pendingInterventionCount,
+      latestJobStatus,
+      latestAbnormalMetricCount,
       latestSleepRecordId: getString(latestSleep?.sleep_record_id) || null,
       latestReportAt: toTimestamp(getString(latestNightly?.created_at)),
       hasRecentFailedJob: recentFailedJobUsers.has(user.id),
+      isDemoUser: scenarioInfo.isDemoUser,
+      scenarioCode: scenarioInfo.scenarioCode,
+      scenarioLabel: scenarioInfo.scenarioLabel,
+      storyTitle: scenarioInfo.storyTitle,
+      storyStage: scenarioInfo.storyStage,
+      actionSummary: scenarioInfo.actionSummary,
+      recommendedPath: buildScenarioPath(scenarioInfo.scenarioCode, user.id),
+      evidenceCount: buildScenarioEvidenceCount({
+        latestSleepDate: toTimestamp(getString(latestSleep?.session_date)),
+        latestReportAt: toTimestamp(getString(latestNightly?.created_at)),
+        latestAbnormalMetricCount,
+        pendingInterventionCount,
+        latestJobStatus,
+      }),
     };
   });
 
@@ -378,6 +419,12 @@ export async function listAdminPatients(query: AdminPatientsQuery = {}): Promise
       }
     }
     if (riskLevel !== "ALL" && item.latestRiskLevel !== riskLevel) {
+      return false;
+    }
+    if (scenarioCode !== "ALL" && item.scenarioCode !== scenarioCode) {
+      return false;
+    }
+    if (demoOnly && !item.isDemoUser) {
       return false;
     }
     if (pendingOnly && item.pendingInterventionCount <= 0) {
@@ -392,12 +439,24 @@ export async function listAdminPatients(query: AdminPatientsQuery = {}): Promise
     return true;
   });
 
-  filtered.sort((left, right) => (right.lastActiveAt ?? 0) - (left.lastActiveAt ?? 0));
+  filtered.sort((left, right) => {
+    if (Number(right.isDemoUser) !== Number(left.isDemoUser)) {
+      return Number(right.isDemoUser) - Number(left.isDemoUser);
+    }
+    if (right.latestRiskLevel !== left.latestRiskLevel) {
+      const priority = { HIGH: 3, MEDIUM: 2, LOW: 1 };
+      return priority[right.latestRiskLevel] - priority[left.latestRiskLevel];
+    }
+    return (right.lastActiveAt ?? 0) - (left.lastActiveAt ?? 0);
+  });
 
   const summary = filtered.reduce(
     (acc, item) => {
       if (item.latestRiskLevel === "HIGH") {
         acc.highRiskPatients += 1;
+      }
+      if (item.isDemoUser) {
+        acc.demoPatients += 1;
       }
       acc.pendingInterventions += item.pendingInterventionCount;
       if (item.latestSleepDate && (!item.latestReportAt || item.latestReportAt < Date.now() - 24 * 60 * 60 * 1000)) {
@@ -409,7 +468,14 @@ export async function listAdminPatients(query: AdminPatientsQuery = {}): Promise
       acc.totalPatients += 1;
       return acc;
     },
-    { highRiskPatients: 0, pendingInterventions: 0, staleSleepReports: 0, failedJobPatients: 0, totalPatients: 0 }
+    {
+      highRiskPatients: 0,
+      demoPatients: 0,
+      pendingInterventions: 0,
+      staleSleepReports: 0,
+      failedJobPatients: 0,
+      totalPatients: 0,
+    }
   );
 
   const total = filtered.length;
@@ -420,7 +486,16 @@ export async function listAdminPatients(query: AdminPatientsQuery = {}): Promise
   return {
     summary,
     pagination: { page: safePage, pageSize, total, totalPages },
-    filters: { q: query.q ?? "", riskLevel, pendingOnly, failedOnly, recentSleepOnly, recentSleepDays },
+    filters: {
+      q: query.q ?? "",
+      riskLevel,
+      scenarioCode,
+      demoOnly,
+      pendingOnly,
+      failedOnly,
+      recentSleepOnly,
+      recentSleepDays,
+    },
     items: filtered.slice(startIndex, startIndex + pageSize),
   };
 }

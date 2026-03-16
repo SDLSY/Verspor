@@ -25,6 +25,11 @@ export function isAdminEmailAllowed(email: string | null | undefined): boolean {
   return getAllowlist().has(email.trim().toLowerCase());
 }
 
+function hasDemoAdminRole(user: User | null | undefined): boolean {
+  const metadata = (user?.user_metadata ?? {}) as { demoRole?: string | null };
+  return String(metadata.demoRole ?? "").trim().toLowerCase() === "demo_admin";
+}
+
 export async function getSessionUser(): Promise<User | null> {
   const supabase = await createClient();
   const {
@@ -43,7 +48,7 @@ export async function requireSignedInPage(): Promise<User> {
 
 export async function requireAdminPage(): Promise<User> {
   const user = await requireSignedInPage();
-  if (!isAdminEmailAllowed(user.email)) {
+  if (!isAdminEmailAllowed(user.email) && !hasDemoAdminRole(user)) {
     redirect("/unauthorized" as Route);
   }
   return user;
@@ -68,7 +73,7 @@ export async function requireAdminRoute(): Promise<AdminRouteContext> {
     };
   }
 
-  if (!isAdminEmailAllowed(user.email)) {
+  if (!isAdminEmailAllowed(user.email) && !hasDemoAdminRole(user)) {
     return {
       ok: false,
       response: NextResponse.json(fail(403, "admin access denied"), { status: 403 }),

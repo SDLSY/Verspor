@@ -20,22 +20,17 @@ export default async function LoginPage({
       <ResetPasswordRedirector />
       <section className="admin-login-card">
         <div>
-          <p className="admin-kicker">NeuroSleep</p>
-          <h1 className="admin-page-title">临床运营登录</h1>
-          <p className="admin-page-subtitle">登录后即可进入模型运维台、推荐策略中心和患者运营工作台。</p>
+          <p className="admin-kicker">ChangGeng Ring Demo Console</p>
+          <h1 className="admin-page-title">后台登录</h1>
+          <p className="admin-page-subtitle">
+            登录后可进入端云闭环演示后台，查看患者工作台、报告问诊、建议效果和高级运维页面。
+          </p>
         </div>
 
         <form className="admin-form-stack">
           <label className="admin-field">
             <span>邮箱</span>
-            <input
-              className="admin-input"
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-            />
+            <input className="admin-input" id="email" name="email" type="email" autoComplete="email" required />
           </label>
 
           <label className="admin-field">

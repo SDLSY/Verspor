@@ -4,7 +4,7 @@ import Link from "next/link";
 import { logout } from "@/app/login/actions";
 import { adminBrand, adminNavGroups } from "@/lib/admin-copy";
 
-type AdminSection = "dashboard" | "recommendations" | "patients" | "reports" | "system";
+type AdminSection = "dashboard" | "story" | "recommendations" | "patients" | "reports" | "system";
 
 type AdminShellProps = {
   section: AdminSection;
@@ -17,10 +17,11 @@ type AdminShellProps = {
 
 const sectionLabels: Record<AdminSection, string> = {
   dashboard: "驾驶舱",
+  story: "闭环故事",
   recommendations: "推荐策略",
   patients: "患者运营",
   reports: "报告与问诊",
-  system: "系统运维",
+  system: "高级运维",
 };
 
 function isActivePath(activePath: string, href: string): boolean {

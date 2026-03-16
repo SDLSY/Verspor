@@ -10,6 +10,28 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, "..", "..");
 const configPath = path.join(rootDir, "src", "lib", "demo", "demo-accounts.config.json");
 
+loadEnvFiles();
+
+function loadEnvFiles() {
+  const candidates = [
+    path.join(rootDir, ".env.local"),
+    path.join(rootDir, ".env.production-pulled"),
+    path.join(rootDir, ".env"),
+  ];
+  for (const filePath of candidates) {
+    if (!fs.existsSync(filePath)) continue;
+    const content = fs.readFileSync(filePath, "utf8");
+    for (const line of content.split(/\r?\n/)) {
+      const match = line.match(/^([^#=\s]+)=(.*)$/);
+      if (!match) continue;
+      const key = match[1];
+      const rawValue = match[2].trim();
+      if (process.env[key]?.trim()) continue;
+      process.env[key] = rawValue.replace(/^"(.*)"$/, "$1").replace(/^'(.*)'$/, "$1");
+    }
+  }
+}
+
 function requireEnv(name) {
   const value = process.env[name]?.trim();
   if (!value) {
@@ -346,11 +368,13 @@ function makeAssessmentBaseline(userId, assessedAt, codes) {
 }
 
 function makeInferenceJob(userId, scenarioCode, sleepRecordId, createdAt, payload) {
+  const jobSuffix = payload.status ?? "queued";
   return {
     id: crypto.randomUUID(),
     user_id: userId,
     sleep_record_id: sleepRecordId,
     status: payload.status,
+    idempotency_key: `${scenarioCode}_${sleepRecordId}_${jobSuffix}`,
     model_version: payload.modelVersion ?? "demo-mmt-v1",
     error_message: payload.errorMessage ?? null,
     created_at: iso(createdAt),

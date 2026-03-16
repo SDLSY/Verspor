@@ -1,7 +1,7 @@
-﻿export type AdminNavItem = {
+export type AdminNavItem = {
   href: string;
   label: string;
-  section: "dashboard" | "recommendations" | "patients" | "reports" | "system";
+  section: "dashboard" | "story" | "recommendations" | "patients" | "reports" | "system";
   description?: string;
 };
 
@@ -10,89 +10,72 @@ export const adminNavGroups: Array<{
   items: AdminNavItem[];
 }> = [
   {
-    title: "驾驶舱",
+    title: "演示入口",
     items: [
       {
         href: "/dashboard",
         label: "总览驾驶舱",
         section: "dashboard",
-        description: "查看高风险患者、推荐运行和系统状态",
+        description: "先看五条闭环主线和整体演示状态。",
+      },
+      {
+        href: "/story",
+        label: "闭环故事",
+        section: "story",
+        description: "按演示账号逐条讲解端云闭环，不先掉进技术细节。",
       },
     ],
   },
   {
-    title: "推荐策略",
-    items: [
-      {
-        href: "/recommendations",
-        label: "建议轨迹",
-        section: "recommendations",
-        description: "查看解释、模式分布和最近建议结果",
-      },
-      {
-        href: "/recommendations/profiles",
-        label: "策略配置",
-        section: "recommendations",
-        description: "管理 SRM_V2 阈值、权重、门控和模式优先级",
-      },
-      {
-        href: "/recommendations/effects",
-        label: "效果闭环",
-        section: "recommendations",
-        description: "追踪建议执行归因、配置效果和模式表现",
-      },
-    ],
-  },
-  {
-    title: "患者运营",
+    title: "运营工作台",
     items: [
       {
         href: "/patients",
         label: "患者工作台",
         section: "patients",
-        description: "查看高风险患者、待处理事项和个体运营详情",
+        description: "查看 demo 患者、高风险患者和个体工作台。",
       },
-    ],
-  },
-  {
-    title: "报告与问诊",
-    items: [
       {
         href: "/reports",
-        label: "报告工作台",
+        label: "报告与问诊",
         section: "reports",
-        description: "集中查看 OCR、医检、解析风险和待确认报告",
+        description: "按待处理队列查看报告、问诊和干预承接。",
+      },
+      {
+        href: "/recommendations",
+        label: "建议与效果",
+        section: "recommendations",
+        description: "查看建议原因、执行结果和效果闭环。",
       },
     ],
   },
   {
-    title: "系统运维",
+    title: "高级运维",
     items: [
       {
         href: "/system/models",
         label: "模型资产",
         section: "system",
-        description: "管理推理模型、provider 和当前生效版本",
+        description: "查看当前启用版本、健康状态和高级配置。",
       },
       {
         href: "/system/jobs",
         label: "作业监控",
         section: "system",
-        description: "查看队列、失败作业、延迟和 worker 状态",
+        description: "查看失败作业、影响范围和手动触发入口。",
       },
       {
         href: "/system/audit",
         label: "审计记录",
         section: "system",
-        description: "查看配置修改、人工操作和系统审计流水",
+        description: "查看配置修改、人工操作和系统审计流水。",
       },
     ],
   },
 ];
 
 export const adminBrand = {
-  kicker: "VesperO Console",
-  title: "模型运维与患者运营后台",
-  description:
-    "围绕推荐策略、效果闭环、患者运营、报告处理和系统运维构建的一体化控制台。",
+  kicker: "ChangGeng Ring Demo Console",
+  title: "端云闭环演示与运营后台",
+  description: "先讲清恢复、报告、药食、干预和高风险运维闭环，再下钻运营动作与技术诊断。",
 };

@@ -29,9 +29,17 @@ export default async function RecommendationEffectsPage({
     recommendationMode: pickFirst(resolved.recommendationMode) || undefined,
     userId: pickFirst(resolved.userId) || undefined,
   });
+  const topMode = data.byRecommendationMode[0] ?? null;
+  const topProfile = data.byModelProfile[0] ?? null;
+  const topUser = data.byUser[0] ?? null;
 
   return (
-    <AdminShell section="recommendations" activePath="/recommendations/effects" title="效果闭环">
+    <AdminShell
+      section="recommendations"
+      activePath="/recommendations/effects"
+      title="效果闭环"
+      subtitle="用一段讲解摘要先说明最近哪种建议最有效，再展开统计表。"
+    >
       <section className="admin-stat-grid four-up">
         <AdminStatCard label="数据来源" value={data.source} tone="info" />
         <AdminStatCard label="执行总数" value={String(data.totalExecutions)} tone="info" />
@@ -48,6 +56,27 @@ export default async function RecommendationEffectsPage({
           tone="warning"
         />
       </section>
+
+      <AdminSectionCard title="讲解摘要" description="用于答辩时先给结论，再展示后面的统计表。">
+        {data.totalExecutions === 0 ? (
+          <EmptyState title="暂无闭环效果数据" description="当前筛选窗口内没有可展示的执行结果。" />
+        ) : (
+          <div className="admin-grid three-up">
+            <article className="admin-alert-card">
+              <div className="admin-table-primary">当前最稳的建议模式</div>
+              <p>{topMode ? `${topMode.recommendationMode}，平均效果 ${formatScore(topMode.avgEffectScore)}` : "暂无数据"}</p>
+            </article>
+            <article className="admin-alert-card">
+              <div className="admin-table-primary">当前最强的策略配置</div>
+              <p>{topProfile ? `${topProfile.profileCode} / ${topProfile.configSource}` : "暂无数据"}</p>
+            </article>
+            <article className="admin-alert-card">
+              <div className="admin-table-primary">最值得讲的患者样本</div>
+              <p>{topUser ? `${topUser.displayName}，执行 ${topUser.executionCount} 次` : "暂无数据"}</p>
+            </article>
+          </div>
+        )}
+      </AdminSectionCard>
 
       <AdminSectionCard title="筛选条件" description="按时间窗口、策略配置、建议模式和患者查看闭环效果。">
         <form method="get" className="admin-filter-grid compact">

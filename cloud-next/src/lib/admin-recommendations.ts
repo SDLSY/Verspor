@@ -1,4 +1,5 @@
-﻿import { listDirectoryUsers, normalizeDisplayName, toTimestamp } from "@/lib/admin-core";
+import { listDirectoryUsers, normalizeDisplayName, toTimestamp } from "@/lib/admin-core";
+import { getAdminScenarioInfo } from "@/lib/admin-story";
 import { createServiceClient } from "@/lib/supabase";
 
 type RecommendationTraceMetadata = {
@@ -29,6 +30,13 @@ type RecommendationTraceAdminRow = {
   created_at: string;
 };
 
+type RecommendationEffectTraceRow = {
+  attributed_trace_id: string | null;
+  effect_score: number | null;
+  stress_drop: number | null;
+  ended_at: string | null;
+};
+
 type RecommendationEffectAdminRow = {
   user_id: string;
   execution_id: string;
@@ -46,11 +54,20 @@ type RecommendationEffectAdminRow = {
   attribution_mode: string;
 };
 
+type TraceEffectAggregate = {
+  executionCount: number;
+  avgEffectScore: number | null;
+  avgStressDrop: number | null;
+  latestExecutionAt: number | null;
+};
+
 export type RecommendationTraceAdminItem = {
   id: string;
   userId: string;
   email: string;
   displayName: string;
+  scenarioCode: string | null;
+  scenarioLabel: string | null;
   traceType: string;
   traceKey: string | null;
   traceId: string | null;
@@ -69,6 +86,10 @@ export type RecommendationTraceAdminItem = {
   safetyGate: string | null;
   evidenceCoverage: number | null;
   evidenceHighlights: string[];
+  executionCount: number;
+  avgEffectScore: number | null;
+  avgStressDrop: number | null;
+  latestExecutionAt: number | null;
 };
 
 export type RecommendationTraceAdminView = {
@@ -77,6 +98,11 @@ export type RecommendationTraceAdminView = {
     fallbackTraces: number;
     highRiskTraces: number;
     topRecommendationMode: string | null;
+    configSources: string[];
+  };
+  facets: {
+    traceTypes: string[];
+    recommendationModes: string[];
     configSources: string[];
   };
   filters: {
@@ -182,7 +208,47 @@ function readStringArray(value: unknown, max = 3): string[] {
     .slice(0, max);
 }
 
-function buildTraceItem(row: RecommendationTraceAdminRow, userInfo: { email: string; displayName: string }): RecommendationTraceAdminItem {
+function buildTraceEffectMap(rows: RecommendationEffectTraceRow[]): Map<string, TraceEffectAggregate> {
+  const buckets = new Map<string, { count: number; effect: number; stress: number; latestExecutionAt: number | null }>();
+  rows.forEach((row) => {
+    const traceId = readString(row.attributed_trace_id);
+    if (!traceId) {
+      return;
+    }
+    const bucket = buckets.get(traceId) ?? { count: 0, effect: 0, stress: 0, latestExecutionAt: null };
+    bucket.count += 1;
+    bucket.effect += readNumber(row.effect_score) ?? 0;
+    bucket.stress += readNumber(row.stress_drop) ?? 0;
+    const endedAt = toTimestamp(readString(row.ended_at));
+    if (!bucket.latestExecutionAt || (endedAt ?? 0) > bucket.latestExecutionAt) {
+      bucket.latestExecutionAt = endedAt;
+    }
+    buckets.set(traceId, bucket);
+  });
+
+  return new Map(
+    [...buckets.entries()].map(([traceId, bucket]) => [
+      traceId,
+      {
+        executionCount: bucket.count,
+        avgEffectScore: bucket.count > 0 ? bucket.effect / bucket.count : null,
+        avgStressDrop: bucket.count > 0 ? bucket.stress / bucket.count : null,
+        latestExecutionAt: bucket.latestExecutionAt,
+      },
+    ])
+  );
+}
+
+function buildTraceItem(
+  row: RecommendationTraceAdminRow,
+  userInfo: {
+    email: string;
+    displayName: string;
+    scenarioCode: string | null;
+    scenarioLabel: string | null;
+  },
+  effectByTraceId: Map<string, TraceEffectAggregate>
+): RecommendationTraceAdminItem {
   const metadata = toObject(row.metadata_json) as RecommendationTraceMetadata;
   const derivedSignals = toObject(row.derived_signals_json);
   const scientificModel = toObject(derivedSignals.scientificModel);
@@ -193,12 +259,15 @@ function buildTraceItem(row: RecommendationTraceAdminRow, userInfo: { email: str
         .map((item) => readString(toObject(item).label) ?? "")
         .filter(Boolean)
     : [];
+  const effectSummary = row.trace_id ? effectByTraceId.get(row.trace_id) : null;
 
   return {
     id: row.id,
     userId: row.user_id,
     email: userInfo.email,
     displayName: userInfo.displayName,
+    scenarioCode: userInfo.scenarioCode,
+    scenarioLabel: userInfo.scenarioLabel,
     traceType: row.trace_type,
     traceKey: row.trace_key,
     traceId: row.trace_id,
@@ -228,6 +297,10 @@ function buildTraceItem(row: RecommendationTraceAdminRow, userInfo: { email: str
     safetyGate: readString(scientificModel.safetyGate),
     evidenceCoverage: readNumber(scientificModel.evidenceCoverage),
     evidenceHighlights: evidenceLedger,
+    executionCount: effectSummary?.executionCount ?? 0,
+    avgEffectScore: effectSummary?.avgEffectScore ?? null,
+    avgStressDrop: effectSummary?.avgStressDrop ?? null,
+    latestExecutionAt: effectSummary?.latestExecutionAt ?? null,
   };
 }
 
@@ -236,9 +309,14 @@ function matchesQuery(item: RecommendationTraceAdminItem, q: string): boolean {
     return true;
   }
   const keyword = q.trim().toLowerCase();
-  return [item.displayName, item.email, item.userId, item.traceId ?? "", item.providerId ?? "", item.summary].some((value) =>
-    value.toLowerCase().includes(keyword)
-  );
+  return [
+    item.displayName,
+    item.email,
+    item.userId,
+    item.traceId ?? "",
+    item.summary,
+    item.scenarioLabel ?? "",
+  ].some((value) => value.toLowerCase().includes(keyword));
 }
 
 export async function listAdminRecommendationTraces(
@@ -252,7 +330,9 @@ export async function listAdminRecommendationTraces(
 
   let query = client
     .from("recommendation_traces")
-    .select("id,user_id,trace_type,trace_key,trace_id,provider_id,risk_level,personalization_level,is_fallback,metadata_json,derived_signals_json,created_at")
+    .select(
+      "id,user_id,trace_type,trace_key,trace_id,provider_id,risk_level,personalization_level,is_fallback,metadata_json,derived_signals_json,created_at"
+    )
     .gte("created_at", startAt)
     .order("created_at", { ascending: false })
     .limit(500);
@@ -269,10 +349,46 @@ export async function listAdminRecommendationTraces(
     throw new Error(error.message);
   }
 
-  const directory = new Map(users.map((user) => [user.id, { email: user.email ?? "", displayName: normalizeDisplayName(user) }]));
+  const traceRows = data ?? [];
+  const traceIds = traceRows.map((row) => readString(row.trace_id)).filter(Boolean) as string[];
+  const effectByTraceId = new Map<string, TraceEffectAggregate>();
+  if (traceIds.length > 0) {
+    const { data: effectRows } = await client
+      .from("recommendation_effect_links_v1")
+      .select("attributed_trace_id,effect_score,stress_drop,ended_at")
+      .in("attributed_trace_id", traceIds)
+      .returns<RecommendationEffectTraceRow[]>();
+    (buildTraceEffectMap(effectRows ?? [])).forEach((value, key) => {
+      effectByTraceId.set(key, value);
+    });
+  }
 
-  const items = (data ?? []).map((row) =>
-    buildTraceItem(row, directory.get(row.user_id) ?? { email: "", displayName: row.user_id.slice(0, 8) })
+  const directory = new Map(
+    users.map((user) => {
+      const scenarioInfo = getAdminScenarioInfo(user);
+      return [
+        user.id,
+        {
+          email: user.email ?? "",
+          displayName: normalizeDisplayName(user),
+          scenarioCode: scenarioInfo.scenarioCode,
+          scenarioLabel: scenarioInfo.scenarioLabel,
+        },
+      ];
+    })
+  );
+
+  const items = traceRows.map((row) =>
+    buildTraceItem(
+      row,
+      directory.get(row.user_id) ?? {
+        email: "",
+        displayName: row.user_id.slice(0, 8),
+        scenarioCode: null,
+        scenarioLabel: null,
+      },
+      effectByTraceId
+    )
   );
 
   const filtered = items.filter((item) => {
@@ -305,6 +421,11 @@ export async function listAdminRecommendationTraces(
       topRecommendationMode: Object.entries(modeCounts).sort((left, right) => right[1] - left[1])[0]?.[0] ?? null,
       configSources: Array.from(new Set(filtered.map((item) => item.configSource ?? "default"))).sort(),
     },
+    facets: {
+      traceTypes: Array.from(new Set(filtered.map((item) => item.traceType).filter(Boolean))).sort(),
+      recommendationModes: Array.from(new Set(filtered.map((item) => item.recommendationMode ?? "").filter(Boolean))).sort(),
+      configSources: Array.from(new Set(filtered.map((item) => item.configSource ?? "").filter(Boolean))).sort(),
+    },
     filters: {
       q: filters.q?.trim() ?? "",
       traceType: filters.traceType?.trim() ?? "",
@@ -318,7 +439,10 @@ export async function listAdminRecommendationTraces(
   };
 }
 
-function aggregateBucket(target: { count: number; effect: number; stress: number; elapsed: number }, row: RecommendationEffectAdminRow) {
+function aggregateBucket(
+  target: { count: number; effect: number; stress: number; elapsed: number },
+  row: RecommendationEffectAdminRow
+) {
   target.count += 1;
   target.effect += typeof row.effect_score === "number" ? row.effect_score : 0;
   target.stress += typeof row.stress_drop === "number" ? row.stress_drop : 0;
@@ -334,7 +458,9 @@ export async function getAdminRecommendationEffects(
 
   let query = client
     .from("recommendation_effect_links_v1")
-    .select("user_id,execution_id,ended_at,elapsed_sec,effect_score,stress_drop,attributed_trace_id,provider_id,risk_level,model_version,model_profile,config_source,recommendation_mode,attribution_mode")
+    .select(
+      "user_id,execution_id,ended_at,elapsed_sec,effect_score,stress_drop,attributed_trace_id,provider_id,risk_level,model_version,model_profile,config_source,recommendation_mode,attribution_mode"
+    )
     .gte("ended_at", startAt)
     .order("ended_at", { ascending: false });
 
@@ -403,7 +529,12 @@ export async function getAdminRecommendationEffects(
     stressSum += typeof row.stress_drop === "number" ? row.stress_drop : 0;
     elapsedSum += typeof row.elapsed_sec === "number" ? row.elapsed_sec : 0;
 
-    const modeBucket = byMode.get(row.recommendation_mode ?? "UNSPECIFIED") ?? { count: 0, effect: 0, stress: 0, elapsed: 0 };
+    const modeBucket = byMode.get(row.recommendation_mode ?? "UNSPECIFIED") ?? {
+      count: 0,
+      effect: 0,
+      stress: 0,
+      elapsed: 0,
+    };
     aggregateBucket(modeBucket, row);
     byMode.set(row.recommendation_mode ?? "UNSPECIFIED", modeBucket);
 
@@ -432,26 +563,33 @@ export async function getAdminRecommendationEffects(
     avgEffectScore: filtered.length > 0 ? effectSum / filtered.length : 0,
     avgStressDrop: filtered.length > 0 ? stressSum / filtered.length : 0,
     avgElapsedSec: filtered.length > 0 ? elapsedSum / filtered.length : 0,
-    byRecommendationMode: [...byMode.entries()].map(([recommendationMode, bucket]) => ({
-      recommendationMode,
-      executionCount: bucket.count,
-      avgEffectScore: bucket.count > 0 ? bucket.effect / bucket.count : 0,
-      avgStressDrop: bucket.count > 0 ? bucket.stress / bucket.count : 0,
-    })).sort((left, right) => right.executionCount - left.executionCount),
-    byModelProfile: [...byProfile.entries()].map(([key, bucket]) => ({
-      profileCode: key.split("::")[0],
-      configSource: bucket.configSource,
-      executionCount: bucket.count,
-      avgEffectScore: bucket.count > 0 ? bucket.effect / bucket.count : 0,
-      avgStressDrop: bucket.count > 0 ? bucket.stress / bucket.count : 0,
-    })).sort((left, right) => right.executionCount - left.executionCount),
-    byUser: [...byUser.entries()].map(([userId, bucket]) => ({
-      userId,
-      email: directory.get(userId)?.email ?? "",
-      displayName: directory.get(userId)?.displayName ?? userId.slice(0, 8),
-      executionCount: bucket.count,
-      avgEffectScore: bucket.count > 0 ? bucket.effect / bucket.count : 0,
-      avgStressDrop: bucket.count > 0 ? bucket.stress / bucket.count : 0,
-    })).sort((left, right) => right.executionCount - left.executionCount).slice(0, 12),
+    byRecommendationMode: [...byMode.entries()]
+      .map(([recommendationMode, bucket]) => ({
+        recommendationMode,
+        executionCount: bucket.count,
+        avgEffectScore: bucket.count > 0 ? bucket.effect / bucket.count : 0,
+        avgStressDrop: bucket.count > 0 ? bucket.stress / bucket.count : 0,
+      }))
+      .sort((left, right) => right.executionCount - left.executionCount),
+    byModelProfile: [...byProfile.entries()]
+      .map(([key, bucket]) => ({
+        profileCode: key.split("::")[0],
+        configSource: bucket.configSource,
+        executionCount: bucket.count,
+        avgEffectScore: bucket.count > 0 ? bucket.effect / bucket.count : 0,
+        avgStressDrop: bucket.count > 0 ? bucket.stress / bucket.count : 0,
+      }))
+      .sort((left, right) => right.executionCount - left.executionCount),
+    byUser: [...byUser.entries()]
+      .map(([userId, bucket]) => ({
+        userId,
+        email: directory.get(userId)?.email ?? "",
+        displayName: directory.get(userId)?.displayName ?? userId.slice(0, 8),
+        executionCount: bucket.count,
+        avgEffectScore: bucket.count > 0 ? bucket.effect / bucket.count : 0,
+        avgStressDrop: bucket.count > 0 ? bucket.stress / bucket.count : 0,
+      }))
+      .sort((left, right) => right.executionCount - left.executionCount)
+      .slice(0, 12),
   };
 }
