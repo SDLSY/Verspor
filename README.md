@@ -81,6 +81,11 @@ python ml\pipeline\smoke.py
 6. `docs/AI_RUNTIME_ARCHITECTURE.md`：AI 运行时架构与 provider 策略
 7. `docs/DOC_MAINTENANCE.md`：文档维护规则
 
+说明：
+- 仓库的 canonical 文档入口是 `docs/` 及各模块自己的 `README.md`。
+- 比赛报名通知、提交模板、附件包等外部材料不再随仓库分发，也不作为源码事实入口。
+- 如果后续需要比赛交付材料，请基于 `docs/` 中的源码对齐资料和最新实现单独导出。
+
 ## 当前主线说明
 
 ### 1. 统一画像
