@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
+import { hasAdminAccess } from "@/lib/admin-auth";
 import { writeAuditEvent } from "@/lib/audit";
 import { readDemoMetadata } from "@/lib/demo/bootstrap";
 import { fail, ok, parseJsonBody } from "@/lib/http";
@@ -25,6 +26,8 @@ function buildProfile(
   demoScenario: string | null;
   demoSeedVersion: string | null;
   displayName: string | null;
+  adminRole: string | null;
+  adminAccess: boolean;
 } {
   const usernameRaw = metadata?.username;
   const ageRaw = metadata?.age;
@@ -40,6 +43,11 @@ function buildProfile(
     demoScenario: demoMetadata.demoScenario || null,
     demoSeedVersion: demoMetadata.demoSeedVersion || null,
     displayName: demoMetadata.displayName || null,
+    adminRole: typeof metadata?.adminRole === "string" ? metadata.adminRole : null,
+    adminAccess: hasAdminAccess({
+      email,
+      user_metadata: metadata ?? {},
+    }),
   };
 }
 

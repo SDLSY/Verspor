@@ -49,6 +49,12 @@ function readConfig() {
   return JSON.parse(fs.readFileSync(configPath, "utf8"));
 }
 
+function resolveTimelineAnchor(config) {
+  const raw = typeof config.timelineAnchorDate === "string" ? config.timelineAnchorDate.trim() : "";
+  const parsed = raw ? Date.parse(raw) : Number.NaN;
+  return Number.isFinite(parsed) ? parsed : Date.now();
+}
+
 function createServiceClient() {
   return createClient(
     requireEnv("NEXT_PUBLIC_SUPABASE_URL"),
@@ -405,7 +411,7 @@ function emptySeed() {
 function buildBaselineRecoverySeed(userId, scenarioCode, now) {
   const base = emptySeed();
   Object.assign(base, buildSleepRows(userId, scenarioCode, now, {
-    days: 30,
+    days: 32,
     totalSleepBase: 420,
     totalSleepSlope: 0.4,
     recoveryBase: 76,
@@ -466,7 +472,7 @@ function buildBaselineRecoverySeed(userId, scenarioCode, now) {
 function buildReportDoctorSeed(userId, scenarioCode, now) {
   const base = emptySeed();
   Object.assign(base, buildSleepRows(userId, scenarioCode, now, {
-    days: 21,
+    days: 28,
     totalSleepBase: 355,
     totalSleepSlope: 0.5,
     recoveryBase: 54,
@@ -553,7 +559,7 @@ function buildReportDoctorSeed(userId, scenarioCode, now) {
 function buildLifestyleSeed(userId, scenarioCode, now) {
   const base = emptySeed();
   Object.assign(base, buildSleepRows(userId, scenarioCode, now, {
-    days: 14,
+    days: 28,
     totalSleepBase: 340,
     totalSleepSlope: 0.3,
     recoveryBase: 49,
@@ -650,7 +656,7 @@ function buildLifestyleSeed(userId, scenarioCode, now) {
 function buildLiveInterventionSeed(userId, scenarioCode, now) {
   const base = emptySeed();
   Object.assign(base, buildSleepRows(userId, scenarioCode, now, {
-    days: 10,
+    days: 21,
     totalSleepBase: 352,
     totalSleepSlope: 0.6,
     recoveryBase: 47,
@@ -733,7 +739,7 @@ function buildLiveInterventionSeed(userId, scenarioCode, now) {
 function buildHighRiskSeed(userId, scenarioCode, now) {
   const base = emptySeed();
   Object.assign(base, buildSleepRows(userId, scenarioCode, now, {
-    days: 30,
+    days: 35,
     totalSleepBase: 292,
     totalSleepSlope: 0.3,
     recoveryBase: 38,
@@ -970,7 +976,7 @@ async function main() {
   const defaultPassword = requireEnv("DEMO_ACCOUNT_DEFAULT_PASSWORD");
   const adminPassword = optionalEnv("DEMO_ADMIN_DEFAULT_PASSWORD", defaultPassword);
   const existingUsersByEmail = await loadExistingUsers(client);
-  const now = Date.now();
+  const now = resolveTimelineAnchor(config);
   const summaries = [];
 
   for (const account of config.accounts) {
@@ -1002,6 +1008,7 @@ async function main() {
   console.log("\nDemo accounts seeded successfully.\n");
   console.table(summaries);
   console.log(`Seed version: ${config.seedVersion}`);
+  console.log(`Timeline anchor: ${new Date(now).toISOString()}`);
   console.log(`User password source: DEMO_ACCOUNT_DEFAULT_PASSWORD${adminPassword !== defaultPassword ? " / DEMO_ADMIN_DEFAULT_PASSWORD" : ""}`);
   console.log(`Remember to add demo_admin_console@${domain} into ADMIN_EMAIL_ALLOWLIST for admin console login.\n`);
 }

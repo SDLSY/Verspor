@@ -102,13 +102,14 @@ class DoctorChatAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: DoctorChatMessage) {
             val payload = item.followUpPayload
-            binding.tvFollowUpQuestion.text = payload?.question ?: item.content
-            binding.tvFollowUpMissing.text = if (payload?.missingInfo.isNullOrEmpty()) {
+            val missingInfo = payload?.missingInfo.orEmpty()
+            binding.tvFollowUpQuestion.text = safeText(payload?.question, item.content)
+            binding.tvFollowUpMissing.text = if (missingInfo.isEmpty()) {
                 binding.root.context.getString(R.string.doctor_follow_up_missing_default)
             } else {
                 binding.root.context.getString(
                     R.string.doctor_follow_up_missing_format,
-                    payload?.missingInfo?.joinToString("、")
+                    missingInfo.joinToString("、")
                 )
             }
         }
@@ -132,39 +133,51 @@ class DoctorChatAdapter(
                 return
             }
 
-            binding.tvAssessmentSummary.text = payload.doctorSummary
+            val symptomFacts = payload.symptomFacts.orEmpty()
+            val suspectedIssues = payload.suspectedIssues.orEmpty()
+            val redFlags = payload.redFlags.orEmpty()
+            val nextStepAdvice = payload.nextStepAdvice.orEmpty()
+
+            binding.tvAssessmentSummary.text = safeText(payload.doctorSummary, item.content)
             binding.tvAssessmentComplaint.text = context.getString(
                 R.string.doctor_assessment_complaint_format,
-                payload.chiefComplaint
+                safeText(payload.chiefComplaint, "待补充")
             )
             binding.tvAssessmentSymptomFacts.text = context.getString(
                 R.string.doctor_assessment_symptom_facts_format,
-                payload.symptomFacts.joinToString("\n- ", prefix = "- ")
+                symptomFacts.joinToString("\n- ", prefix = "- ").ifBlank { "- 暂无补充症状事实" }
             )
             binding.tvAssessmentSuspectedIssues.text = context.getString(
                 R.string.doctor_assessment_suspected_issues_format,
-                payload.suspectedIssues.mapIndexed { index, issue ->
-                    "${index + 1}. ${issue.name}（${issue.confidence}%）\n${issue.rationale}"
-                }.joinToString("\n\n")
+                suspectedIssues.mapIndexed { index, issue ->
+                    "${index + 1}. ${safeText(issue.name, "待确认问题")}（${issue.confidence}%）\n${
+                        safeText(issue.rationale, "暂无补充说明")
+                    }"
+                }.joinToString("\n\n").ifBlank { "暂无明确怀疑问题，请结合后续问诊继续补充。" }
             )
-            if (payload.redFlags.isEmpty()) {
+            if (redFlags.isEmpty()) {
                 binding.tvAssessmentRedFlags.visibility = View.GONE
             } else {
                 binding.tvAssessmentRedFlags.visibility = View.VISIBLE
                 binding.tvAssessmentRedFlags.text = context.getString(
                     R.string.doctor_assessment_red_flags_format,
-                    payload.redFlags.joinToString("、")
+                    redFlags.joinToString("、")
                 )
             }
             binding.tvAssessmentDepartment.text = context.getString(
                 R.string.doctor_assessment_department_format,
-                payload.recommendedDepartment
+                safeText(payload.recommendedDepartment, "综合门诊")
             )
             binding.tvAssessmentNextSteps.text = context.getString(
                 R.string.doctor_assessment_next_steps_format,
-                payload.nextStepAdvice.joinToString("\n- ", prefix = "- ")
+                nextStepAdvice.joinToString("\n- ", prefix = "- ").ifBlank {
+                    "- 建议继续补充主诉、症状持续时间和危险信号。"
+                }
             )
-            binding.tvAssessmentDisclaimer.text = payload.disclaimer
+            binding.tvAssessmentDisclaimer.text = safeText(
+                payload.disclaimer,
+                "本问诊结果仅用于健康辅助与演示，不替代医生面诊。"
+            )
         }
     }
 
@@ -183,5 +196,9 @@ class DoctorChatAdapter(
         private const val VIEW_TYPE_ASSISTANT = 2
         private const val VIEW_TYPE_FOLLOW_UP = 3
         private const val VIEW_TYPE_ASSESSMENT = 4
+
+        private fun safeText(value: String?, fallback: String = ""): String {
+            return value?.trim().takeUnless { it.isNullOrEmpty() } ?: fallback
+        }
     }
 }

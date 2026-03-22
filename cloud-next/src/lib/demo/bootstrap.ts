@@ -346,6 +346,15 @@ const accountConfigs = (demoConfig.accounts as DemoAccountConfig[]).reduce<
   return acc;
 }, {});
 
+function getDemoTimelineAnchorMs(): number {
+  const raw =
+    typeof (demoConfig as { timelineAnchorDate?: string }).timelineAnchorDate === "string"
+      ? (demoConfig as { timelineAnchorDate?: string }).timelineAnchorDate?.trim()
+      : "";
+  const parsed = raw ? Date.parse(raw) : Number.NaN;
+  return Number.isFinite(parsed) ? parsed : Date.now();
+}
+
 function json(value: unknown): string {
   return JSON.stringify(value);
 }
@@ -841,7 +850,7 @@ function makeFoodRecord(
 
 function buildBaselineRecoveryScenario(now: number): DemoBootstrapSnapshot {
   const prefix = "demo-baseline";
-  const series = makeSleepSeries(prefix, now, 30, {
+  const series = makeSleepSeries(prefix, now, 32, {
     totalSleepBase: 410,
     totalSleepSlope: 2.4,
     recoveryBase: 61,
@@ -980,7 +989,7 @@ function buildBaselineRecoveryScenario(now: number): DemoBootstrapSnapshot {
 
 function buildReportDoctorScenario(now: number): DemoBootstrapSnapshot {
   const prefix = "demo-report-doctor";
-  const series = makeSleepSeries(prefix, now, 21, {
+  const series = makeSleepSeries(prefix, now, 28, {
     totalSleepBase: 365,
     totalSleepSlope: 0.8,
     recoveryBase: 54,
@@ -1116,7 +1125,7 @@ function buildReportDoctorScenario(now: number): DemoBootstrapSnapshot {
 
 function buildLifestyleScenario(now: number): DemoBootstrapSnapshot {
   const prefix = "demo-lifestyle";
-  const series = makeSleepSeries(prefix, now, 21, {
+  const series = makeSleepSeries(prefix, now, 28, {
     totalSleepBase: 345,
     totalSleepSlope: 1.1,
     recoveryBase: 48,
@@ -1215,7 +1224,7 @@ function buildLifestyleScenario(now: number): DemoBootstrapSnapshot {
 
 function buildLiveInterventionScenario(now: number): DemoBootstrapSnapshot {
   const prefix = "demo-live-intervention";
-  const series = makeSleepSeries(prefix, now, 14, {
+  const series = makeSleepSeries(prefix, now, 21, {
     totalSleepBase: 352,
     totalSleepSlope: 1.3,
     recoveryBase: 46,
@@ -1311,7 +1320,7 @@ function buildLiveInterventionScenario(now: number): DemoBootstrapSnapshot {
 
 function buildHighRiskScenario(now: number): DemoBootstrapSnapshot {
   const prefix = "demo-high-risk";
-  const series = makeSleepSeries(prefix, now, 30, {
+  const series = makeSleepSeries(prefix, now, 35, {
     totalSleepBase: 298,
     totalSleepSlope: 0.6,
     recoveryBase: 36,
@@ -1501,7 +1510,7 @@ export function buildDemoBootstrapPayload(input: {
   if (!config || config.role !== "demo_user") {
     return null;
   }
-  const now = input.now ?? Date.now();
+  const now = input.now ?? getDemoTimelineAnchorMs();
   const snapshot = (() => {
     switch (input.scenario) {
       case "demo_baseline_recovery":

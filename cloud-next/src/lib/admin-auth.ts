@@ -5,6 +5,15 @@ import type { User } from "@supabase/supabase-js";
 import { fail } from "@/lib/http";
 import { createClient } from "@/lib/supabase/server";
 
+type AdminUserLike =
+  | Pick<User, "email" | "user_metadata">
+  | {
+      email?: string | null;
+      user_metadata?: unknown;
+    }
+  | null
+  | undefined;
+
 function parseAllowlist(raw: string | undefined): Set<string> {
   return new Set(
     (raw ?? "")
@@ -25,9 +34,34 @@ export function isAdminEmailAllowed(email: string | null | undefined): boolean {
   return getAllowlist().has(email.trim().toLowerCase());
 }
 
-function hasDemoAdminRole(user: User | null | undefined): boolean {
-  const metadata = (user?.user_metadata ?? {}) as { demoRole?: string | null };
+type AdminMetadata = {
+  demoRole?: string | null;
+  adminRole?: string | null;
+  adminAccessGranted?: boolean | string | null;
+};
+
+function readAdminMetadata(user: AdminUserLike): AdminMetadata {
+  return (user?.user_metadata ?? {}) as AdminMetadata;
+}
+
+function hasDemoAdminRole(user: AdminUserLike): boolean {
+  const metadata = readAdminMetadata(user);
   return String(metadata.demoRole ?? "").trim().toLowerCase() === "demo_admin";
+}
+
+function hasRegisteredAdminAccess(user: AdminUserLike): boolean {
+  const metadata = readAdminMetadata(user);
+  const adminRole = String(metadata.adminRole ?? "").trim().toLowerCase();
+  const adminAccessGranted = String(metadata.adminAccessGranted ?? "").trim().toLowerCase();
+  return (
+    adminRole === "registered_admin" ||
+    adminRole === "admin" ||
+    adminAccessGranted === "true"
+  );
+}
+
+export function hasAdminAccess(user: AdminUserLike): boolean {
+  return isAdminEmailAllowed(user?.email) || hasDemoAdminRole(user) || hasRegisteredAdminAccess(user);
 }
 
 export async function getSessionUser(): Promise<User | null> {
@@ -48,7 +82,7 @@ export async function requireSignedInPage(): Promise<User> {
 
 export async function requireAdminPage(): Promise<User> {
   const user = await requireSignedInPage();
-  if (!isAdminEmailAllowed(user.email) && !hasDemoAdminRole(user)) {
+  if (!hasAdminAccess(user)) {
     redirect("/unauthorized" as Route);
   }
   return user;
@@ -73,7 +107,7 @@ export async function requireAdminRoute(): Promise<AdminRouteContext> {
     };
   }
 
-  if (!isAdminEmailAllowed(user.email) && !hasDemoAdminRole(user)) {
+  if (!hasAdminAccess(user)) {
     return {
       ok: false,
       response: NextResponse.json(fail(403, "admin access denied"), { status: 403 }),

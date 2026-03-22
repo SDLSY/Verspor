@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { writeAuditEvent } from "@/lib/audit";
+import { hasAdminAccess } from "@/lib/admin-auth";
 import { readDemoMetadata } from "@/lib/demo/bootstrap";
 import { fail, ok, parseJsonBody } from "@/lib/http";
 import { createPublicClient, createServiceClient } from "@/lib/supabase";
@@ -62,6 +63,8 @@ export async function POST(req: Request) {
         demoScenario: demoMetadata.demoScenario || null,
         demoSeedVersion: demoMetadata.demoSeedVersion || null,
         displayName: demoMetadata.displayName || null,
+        adminRole: typeof metadata?.adminRole === "string" ? metadata.adminRole : null,
+        adminAccess: hasAdminAccess(data.user),
         canResendConfirmation: false,
       })
     );

@@ -18,6 +18,12 @@ android {
         buildConfigField("String", "OPENROUTER_MODEL", "\"google/gemini-2.5-flash\"")
     }
 
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
+    }
+
     buildTypes {
         debug {
             val debugQwenModelUrl = (project.findProperty("DEBUG_QWEN_MODEL_URL") as String?) ?: ""
@@ -61,4 +67,5 @@ dependencies {
     implementation(project(":core-common"))
     implementation(project(":core-db"))
     implementation(project(":core-model"))
+    testImplementation("junit:junit:4.13.2")
 }

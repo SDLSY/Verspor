@@ -468,7 +468,8 @@ class DoctorChatViewModel(application: Application) : AndroidViewModel(applicati
     ) {
         withContext(Dispatchers.IO) {
             persistMessage(session.id, assistantMessage)
-            val assessment = assistantMessage.assessmentPayload ?: result.turn.assessment
+            val assessment = (assistantMessage.assessmentPayload ?: result.turn.assessment)
+                ?.sanitizeForPersistence()
             if (assessment != null) {
                 upsertAssessmentSnapshot(session.id, assessment)
             }
@@ -502,17 +503,18 @@ class DoctorChatViewModel(application: Application) : AndroidViewModel(applicati
         sessionId: String,
         assessment: DoctorAssessmentPayload
     ) {
+        val sanitized = assessment.sanitizeForPersistence()
         doctorRepository.saveAssessment(
             DoctorAssessmentEntity(
                 sessionId = sessionId,
-                suspectedIssuesJson = gson.toJson(assessment.suspectedIssues),
-                symptomFactsJson = gson.toJson(assessment.symptomFacts),
-                missingInfoJson = gson.toJson(assessment.missingInfo),
-                redFlagsJson = gson.toJson(assessment.redFlags),
-                recommendedDepartment = assessment.recommendedDepartment,
-                doctorSummary = assessment.doctorSummary,
-                nextStepAdviceJson = gson.toJson(assessment.nextStepAdvice),
-                disclaimer = assessment.disclaimer
+                suspectedIssuesJson = gson.toJson(sanitized.suspectedIssues),
+                symptomFactsJson = gson.toJson(sanitized.symptomFacts),
+                missingInfoJson = gson.toJson(sanitized.missingInfo),
+                redFlagsJson = gson.toJson(sanitized.redFlags),
+                recommendedDepartment = sanitized.recommendedDepartment,
+                doctorSummary = sanitized.doctorSummary,
+                nextStepAdviceJson = gson.toJson(sanitized.nextStepAdvice),
+                disclaimer = sanitized.disclaimer
             )
         )
     }
@@ -522,17 +524,73 @@ class DoctorChatViewModel(application: Application) : AndroidViewModel(applicati
         assessment: DoctorAssessmentPayload
     ) {
         val cloudSession = networkRepository.getCurrentSession() ?: return
+        val sanitized = assessment.sanitizeForPersistence()
         val request = DoctorInquirySummaryUpsertRequest(
             sessionId = session.id,
             assessedAt = System.currentTimeMillis(),
-            riskLevel = assessment.riskLevel.ifBlank { session.riskLevel },
-            chiefComplaint = assessment.chiefComplaint.ifBlank { session.chiefComplaint },
-            redFlags = assessment.redFlags,
-            recommendedDepartment = assessment.recommendedDepartment,
-            doctorSummary = assessment.doctorSummary
+            riskLevel = sanitized.riskLevel.ifBlank { session.riskLevel },
+            chiefComplaint = sanitized.chiefComplaint.ifBlank { session.chiefComplaint },
+            redFlags = sanitized.redFlags,
+            recommendedDepartment = sanitized.recommendedDepartment,
+            doctorSummary = sanitized.doctorSummary
         )
         networkRepository.upsertDoctorInquirySummary(request).onFailure {
             Log.w(TAG, "syncDoctorInquirySummaryIfPossible failed for ${cloudSession.userId}: ${it.message}")
+        }
+    }
+
+    private fun DoctorAssessmentPayload.sanitizeForPersistence(): DoctorAssessmentPayload {
+        return DoctorAssessmentPayload(
+            chiefComplaint = safeText(chiefComplaint, "待补充主诉"),
+            symptomFacts = safeStringList(symptomFacts, listOf("暂无补充症状事实")),
+            missingInfo = safeStringList(missingInfo),
+            suspectedIssues = safeSuspectedIssues(suspectedIssues),
+            riskLevel = safeText(riskLevel, "LOW"),
+            redFlags = safeStringList(redFlags),
+            recommendedDepartment = safeText(recommendedDepartment, "综合门诊"),
+            nextStepAdvice = safeStringList(
+                nextStepAdvice,
+                listOf("建议继续补充主诉、症状持续时间和危险信号。")
+            ),
+            doctorSummary = safeText(
+                doctorSummary,
+                "当前信息仍不完整，建议继续补充症状与病程后再生成完整问诊建议。"
+            ),
+            disclaimer = safeText(
+                disclaimer,
+                "本问诊结果仅用于健康辅助与演示，不替代医生面诊。"
+            )
+        )
+    }
+
+    private fun safeText(value: String?, fallback: String): String {
+        return value?.trim()?.takeIf { it.isNotBlank() } ?: fallback
+    }
+
+    private fun safeStringList(value: List<String>?, fallback: List<String> = emptyList()): List<String> {
+        val normalized = buildList {
+            (value as? Iterable<*>)?.forEach { item ->
+                val text = (item as? String)?.trim()
+                if (!text.isNullOrBlank()) {
+                    add(text)
+                }
+            }
+        }
+        return if (normalized.isNotEmpty()) normalized else fallback
+    }
+
+    private fun safeSuspectedIssues(value: List<DoctorSuspectedIssue>?): List<DoctorSuspectedIssue> {
+        return buildList {
+            (value as? Iterable<*>)?.forEach { item ->
+                val issue = item as? DoctorSuspectedIssue ?: return@forEach
+                add(
+                    DoctorSuspectedIssue(
+                        name = safeText(issue.name, "待确认问题"),
+                        rationale = safeText(issue.rationale, "待补充依据"),
+                        confidence = issue.confidence.coerceIn(0, 100)
+                    )
+                )
+            }
         }
     }
 

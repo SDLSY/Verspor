@@ -12,6 +12,12 @@ android {
         minSdk = 24
     }
 
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -28,4 +34,5 @@ dependencies {
     api("androidx.room:room-ktx:2.8.0")
     implementation("com.google.code.gson:gson:2.10.1")
     kapt("androidx.room:room-compiler:2.8.0")
+    testImplementation("junit:junit:4.13.2")
 }

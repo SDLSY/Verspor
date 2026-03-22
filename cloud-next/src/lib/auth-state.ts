@@ -10,6 +10,8 @@ export type AuthPayload = {
   refreshToken?: string;
   userId?: string;
   username?: string;
+  adminRole?: string | null;
+  adminAccess?: boolean;
   canResendConfirmation: boolean;
 };
 

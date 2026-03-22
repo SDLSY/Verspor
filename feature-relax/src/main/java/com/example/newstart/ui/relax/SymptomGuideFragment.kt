@@ -100,7 +100,6 @@ class SymptomGuideFragment : Fragment() {
         (quickChips() + redFlagChips()).forEach { chip ->
             chip.setOnClickListener {
                 viewModel.addQuickSymptom(chip.text.toString())
-                chip.isChecked = false
             }
         }
 
@@ -147,6 +146,7 @@ class SymptomGuideFragment : Fragment() {
         viewModel.uiState.observe(viewLifecycleOwner) { state ->
             bindSurfaceSide(state.selectedSurfaceSide)
             bindHotspotState(state)
+            bindQuickChipState(state.selectedMarkers)
             bindSelectedMarkers(state.selectedMarkers)
             bindDeviceEvidence(state.deviceEvidence)
             binding.btnGenerateOutcome.isEnabled = state.canGenerate
@@ -204,16 +204,57 @@ class SymptomGuideFragment : Fragment() {
         val count = state.selectedMarkers.count { it.zone == zone && it.surfaceSide == currentSide }
         val selected = count > 0
         view.text = ""
-        view.alpha = if (selected) 0.95f else 0f
-        view.backgroundTintList = ColorStateList.valueOf(
-            color(
-                if (selected) {
-                    R.color.md_theme_light_primary
-                } else {
-                    android.R.color.transparent
-                }
+        view.alpha = 0f
+        view.backgroundTintList = ColorStateList.valueOf(color(android.R.color.transparent))
+        view.isSelected = selected
+    }
+
+    private fun bindQuickChipState(markers: List<SelectedBodyMarker>) {
+        val selectedLabels = markers.map { it.symptomLabel }.toSet()
+        quickChips().forEach { chip ->
+            bindSelectableChip(
+                chip = chip,
+                selected = selectedLabels.contains(chip.text.toString()),
+                accent = ChipAccent.PRIMARY
             )
-        )
+        }
+        redFlagChips().forEach { chip ->
+            bindSelectableChip(
+                chip = chip,
+                selected = selectedLabels.contains(chip.text.toString()),
+                accent = ChipAccent.DANGER
+            )
+        }
+    }
+
+    private fun bindSelectableChip(
+        chip: Chip,
+        selected: Boolean,
+        accent: ChipAccent
+    ) {
+        val background = when {
+            !selected -> color(R.color.chip_bg)
+            accent == ChipAccent.DANGER -> color(R.color.status_negative)
+            else -> color(R.color.md_theme_light_primaryContainer)
+        }
+        val textColor = when {
+            !selected -> color(R.color.text_primary)
+            accent == ChipAccent.DANGER -> color(android.R.color.white)
+            else -> color(R.color.md_theme_light_onPrimaryContainer)
+        }
+        val strokeColor = when {
+            !selected -> color(R.color.md_theme_light_outlineVariant)
+            accent == ChipAccent.DANGER -> color(R.color.status_negative)
+            else -> color(R.color.md_theme_light_primary)
+        }
+        chip.isChecked = selected
+        chip.chipBackgroundColor = ColorStateList.valueOf(background)
+        chip.chipStrokeColor = ColorStateList.valueOf(strokeColor)
+        chip.chipStrokeWidth = if (selected) resources.displayMetrics.density * 1.25f else 0f
+        chip.setTextColor(textColor)
+        chip.alpha = if (selected) 1f else 0.96f
+        chip.scaleX = if (selected) 1.03f else 1f
+        chip.scaleY = if (selected) 1.03f else 1f
     }
 
     private fun bindSurfaceToggleButton(button: MaterialButton, selected: Boolean) {
@@ -447,6 +488,11 @@ class SymptomGuideFragment : Fragment() {
     }
 
     private fun color(colorRes: Int): Int = requireContext().getColor(colorRes)
+
+    private enum class ChipAccent {
+        PRIMARY,
+        DANGER
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

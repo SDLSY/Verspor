@@ -22,6 +22,7 @@ import com.example.newstart.database.entity.PrescriptionItemEntity
 import com.example.newstart.database.entity.RecoveryScoreEntity
 import com.example.newstart.database.entity.RelaxSessionEntity
 import com.example.newstart.database.entity.SleepDataEntity
+import com.example.newstart.demo.DemoConfig
 import com.example.newstart.network.models.AuthData
 import com.example.newstart.network.models.DemoBootstrapData
 import com.example.newstart.network.models.UserProfile
@@ -56,17 +57,19 @@ class DemoBootstrapCoordinator(
 
     suspend fun bootstrapForAuth(authData: AuthData): Result<DemoBootstrapResult> {
         return withContext(Dispatchers.IO) {
-            val session = accountRepository.getCurrentSession()
-                ?: return@withContext Result.success(
+            val session = accountRepository.getCurrentSession() ?: run {
+                clearDemoStateForRegularMode()
+                return@withContext Result.success(
                     DemoBootstrapResult(
                         isDemoAccount = false,
                         applied = false,
                         message = "当前没有有效登录会话"
                     )
                 )
+            }
 
             if (!authData.demoRole.equals(ROLE_DEMO_USER, ignoreCase = true)) {
-                clearPreviousDemoImportIfNeeded()
+                clearDemoStateForRegularMode()
                 return@withContext Result.success(
                     DemoBootstrapResult(
                         isDemoAccount = false,
@@ -83,6 +86,7 @@ class DemoBootstrapCoordinator(
             }
 
             if (isCurrentImport(session.userId, scenario, version)) {
+                DemoConfig.isDemoMode = true
                 return@withContext Result.success(
                     DemoBootstrapResult(
                         isDemoAccount = true,
@@ -98,6 +102,7 @@ class DemoBootstrapCoordinator(
                 return@withContext Result.failure(it)
             }
             importSnapshot(payload)
+            DemoConfig.isDemoMode = true
             persistState(session.userId, payload.demoScenario, payload.demoSeedVersion)
             Result.success(
                 DemoBootstrapResult(
@@ -114,6 +119,7 @@ class DemoBootstrapCoordinator(
     suspend fun bootstrapForCurrentSession(): Result<DemoBootstrapResult> {
         return withContext(Dispatchers.IO) {
             if (accountRepository.getCurrentSession() == null) {
+                clearDemoStateForRegularMode()
                 return@withContext Result.success(
                     DemoBootstrapResult(
                         isDemoAccount = false,
@@ -132,7 +138,7 @@ class DemoBootstrapCoordinator(
 
     private suspend fun syncForProfile(profile: UserProfile): Result<DemoBootstrapResult> {
         if (!profile.demoRole.equals(ROLE_DEMO_USER, ignoreCase = true)) {
-            clearPreviousDemoImportIfNeeded()
+            clearDemoStateForRegularMode()
             return Result.success(
                 DemoBootstrapResult(
                     isDemoAccount = false,
@@ -148,6 +154,7 @@ class DemoBootstrapCoordinator(
             return Result.failure(Exception("演示账号缺少场景元信息"))
         }
         if (isCurrentImport(profile.userId, scenario, version)) {
+            DemoConfig.isDemoMode = true
             return Result.success(
                 DemoBootstrapResult(
                     isDemoAccount = true,
@@ -163,6 +170,7 @@ class DemoBootstrapCoordinator(
             return Result.failure(it)
         }
         importSnapshot(payload)
+        DemoConfig.isDemoMode = true
         persistState(profile.userId, payload.demoScenario, payload.demoSeedVersion)
         return Result.success(
             DemoBootstrapResult(
@@ -220,6 +228,11 @@ class DemoBootstrapCoordinator(
         db.clearAllTables()
         prefs.edit().clear().apply()
         Log.i(TAG, "cleared previously imported demo data for user=$priorUserId")
+    }
+
+    private fun clearDemoStateForRegularMode() {
+        DemoConfig.isDemoMode = false
+        clearPreviousDemoImportIfNeeded()
     }
 
     private fun isCurrentImport(userId: String, scenario: String, version: String): Boolean {

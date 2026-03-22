@@ -1,5 +1,6 @@
 package com.example.newstart.repository
 
+import com.example.newstart.demo.DemoConfig
 import com.example.newstart.network.ApiClient
 import com.example.newstart.network.CloudSession
 import com.example.newstart.network.models.ActionResponse
@@ -178,6 +179,7 @@ class CloudAccountRepository {
     }
 
     fun logout() {
+        DemoConfig.isDemoMode = false
         ApiClient.clearAuthToken()
     }
 

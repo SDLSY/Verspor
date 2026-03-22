@@ -17,6 +17,12 @@ android {
         buildConfigField("String", "API_BASE_URL", "\"$releaseApiBaseUrl\"")
     }
 
+    testOptions {
+        unitTests {
+            isReturnDefaultValues = true
+        }
+    }
+
     buildTypes {
         debug {
             buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
@@ -56,4 +62,5 @@ dependencies {
     implementation(project(":core-ble"))
     implementation(project(":core-network"))
     implementation(project(":core-ml"))
+    testImplementation("junit:junit:4.13.2")
 }
