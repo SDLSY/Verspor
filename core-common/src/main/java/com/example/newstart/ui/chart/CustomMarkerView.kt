@@ -1,4 +1,4 @@
-﻿package com.example.newstart.ui.chart
+package com.example.newstart.ui.chart
 
 import android.content.Context
 import android.widget.TextView
@@ -20,14 +20,15 @@ class CustomMarkerView(
     private var valueFormatter: ((Float) -> String)? = null
 
     /**
-     * 璁剧疆鏃ユ湡鏍煎紡鍖栧櫒
+     * 设置日期格式化器
      */
     fun setDateFormatter(formatter: (Float) -> String) {
         dateFormatter = formatter
     }
 
     /**
-     * 璁剧疆鏁板€兼牸寮忓寲鍣?     */
+     * 设置数值格式化器
+     */
     fun setValueFormatter(formatter: (Float) -> String) {
         valueFormatter = formatter
     }
@@ -41,7 +42,7 @@ class CustomMarkerView(
     }
 
     override fun getOffset(): MPPointF {
-        // 灏?marker 灞呬腑鏄剧ず鍦ㄦ暟鎹偣涓婃柟
+        // 将 marker 居中显示在数据点上方
         return MPPointF(-(width / 2f), -height.toFloat() - 10f)
     }
 }

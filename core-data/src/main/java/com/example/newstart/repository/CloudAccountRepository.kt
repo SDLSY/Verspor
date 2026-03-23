@@ -102,7 +102,7 @@ class CloudAccountRepository {
         return withContext(Dispatchers.IO) {
             try {
                 val response = apiService.loginWithDemoAccount()
-                handleAuthResponse(response, "婕旂ず璐︽埛鐧诲綍澶辫触")
+                handleAuthResponse(response, "演示账号登录失败")
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

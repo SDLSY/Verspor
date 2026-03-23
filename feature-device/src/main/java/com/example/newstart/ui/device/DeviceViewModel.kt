@@ -1,4 +1,4 @@
-﻿package com.example.newstart.ui.device
+package com.example.newstart.ui.device
 
 import android.app.Application
 import android.bluetooth.BluetoothDevice
@@ -206,7 +206,7 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
                     _currentDevice.value = connectedDevice
                     _statusMessage.value = "连接成功"
                     
-                    // 淇濆瓨鍒版暟鎹簱
+                    // 保存到数据库
                     saveDeviceToDb(connectedDevice)
                     
                     // Start data collection.
@@ -331,7 +331,7 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
                     _statusMessage.value = "连接成功"
                     _scannedDevices.value = emptyList()  // 清空扫描列表
                     
-                    // 淇濆瓨鍒版暟鎹簱
+                    // 保存到数据库
                     saveDeviceToDb(connectedDevice)
                     
                     // Start data collection.
@@ -721,7 +721,7 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
     }
     
     /**
-     * 娓呯悊璧勬簮
+     * 清理资源
      */
     override fun onCleared() {
         super.onCleared()
@@ -737,7 +737,7 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
 data class ScannedDevice(
     val name: String,
     val address: String,
-    val rssi: Int  // 淇″彿寮哄害
+    val rssi: Int  // 信号强度
 )
 
 data class PpgWaveUiState(

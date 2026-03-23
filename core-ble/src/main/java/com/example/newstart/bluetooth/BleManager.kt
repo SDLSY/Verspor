@@ -1,4 +1,4 @@
-﻿package com.example.newstart.bluetooth
+package com.example.newstart.bluetooth
 
 import android.annotation.SuppressLint
 import android.bluetooth.*
@@ -962,13 +962,15 @@ class BleManager(private val context: Context) {
     }
     
     /**
-     * 鍒涘缓浼犳劅鍣ㄦ暟鎹璞?     */
+     * 创建传感器数据对象
+     */
     private fun bytesToShort(low: Byte, high: Byte): Short {
         return (((high.toInt() and 0xFF) shl 8) or (low.toInt() and 0xFF)).toShort()
     }
     
     /**
-     * 鍒涘缓浼犳劅鍣ㄦ暟鎹璞?     */
+     * 创建传感器数据对象
+     */
     private fun createSensorData(
         heartRate: Int = 0,
         bloodOxygen: Int = 0,
