@@ -247,7 +247,7 @@ dependencies {
     implementation("com.airbnb.android:lottie:6.1.0")
     implementation("com.facebook.shimmer:shimmer:0.5.0")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-    runtimeOnly("com.llamatik:library:0.12.0")
+    debugRuntimeOnly("com.llamatik:library:0.12.0")
     implementation("org.tensorflow:tensorflow-lite:2.14.0")
     implementation("com.google.android.filament:filament-android:$filamentVersion")
     implementation("com.google.android.filament:gltfio-android:$filamentVersion")

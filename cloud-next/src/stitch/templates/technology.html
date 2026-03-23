@@ -122,8 +122,19 @@
 <circle class="opacity-50" cx="400" cy="200" r="80" stroke-width="0.5"></circle>
 <circle class="opacity-20" cx="400" cy="200" r="120" stroke-width="0.5"></circle>
 <!-- Pulse Dots -->
-<circle class="text-tertiary shadow-[0_0_10px_#4DE082]" cx="200" cy="125" fill="currentColor" r="2"></circle>
-<circle class="text-tertiary shadow-[0_0_10px_#4DE082]" cx="600" cy="275" fill="currentColor" r="2"></circle>
+<circle class="text-tertiary shadow-[0_0_10px_#4DE082]" fill="currentColor" r="2">
+  <animateMotion
+    dur="9s"
+    repeatCount="indefinite"
+    path="M50,200 Q200,50 400,200 T750,200" />
+</circle>
+<circle class="text-tertiary shadow-[0_0_10px_#4DE082]" fill="currentColor" r="2">
+  <animateMotion
+    dur="11s"
+    repeatCount="indefinite"
+    begin="1.2s"
+    path="M50,200 Q200,350 400,200 T750,200" />
+</circle>
 </svg>
 </div>
 </div>
@@ -137,6 +148,12 @@
 <svg class="w-full h-full stroke-primary" viewbox="0 0 200 200">
 <circle cx="100" cy="100" fill="none" r="80" stroke-dasharray="2 4"></circle>
 <circle cx="100" cy="100" fill="none" r="40" stroke-dasharray="1 2"></circle>
+<circle fill="#4DE082" opacity="0.95" r="3">
+  <animateMotion
+    dur="8s"
+    repeatCount="indefinite"
+    path="M 100 20 A 80 80 0 1 1 100 180 A 80 80 0 1 1 100 20"></animateMotion>
+</circle>
 </svg>
 </div>
 <div>
@@ -181,7 +198,12 @@
 <svg class="w-full h-full animate-pulse-slow" viewbox="0 0 100 100">
 <circle class="text-tertiary/20" cx="50" cy="50" fill="none" r="45" stroke="currentColor" stroke-dasharray="10 5" stroke-width="1"></circle>
 <circle class="text-tertiary/40" cx="50" cy="50" fill="none" r="30" stroke="currentColor" stroke-width="1"></circle>
-<circle class="text-tertiary" cx="50" cy="5" fill="currentColor" r="4"></circle>
+<circle fill="#4DE082" opacity="0.95" r="4">
+  <animateMotion
+    dur="6.5s"
+    repeatCount="indefinite"
+    path="M 50 5 A 45 45 0 1 1 50 95 A 45 45 0 1 1 50 5"></animateMotion>
+</circle>
 </svg>
 </div>
 </div>
@@ -258,6 +280,17 @@
 <a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">媒体资料包</a>
 </div>
 <p class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40">© 2024 VesperO. 精准修复，奢华永续。</p>
+</div>
+</footer>
+</body></html>x-col items-start">
+<span class="font-noto-serif text-4xl mb-8 block text-[#E0E2ED]">VesperO</span>
+<div class="flex flex-wrap gap-12 mb-24">
+<a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">闅愮鏀跨瓥</a>
+<a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">鏈嶅姟鏉℃</a>
+<a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">绉戝鐧界毊涔?/a>
+<a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">濯掍綋璧勬枡鍖?/a>
+</div>
+<p class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40">漏 2026 VesperO. 绮惧噯淇锛屽ア鍗庢案缁€?/p>
 </div>
 </footer>
 </body></html>

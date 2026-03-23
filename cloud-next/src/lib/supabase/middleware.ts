@@ -2,9 +2,26 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const PUBLIC_AUTH_PATHS = ["/login", "/auth/confirm", "/reset-password"] as const;
+const PUBLIC_MARKETING_PATHS = [
+  "/",
+  "/product",
+  "/technology",
+  "/about",
+  "/demo",
+  "/story",
+  "/favicon.ico",
+  "/robots.txt",
+  "/sitemap.xml",
+] as const;
 
 function isPublicAuthPath(pathname: string): boolean {
   return PUBLIC_AUTH_PATHS.some((path) => pathname.startsWith(path));
+}
+
+function isPublicMarketingPath(pathname: string): boolean {
+  return PUBLIC_MARKETING_PATHS.some((path) =>
+    path === "/" ? pathname === "/" : pathname.startsWith(path),
+  );
 }
 
 export async function updateSession(request: NextRequest) {
@@ -37,7 +54,12 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user && !isPublicAuthPath(request.nextUrl.pathname) && !request.nextUrl.pathname.startsWith("/api")) {
+  if (
+    !user &&
+    !isPublicAuthPath(request.nextUrl.pathname) &&
+    !isPublicMarketingPath(request.nextUrl.pathname) &&
+    !request.nextUrl.pathname.startsWith("/api")
+  ) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);

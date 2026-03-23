@@ -167,6 +167,14 @@ code {
   margin-top: auto;
 }
 
+.admin-frontdoor {
+  margin: 10px 0 4px;
+}
+
+.admin-frontdoor-link {
+  width: 100%;
+}
+
 .admin-main {
   padding: 30px;
   display: grid;

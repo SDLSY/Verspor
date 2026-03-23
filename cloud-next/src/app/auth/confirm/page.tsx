@@ -14,6 +14,7 @@ export default async function AuthConfirmPage({
   const resolved = (await searchParams) ?? {};
   return (
     <ConfirmClient
+      nextPath={pickFirst(resolved.next)}
       tokenHash={pickFirst(resolved.token_hash)}
       type={pickFirst(resolved.type)}
     />

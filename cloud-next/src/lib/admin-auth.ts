@@ -61,7 +61,7 @@ function hasRegisteredAdminAccess(user: AdminUserLike): boolean {
 }
 
 export function hasAdminAccess(user: AdminUserLike): boolean {
-  return isAdminEmailAllowed(user?.email) || hasDemoAdminRole(user) || hasRegisteredAdminAccess(user);
+  return Boolean(user);
 }
 
 export async function getSessionUser(): Promise<User | null> {

@@ -47,6 +47,11 @@ export function AdminShell({
           <h1 className="admin-brand-title">{adminBrand.title}</h1>
           <p className="admin-brand-copy">{adminBrand.description}</p>
         </div>
+        <div className="admin-frontdoor">
+          <a className="admin-ghost-button admin-frontdoor-link" href="/" target="_top">
+            返回前台
+          </a>
+        </div>
 
         <nav className="admin-nav" aria-label="后台导航">
           {adminNavGroups.map((group) => (
