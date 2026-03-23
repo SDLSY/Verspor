@@ -4,3 +4,4 @@
 .env.production-pulled
 .env.*-pulled
 .env.local.bak*
+output/playwright/
