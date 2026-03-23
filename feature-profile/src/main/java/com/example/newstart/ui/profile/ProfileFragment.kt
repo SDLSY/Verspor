@@ -18,6 +18,7 @@ import com.example.newstart.core.common.ui.cards.MedicalCardRenderer
 import com.example.newstart.core.common.ui.cards.RiskSummaryCardModel
 import com.example.newstart.feature.profile.databinding.FragmentProfileBinding
 import com.example.newstart.repository.CloudAccountRepository
+import com.example.newstart.repository.DemoBootstrapCoordinator
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
@@ -25,6 +26,9 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val accountRepository = CloudAccountRepository()
+    private val demoBootstrapCoordinator by lazy(LazyThreadSafetyMode.NONE) {
+        DemoBootstrapCoordinator(requireContext().applicationContext)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,6 +82,9 @@ class ProfileFragment : Fragment() {
         binding.btnCloudLogin.setOnClickListener {
             openCloudAuth(register = false)
         }
+        binding.btnCloudDemoLogin.setOnClickListener {
+            loginWithDemoAccount()
+        }
     }
 
     private fun openCloudAuth(register: Boolean) {
@@ -122,9 +129,11 @@ class ProfileFragment : Fragment() {
     }
 
     private fun renderLoggedOut() {
+        setCloudAuthActionsEnabled(true)
         binding.tvCloudAccountState.text = getString(R.string.cloud_account_not_logged_in)
         binding.btnCloudRegister.isVisible = true
         binding.btnCloudLogin.isVisible = true
+        binding.btnCloudDemoLogin.isVisible = true
         binding.btnLogout.isVisible = false
         binding.tvProfileName.text = getString(R.string.profile_name)
         binding.tvProfileEmail.text = getString(R.string.profile_email)
@@ -145,6 +154,7 @@ class ProfileFragment : Fragment() {
         binding.tvCloudAccountState.text = accountState
         binding.btnCloudRegister.isVisible = false
         binding.btnCloudLogin.isVisible = false
+        binding.btnCloudDemoLogin.isVisible = false
         binding.btnLogout.isVisible = true
         binding.tvProfileName.text = username
         binding.tvProfileEmail.text = email
@@ -245,6 +255,47 @@ class ProfileFragment : Fragment() {
 
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun loginWithDemoAccount() {
+        setCloudAuthActionsEnabled(false)
+        lifecycleScope.launch {
+            accountRepository.loginWithDemoAccount()
+                .onSuccess { authData ->
+                    demoBootstrapCoordinator.bootstrapForAuth(authData)
+                        .onSuccess { bootstrapResult ->
+                            showToast(
+                                when {
+                                    bootstrapResult.isDemoAccount && bootstrapResult.message.isNotBlank() -> bootstrapResult.message
+                                    else -> getString(R.string.cloud_demo_quick_entry_success)
+                                }
+                            )
+                            refreshCloudAccountUi()
+                        }
+                        .onFailure {
+                            showToast(it.message ?: getString(R.string.cloud_demo_quick_entry_failed))
+                        }
+                }
+                .onFailure {
+                    showToast(it.message ?: getString(R.string.cloud_demo_quick_entry_failed))
+                }
+
+            setCloudAuthActionsEnabled(true)
+        }
+    }
+
+    private fun setCloudAuthActionsEnabled(enabled: Boolean) {
+        binding.btnCloudRegister.isEnabled = enabled
+        binding.btnCloudLogin.isEnabled = enabled
+        binding.btnCloudDemoLogin.isEnabled = enabled
+        binding.btnLogout.isEnabled = enabled
+        binding.btnCloudDemoLogin.text = getString(
+            if (enabled) {
+                R.string.cloud_demo_quick_entry
+            } else {
+                R.string.cloud_demo_quick_entry_loading
+            }
+        )
     }
 
     override fun onDestroyView() {

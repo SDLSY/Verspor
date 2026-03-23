@@ -98,6 +98,19 @@ class CloudAccountRepository {
         }
     }
 
+    suspend fun loginWithDemoAccount(): Result<AuthData> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = apiService.loginWithDemoAccount()
+                handleAuthResponse(response, "婕旂ず璐︽埛鐧诲綍澶辫触")
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Result.failure(Exception(mapExceptionMessage(e)))
+            }
+        }
+    }
+
     suspend fun getUserProfile(): Result<UserProfile> {
         return withContext(Dispatchers.IO) {
             try {

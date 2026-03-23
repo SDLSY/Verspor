@@ -56,6 +56,7 @@ class CloudAuthFragment : Fragment() {
 
     private fun setupActions() {
         binding.btnAuthBack.setOnClickListener { findNavController().navigateUp() }
+        binding.btnAuthDemoEntry.setOnClickListener { submitDemoLogin() }
         binding.btnAuthPrimary.setOnClickListener { submit() }
         binding.btnAuthSwitchMode.setOnClickListener {
             pendingConfirmationEmail = null
@@ -89,6 +90,7 @@ class CloudAuthFragment : Fragment() {
 
         val isRegister = mode == MODE_REGISTER
         val isReset = mode == MODE_RESET
+        val showDemoEntry = !isReset && accountRepository.getCurrentSession() == null
         binding.cardAuthForm.isVisible = true
         binding.cardAuthPending.isVisible = false
 
@@ -133,6 +135,8 @@ class CloudAuthFragment : Fragment() {
         binding.btnAuthAuxAction.text = getString(
             if (isReset) R.string.cloud_auth_back_to_login else R.string.cloud_auth_forgot_password
         )
+        binding.btnAuthDemoEntry.isVisible = showDemoEntry
+        binding.btnAuthDemoEntry.text = getString(R.string.cloud_demo_quick_entry)
         binding.tvAuthStatus.isVisible = false
         binding.tvAuthStatus.text = ""
     }
@@ -183,6 +187,23 @@ class CloudAuthFragment : Fragment() {
                         .onFailure { handleFailure(it.message, R.string.cloud_auth_login_failed_generic) }
                 }
             }
+
+            setLoading(false)
+            refreshSessionHint()
+        }
+    }
+
+    private fun submitDemoLogin() {
+        if (accountRepository.getCurrentSession() != null) {
+            renderStatus(getString(R.string.cloud_demo_quick_entry_success), isError = false)
+            return
+        }
+
+        setLoading(true)
+        lifecycleScope.launch {
+            accountRepository.loginWithDemoAccount()
+                .onSuccess { handleAuthResult(it, isRegister = false) }
+                .onFailure { handleFailure(it.message, R.string.cloud_demo_quick_entry_failed) }
 
             setLoading(false)
             refreshSessionHint()
@@ -256,6 +277,7 @@ class CloudAuthFragment : Fragment() {
 
     private fun setLoading(loading: Boolean) {
         binding.progressAuth.isVisible = loading
+        binding.btnAuthDemoEntry.isEnabled = !loading
         binding.btnAuthPrimary.isEnabled = !loading
         binding.btnAuthSwitchMode.isEnabled = !loading
         binding.btnAuthAuxAction.isEnabled = !loading
@@ -273,6 +295,13 @@ class CloudAuthFragment : Fragment() {
                 mode == MODE_REGISTER -> R.string.cloud_auth_submit_register
                 mode == MODE_RESET -> R.string.cloud_auth_submit_reset
                 else -> R.string.cloud_auth_submit_login
+            }
+        )
+        binding.btnAuthDemoEntry.text = getString(
+            if (loading) {
+                R.string.cloud_demo_quick_entry_loading
+            } else {
+                R.string.cloud_demo_quick_entry
             }
         )
     }

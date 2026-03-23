@@ -145,6 +145,14 @@
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_cloud_demo_login"
+                    style="@style/Widget.NewStart.Button.Tonal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/cloud_demo_quick_entry" />
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_logout"
                     style="@style/Widget.NewStart.Button.Tonal"
                     android:layout_width="match_parent"

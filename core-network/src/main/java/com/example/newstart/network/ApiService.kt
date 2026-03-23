@@ -29,6 +29,9 @@ interface ApiService {
     @POST("api/auth/password-reset")
     suspend fun requestPasswordReset(@Body request: EmailActionRequest): Response<ActionResponse>
 
+    @POST("api/auth/demo-login")
+    suspend fun loginWithDemoAccount(): Response<AuthResponse>
+
     @POST("api/avatar/narration")
     suspend fun generateAvatarNarration(
         @Body request: AvatarNarrationRequest
