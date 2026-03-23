@@ -48,9 +48,9 @@ export function AdminShell({
           <p className="admin-brand-copy">{adminBrand.description}</p>
         </div>
         <div className="admin-frontdoor">
-          <a className="admin-ghost-button admin-frontdoor-link" href="/" target="_top">
+          <Link className="admin-ghost-button admin-frontdoor-link" href="/" as={("/" as Route)}>
             返回前台
-          </a>
+          </Link>
         </div>
 
         <nav className="admin-nav" aria-label="后台导航">

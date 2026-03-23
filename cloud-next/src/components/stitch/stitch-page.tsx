@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import Link from "next/link";
 
 type StitchTemplate = "home" | "about" | "product" | "technology" | "demo";
 
@@ -408,9 +409,9 @@ export default function StitchPage({ template }: { template: StitchTemplate }) {
         <iframe className="stitch-frame" title={`stitch-${template}`} srcDoc={html} />
       </div>
       {showHomeButton ? (
-        <a className="stitch-home-button" href="/" target="_top">
+        <Link className="stitch-home-button" href="/">
           {"\u8fd4\u56de\u9996\u9875"}
-        </a>
+        </Link>
       ) : null}
     </div>
   );
