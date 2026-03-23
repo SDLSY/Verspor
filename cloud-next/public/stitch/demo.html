@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Manrope:wght@200;300;400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-container": "#001405",
+              "surface-container-lowest": "#0b0e15",
+              "surface-dim": "#10131b",
+              "surface-variant": "#32353d",
+              "outline-variant": "#46464c",
+              "inverse-on-surface": "#2d3038",
+              "secondary-fixed": "#d9e4ea",
+              "on-tertiary-fixed": "#00210c",
+              "on-primary-fixed-variant": "#414658",
+              "on-primary": "#2b3040",
+              "surface": "#10131b",
+              "primary-fixed-dim": "#c2c6db",
+              "on-background": "#e0e2ed",
+              "background": "#10131b",
+              "tertiary-fixed-dim": "#4de082",
+              "primary-fixed": "#dee1f7",
+              "inverse-primary": "#595e70",
+              "on-secondary": "#283237",
+              "surface-bright": "#363941",
+              "primary": "#c2c6db",
+              "on-secondary-fixed-variant": "#3e484d",
+              "on-tertiary": "#003919",
+              "on-secondary-fixed": "#131d21",
+              "secondary-fixed-dim": "#bdc8ce",
+              "on-surface": "#e0e2ed",
+              "outline": "#909097",
+              "surface-tint": "#c2c6db",
+              "on-secondary-container": "#afbac0",
+              "on-error": "#690005",
+              "on-error-container": "#ffdad6",
+              "error-container": "#93000a",
+              "error": "#ffb4ab",
+              "tertiary-fixed": "#6dfe9c",
+              "surface-container": "#1d2027",
+              "on-primary-container": "#777b8e",
+              "inverse-surface": "#e0e2ed",
+              "tertiary": "#4de082",
+              "secondary": "#bdc8ce",
+              "primary-container": "#0a0f1e",
+              "on-tertiary-container": "#008f48",
+              "surface-container-high": "#272a32",
+              "on-surface-variant": "#c7c6cd",
+              "on-tertiary-fixed-variant": "#005227",
+              "on-primary-fixed": "#161b2b",
+              "surface-container-highest": "#32353d",
+              "surface-container-low": "#181b23",
+              "secondary-container": "#404b50"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            backdrop-filter: blur(40px);
+            background: rgba(29, 32, 39, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#10131B]/80 backdrop-blur-xl">
+<div class="flex justify-between items-center max-w-[1440px] mx-auto px-12 py-8">
+<div class="font-noto-serif text-2xl tracking-widest text-[#C2C6DB]">VesperO (长庚环)</div>
+<div class="hidden md:flex items-center space-x-12">
+<a class="font-manrope font-light text-sm tracking-widest text-[#C2C6DB]/60 hover:text-[#C2C6DB] transition-colors" href="#">Product</a>
+<a class="font-manrope font-light text-sm tracking-widest text-[#C2C6DB]/60 hover:text-[#C2C6DB] transition-colors" href="#">Technology</a>
+<a class="font-manrope font-light text-sm tracking-widest text-[#C2C6DB]/60 hover:text-[#C2C6DB] transition-colors" href="#">About</a>
+</div>
+<div class="flex items-center gap-8">
+<a class="text-[#C2C6DB] border-b border-[#C2C6DB] pb-1 font-manrope font-light text-sm tracking-widest transition-all duration-500 hover:opacity-80" href="/demo">Reserve/Demo</a>
+</div>
+</div>
+</nav>
+<main class="min-h-screen pt-32 pb-24 flex flex-col items-center">
+<!-- Hero Section -->
+<section class="w-full max-w-[1440px] px-12 mt-12 mb-24 grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
+<div class="lg:col-span-5 space-y-12">
+<div class="space-y-4">
+<span class="font-label text-xs tracking-[0.4em] uppercase text-primary/60 block">预约演示与合作</span>
+<h1 class="font-headline italic text-5xl lg:text-7xl leading-tight text-on-surface tracking-tight">预约您的专属演示</h1>
+</div>
+<p class="font-body font-light text-lg text-on-surface-variant leading-relaxed max-w-md">通过私人咨询，体验未来修复性健康的无限可能。我们为个人追求者和临床专业人士提供量身定制的演示体验。</p>
+<div class="pt-8 flex flex-col gap-6">
+<div class="flex items-center gap-4 text-on-surface-variant group cursor-pointer transition-colors hover:text-primary">
+<span class="material-symbols-outlined text-xl">description</span>
+<span class="font-manrope text-xs tracking-widest uppercase">获取科学白皮书</span>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined text-xl">location_on</span>
+<span class="font-manrope text-xs tracking-widest uppercase">全球礼宾中心</span>
+</div>
+</div>
+</div>
+<!-- Contact Form Container -->
+<div class="lg:col-span-7 relative">
+<!-- Abstract Decorative Background -->
+<div class="absolute -top-20 -right-20 w-96 h-96 bg-primary/5 rounded-full blur-[100px] -z-10"></div>
+<div class="absolute -bottom-20 -left-20 w-80 h-80 bg-tertiary/5 rounded-full blur-[80px] -z-10"></div>
+<div class="glass-panel rounded-xl p-10 lg:p-16 border border-outline-variant/10">
+<form class="space-y-10">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+<!-- Name Field -->
+<div class="space-y-3">
+<label class="block font-label text-[10px] tracking-[0.2em] uppercase text-on-surface-variant/70" for="name">姓名</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant/30 py-3 px-0 text-on-surface font-body font-light focus:ring-0 focus:border-primary transition-all placeholder:text-on-surface-variant/20" id="name" name="name" placeholder="例如：Julian Vance" type="text"/>
+</div>
+<!-- Email Field -->
+<div class="space-y-3">
+<label class="block font-label text-[10px] tracking-[0.2em] uppercase text-on-surface-variant/70" for="email">专业邮箱</label>
+<input class="w-full bg-transparent border-0 border-b border-outline-variant/30 py-3 px-0 text-on-surface font-body font-light focus:ring-0 focus:border-primary transition-all placeholder:text-on-surface-variant/20" id="email" name="email" placeholder="name@organization.com" type="email"/>
+</div>
+</div>
+<!-- Interest Area -->
+<div class="space-y-6">
+<label class="block font-label text-[10px] tracking-[0.2em] uppercase text-on-surface-variant/70">兴趣领域</label>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<label class="cursor-pointer group">
+<input class="hidden peer" name="interest" type="radio"/>
+<div class="p-4 rounded-lg border border-outline-variant/20 text-center transition-all peer-checked:bg-surface-container peer-checked:border-primary/40">
+<span class="font-body text-xs tracking-widest text-on-surface-variant peer-checked:text-primary">个人</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="hidden peer" name="interest" type="radio"/>
+<div class="p-4 rounded-lg border border-outline-variant/20 text-center transition-all peer-checked:bg-surface-container peer-checked:border-primary/40">
+<span class="font-body text-xs tracking-widest text-on-surface-variant peer-checked:text-primary">临床</span>
+</div>
+</label>
+<label class="cursor-pointer group">
+<input class="hidden peer" name="interest" type="radio"/>
+<div class="p-4 rounded-lg border border-outline-variant/20 text-center transition-all peer-checked:bg-surface-container peer-checked:border-primary/40">
+<span class="font-body text-xs tracking-widest text-on-surface-variant peer-checked:text-primary">科研</span>
+</div>
+</label>
+</div>
+</div>
+<!-- Message -->
+<div class="space-y-3">
+<label class="block font-label text-[10px] tracking-[0.2em] uppercase text-on-surface-variant/70" for="notes">额外需求</label>
+<textarea class="w-full bg-transparent border-0 border-b border-outline-variant/30 py-3 px-0 text-on-surface font-body font-light focus:ring-0 focus:border-primary transition-all placeholder:text-on-surface-variant/20 resize-none" id="notes" name="notes" placeholder="首选地点或特定的生物识别关注点..." rows="3"></textarea>
+</div>
+<!-- Submit -->
+<div class="pt-6">
+<button class="w-full py-5 rounded-full bg-primary text-on-primary font-manrope font-semibold tracking-[0.2em] uppercase text-xs transition-all hover:bg-primary-fixed hover:scale-[1.01] active:scale-95" type="submit">申请私密访问</button>
+<p class="mt-6 text-center font-body text-[10px] text-on-surface-variant/50 leading-relaxed">提交即表示您确认 VesperO 将以极度谨慎的态度处理您的数据。礼宾人员将在 48 个工作小时内与您联系。</p>
+</div>
+</form>
+</div>
+</div>
+</section>
+<!-- Gallery / Moodboard Section -->
+<section class="w-full max-w-[1440px] px-12 grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="md:col-span-2 h-[400px] overflow-hidden rounded-xl bg-surface-container relative">
+<img alt="Clean minimalist laboratory environment" class="w-full h-full object-cover opacity-40 grayscale hover:grayscale-0 transition-all duration-1000" data-alt="Minimalist laboratory with clinical precision lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhaTyBL6orJF9aQZG3vMGcdWc-YiiN8H6yATPKalHt8k9bwjzLU41grjHlNnPQV_YRgPsbRyCpSfRr0RbguJx2m9X96tkB1BvngNMrRMFb2AvCxGElqldfbOyIQs_ZOPGOPfvBaf-P5-DEDT2hIkKyVhi6iXGGRQdO4ej22bpCSXt-UWqs5kvL_-iBoc9Jk5o165TOFSlddWXQjamLjyhWFplK0RseUlO_6VXa85-vLo6KK_R0AKGMYHzJ9ER5G3pCLVYDnHUvduwj"/>
+<div class="absolute bottom-6 left-6">
+<p class="font-headline italic text-xl text-on-surface">精密科学</p>
+</div>
+</div>
+<div class="h-[400px] overflow-hidden rounded-xl bg-surface-container relative">
+<img alt="Macro texture of luxury metal" class="w-full h-full object-cover opacity-40 grayscale hover:grayscale-0 transition-all duration-1000" data-alt="Close-up of premium metallic material finish" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDldl71u844im2Cu1cFmQwtAZa59ZGRvk7nRrBY333_si-MTfUmw37kC1omgh_Ew_D0Kd6pUnshfwOcneRnjMFe9bV--2qQScm3QK1QvAthMVEXcIvqoMM8SFPOXSzPzC99JmQ1Pu6rxGt692pufoF6oOKSiMIJ16hWEJROq-aPw3a9d_Bm2mXdYsQc8ylc-MfTcnr_QlSjOuuMjCK1gKz97kDPKHMXlWCVRhmGUc9RX-RL7sO6RjIEvzUz12OnYA9SpEsXEAwl6Stb"/>
+</div>
+<div class="h-[400px] overflow-hidden rounded-xl bg-surface-container relative">
+<img alt="Peaceful sanctuary space" class="w-full h-full object-cover opacity-40 grayscale hover:grayscale-0 transition-all duration-1000" data-alt="Modern high-end spa or gallery interior" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCReCcek1kXJHmpicnCHRe8haoIiaFgWNJjTYERNXYtmnhv7tWjZEH3w7NJx3mHwFKwAZypM0y49SHQp9HKkS0xOaKAnZvEZegrmBtjyfejurUqxUPONZtWeSHWolNeVONU6Su1nSW3K1M82RvM1UiExk405Pa0r9tZJ4p6e8EpqlxQ0YxWrsSlKxvGmYbn_I6Q2UWBRUrtThbObVKiXShz9OG0pogPOGgcDmON07duCbRyDdyCLC-EoAn-qHx4oyVFqf2cq9DBi3eb"/>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#181B23] w-full pt-24 pb-12">
+<div class="max-w-[1440px] mx-auto px-12 flex flex-col items-start">
+<span class="font-noto-serif text-4xl mb-8 block text-[#E0E2ED]">VesperO</span>
+<div class="grid grid-cols-1 md:grid-cols-4 w-full gap-12 mb-16">
+<div class="space-y-4">
+<p class="font-manrope text-xs tracking-widest uppercase text-primary/60">Legal</p>
+<div class="flex flex-col space-y-2">
+<a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">Privacy Policy</a>
+<a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">Terms of Service</a>
+</div>
+</div>
+<div class="space-y-4">
+<p class="font-manrope text-xs tracking-widest uppercase text-primary/60">Knowledge</p>
+<div class="flex flex-col space-y-2">
+<a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">Scientific Whitepaper</a>
+<a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">Press Kit</a>
+</div>
+</div>
+</div>
+<div class="w-full pt-12 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-6">
+<p class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40">
+                    © 2024 VesperO. Precision in Restorative Luxury.
+                </p>
+<div class="flex gap-8">
+<span class="material-symbols-outlined text-[#C2C6DB]/40">language</span>
+<span class="material-symbols-outlined text-[#C2C6DB]/40">neurology</span>
+<span class="material-symbols-outlined text-[#C2C6DB]/40">potted_plant</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&amp;family=Manrope:wght@200;300;400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "tertiary-container": "#001405",
+              "surface-container-lowest": "#0b0e15",
+              "surface-dim": "#10131b",
+              "surface-variant": "#32353d",
+              "outline-variant": "#46464c",
+              "inverse-on-surface": "#2d3038",
+              "secondary-fixed": "#d9e4ea",
+              "on-tertiary-fixed": "#00210c",
+              "on-primary-fixed-variant": "#414658",
+              "on-primary": "#2b3040",
+              "surface": "#10131b",
+              "primary-fixed-dim": "#c2c6db",
+              "on-background": "#e0e2ed",
+              "background": "#10131b",
+              "tertiary-fixed-dim": "#4de082",
+              "primary-fixed": "#dee1f7",
+              "inverse-primary": "#595e70",
+              "on-secondary": "#283237",
+              "surface-bright": "#363941",
+              "primary": "#c2c6db",
+              "on-secondary-fixed-variant": "#3e484d",
+              "on-tertiary": "#003919",
+              "on-secondary-fixed": "#131d21",
+              "secondary-fixed-dim": "#bdc8ce",
+              "on-surface": "#e0e2ed",
+              "outline": "#909097",
+              "surface-tint": "#c2c6db",
+              "on-secondary-container": "#afbac0",
+              "on-error": "#690005",
+              "on-error-container": "#ffdad6",
+              "error-container": "#93000a",
+              "error": "#ffb4ab",
+              "tertiary-fixed": "#6dfe9c",
+              "surface-container": "#1d2027",
+              "on-primary-container": "#777b8e",
+              "inverse-surface": "#e0e2ed",
+              "tertiary": "#4de082",
+              "secondary": "#bdc8ce",
+              "primary-container": "#0a0f1e",
+              "on-tertiary-container": "#008f48",
+              "surface-container-high": "#272a32",
+              "on-surface-variant": "#c7c6cd",
+              "on-tertiary-fixed-variant": "#005227",
+              "on-primary-fixed": "#161b2b",
+              "surface-container-highest": "#32353d",
+              "surface-container-low": "#181b23",
+              "secondary-container": "#404b50"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Manrope"],
+              "label": ["Manrope"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(29, 32, 39, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .pulse-glow {
+            box-shadow: 0 0 30px rgba(77, 224, 130, 0.15);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #c2c6db 0%, #777b8e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body selection:bg-tertiary/30">
+<!-- Top Navigation Shell -->
+<nav class="fixed top-0 w-full z-50 bg-[#10131B]/80 backdrop-blur-xl">
+<div class="flex justify-between items-center max-w-[1440px] mx-auto px-12 py-8">
+<div class="font-noto-serif text-2xl tracking-widest text-[#C2C6DB]">VesperO (长庚环)</div>
+<div class="hidden md:flex items-center gap-12">
+<a class="font-manrope font-light text-sm text-[#C2C6DB] border-b border-[#C2C6DB] pb-1" href="#">产品</a>
+<a class="font-manrope font-light text-sm text-[#C2C6DB]/60 hover:text-[#C2C6DB] transition-colors" href="#">技术</a>
+<a class="font-manrope font-light text-sm text-[#C2C6DB]/60 hover:text-[#C2C6DB] transition-colors" href="#">关于</a>
+</div>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full text-sm font-semibold hover:opacity-80 transition-all duration-500 scale-95 hover:scale-100">预约演示</button>
+</div>
+</nav>
+<main class="relative">
+<!-- Hero: The Journey Begins -->
+<section class="min-h-screen flex flex-col justify-center items-center px-12 pt-32 text-center relative overflow-hidden">
+<div class="absolute inset-0 z-0 opacity-40">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px]"></div>
+</div>
+<div class="relative z-10 max-w-4xl">
+<span class="font-label text-xs tracking-[0.3em] uppercase text-tertiary mb-6 block">生命活力的叙事</span>
+<h1 class="font-headline italic text-6xl md:text-8xl tracking-tight mb-8 leading-tight">每一次心跳的<br/> <span class="gradient-text">深度旅程</span></h1>
+<p class="font-body text-on-surface-variant text-lg max-w-2xl mx-auto font-light leading-relaxed">从夜晚的静谧节奏到医学洞察的清晰。体验真正生理理解带来的修复式奢华。</p>
+<div class="mt-16 flex flex-col items-center gap-4">
+<span class="material-symbols-outlined text-primary text-4xl animate-bounce">expand_more</span>
+</div>
+</div>
+</section>
+<!-- 1. Nightly Capture: Bento Grid -->
+<section class="max-w-[1440px] mx-auto px-12 py-32">
+<div class="grid grid-cols-12 gap-6">睡眠效率</div>
+</section>
+<!-- 2. Cognitive Synthesis: Overlapping Layout -->
+<section class="bg-surface-container-low py-32 overflow-hidden">
+<div class="max-w-[1440px] mx-auto px-12 grid grid-cols-12 gap-12 items-center">
+<div class="col-span-12 md:col-span-6 order-2 md:order-1">
+<div class="relative">
+<div class="glass-panel p-1 rounded-xl relative z-10">
+<img class="w-full rounded-lg" data-alt="Futuristic data interface with glowing nodes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmj4NT36eFk_9NOh4cng2aEI57NboDgTXhew1FuOokZEsngCXV9i4BX7Opu0ByKoqAydQE7oJIpswWM-T0HizyDxJEjhAdyE6HYLBWzcfVr61I457P8fyBq7aOlKQSweRxSTAPhE5NyqvkoqNUoyZvGaJBQA0vnBvnM2QYTZKJyXFGVF-m9TB_BsUSxNz8P63em5RVneik1fXHQAm0mSa5mWVAFySyt8EX2yeAeUdkZGhj3tp-xidQ-_YQe04fAWAzbOv3R0PNdecl"/>
+</div>
+<div class="absolute -top-12 -left-12 w-64 h-64 bg-tertiary/10 rounded-full blur-3xl"></div>
+</div>
+</div>
+<div class="col-span-12 md:col-span-6 order-1 md:order-2">
+<span class="font-label text-xs tracking-widest text-tertiary mb-4 block">智能</span>
+<h2 class="font-headline italic text-5xl mb-8 leading-tight">02. 认知合成</h2>
+<p class="font-body text-on-surface-variant font-light text-lg mb-8">VesperO 的 AI 不仅仅是展示数据；它更理解背景。它将您的生理信号合成为修复叙事，为您一天的认知和体能需求做好准备。</p>
+<div class="flex items-center gap-6">
+<div class="h-[1px] w-12 bg-outline-variant"></div>
+<span class="font-label text-sm uppercase tracking-widest opacity-60">神经解读</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Medical Insight: Tonal Layering -->
+<section class="py-32">
+<div class="max-w-[1440px] mx-auto px-12">
+<div class="mb-24 text-center max-w-3xl mx-auto">
+<h2 class="font-headline italic text-5xl mb-6">03. 医疗洞察</h2>
+<p class="font-body font-light text-on-surface-variant">即时数字化医疗报告，从血液面板到影像摘要，精准提取关键指标。</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-surface-container p-12 rounded-xl border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary mb-8 text-4xl">document_scanner</span>
+<h3 class="font-headline text-2xl mb-4">精准 OCR</h3>
+<p class="font-body text-sm font-light text-on-surface-variant leading-relaxed">我们的 AI 将外部数据点与您的 VesperO 生物识别数据进行映射，构建 360 度健康画像。</p>
+</div>
+<div class="bg-surface-container-high p-12 rounded-xl pulse-glow">
+<span class="material-symbols-outlined text-tertiary mb-8 text-4xl">account_tree</span>
+<h3 class="font-headline text-2xl mb-4">结构化分析</h3>
+<p class="font-body text-sm font-light text-on-surface-variant leading-relaxed">我们的 AI 将外部数据点与您的 VesperO 生物识别数据进行映射，构建 360 度健康画像。</p>
+</div>
+<div class="bg-surface-container p-12 rounded-xl border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary mb-8 text-4xl">cloud_upload</span>
+<h3 class="font-headline text-2xl mb-4">加密保管库</h3>
+<p class="font-body text-sm font-light text-on-surface-variant leading-relaxed">您的病史通过零知识加密保护，确保仅限您本人访问。</p>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. Dialogue & Decision: Interaction Visual -->
+<section class="bg-surface-container-lowest py-32">
+<div class="max-w-[1440px] mx-auto px-12 grid grid-cols-12 gap-12 items-center">上下文深度</div>
+</section>
+<!-- 5. Precision Intervention: Visual Art -->
+<section class="py-32 overflow-hidden relative">
+<div class="max-w-[1440px] mx-auto px-12 relative z-10">
+<div class="flex flex-col md:flex-row justify-between items-end gap-12">
+<div class="max-w-xl">
+<h2 class="font-headline italic text-5xl mb-8 leading-tight">05. 精准干预</h2>
+<p class="font-body text-on-surface-variant font-light text-lg">我们不提供平庸的建议。每一项推荐都是为您量身定制的干预措施，旨在优化您的生物学机遇窗口。</p>
+</div>
+<div class="bg-surface-container-high px-8 py-4 rounded-full flex items-center gap-4">
+<div class="w-3 h-3 bg-tertiary rounded-full pulse-glow"></div>
+<span class="font-label text-xs uppercase tracking-widest">实时生物优化</span>
+</div>
+</div>
+<div class="mt-24 grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="md:col-span-2 h-[400px] bg-surface-container rounded-xl overflow-hidden relative group">
+<img class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000" data-alt="Zen yoga practice in a dark minimalist studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFWTLTb6Zlz9MUfR7q4bnJdmigqnT7FDIkg53LkssowNfv2pnblH-OCjp_Hu4y--VRddCWycXSq3VDXNkGSHVKDgPw08VgfeB1ZCqOjOA5TxXUJ6Kh2VsrwQYnqmb667DvAlUVlu6ibeCtqHa1LuM8yEQ54S6Ou4EOtGaNXRL5h_r1HHacGsCXMBnVmxv5_3rNrTrKzxspWdC-fi1wvfpHvLinRcq13wCh9vfzf9nV-ounnD6ahs_cMtzfd57SjVVsk6uTL1W5_iCC"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+<div class="absolute bottom-8 left-8">
+<h4 class="font-headline text-2xl mb-2">副交感神经增强</h4>
+<p class="text-xs font-label uppercase tracking-widest text-tertiary">早晨例行流程</p>
+</div>
+</div>
+<div class="h-[400px] bg-surface-container rounded-xl overflow-hidden relative group">
+<img class="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-1000" data-alt="Macro shot of clean mineral water ripples" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC567ZXxnjUw7HHuGFuJhcHDrQS-qhC5Og4BcG79JfB-U336u4eEbmzXvqczBvbnFaEDTYZBiLmBdVCb4j2qkGPWtLIvGwDnMeJ4cShcK3nXE0DHPtp9VOP4ojJTigfWNzL3ELIdmCqJ4i6ZpiMrAd-iEgHokW7Vz99RPh-LU4nEN9Tn_CBdUOhYda8KPFf_r4pgAtv80NvbwCigKIXQ0P2ChRMgP51fFMlHIsG5_gli-bEjXEB60I7dYZq1WSuyPw9sXKF8N03lHE4"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+<div class="absolute bottom-8 left-8">
+<h4 class="font-headline text-xl mb-1">补水弧线</h4>
+<p class="text-[10px] font-label uppercase tracking-widest opacity-60">代谢支持</p>
+</div>
+</div>
+<div class="h-[400px] bg-surface-container rounded-xl overflow-hidden relative group">
+<img class="w-full h-full object-cover opacity-40 group-hover:scale-105 transition-transform duration-1000" data-alt="Abstract soft focus light through leaves" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5oZgrCGVjdEDHD0uRqDfaoP3mOclFnF90q1MBWnXEia3hqMxbLXRtIAiIAdALWPq1i9GWUaAT9YldrVMspRhWofAa9_VmcCZHT-SCQaixWMCELyG4dz2ijyY3frRFgAvUXM38WI0AdE7kuT19PPmGoYzeX76VsVEyitzTE3W3LdTz0MifOg8rtBIpwgmPYhEA8jOPTOnncYmaHMBgAXsEZHo9dgaQcJq2gV9F9DGg-WNY4YSPs1BXWw4Htpu6DCk8ZSRkZGQY1Suw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background to-transparent"></div>
+<div class="absolute bottom-8 left-8">
+<h4 class="font-headline text-xl mb-1">昼夜节律重置</h4>
+<p class="text-[10px] font-label uppercase tracking-widest opacity-60">光疗法</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 6. Continuous Feedback: Closing the Loop -->
+<section class="py-32 bg-primary/5">
+<div class="max-w-[1440px] mx-auto px-12 text-center">
+<div class="w-24 h-24 border border-tertiary/30 rounded-full mx-auto mb-12 flex items-center justify-center relative">
+<div class="absolute inset-0 border-t-2 border-tertiary rounded-full animate-spin duration-[3000ms]"></div>
+<span class="material-symbols-outlined text-tertiary text-3xl">sync</span>
+</div>
+<h2 class="font-headline italic text-5xl mb-8 leading-tight">06. 持续反馈</h2>
+<p class="font-body text-on-surface-variant font-light text-lg max-w-2xl mx-auto mb-16 leading-relaxed">旅程永无止境。每一次心跳、每一次呼吸和每一次干预都会反馈到核心，不断优化您的个人终身精准健康模型。</p>
+<button class="bg-primary text-on-primary px-12 py-5 rounded-full text-lg font-semibold hover:opacity-90 transition-all shadow-xl">开启您的旅程</button>
+</div>
+</section>
+</main>
+<!-- Footer Shell -->
+<footer class="bg-[#181B23] w-full pt-24 pb-12">
+<div class="max-w-[1440px] mx-auto px-12 flex flex-col items-start">
+<span class="font-noto-serif text-4xl mb-8 block text-[#E0E2ED]">VesperO</span>
+<div class="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-12 border-b border-outline-variant/10 pb-12 mb-12">
+<div class="flex flex-wrap gap-8">
+<a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">隐私政策</a>
+<a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">服务条款</a>
+<a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">科学白皮书</a>
+<a class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40 hover:text-[#C2C6DB] transition-colors" href="#">新闻包</a>
+</div>
+<div class="flex gap-6">
+<span class="material-symbols-outlined text-[#C2C6DB]/40 cursor-pointer hover:text-[#C2C6DB]">public</span>
+<span class="material-symbols-outlined text-[#C2C6DB]/40 cursor-pointer hover:text-[#C2C6DB]">share</span>
+</div>
+</div>
+<p class="font-manrope text-xs tracking-widest uppercase text-[#C2C6DB]/40">© 2024 VesperO. 修复式奢华的精准体现。</p>
+</div>
+</footer>
+</body></html>
