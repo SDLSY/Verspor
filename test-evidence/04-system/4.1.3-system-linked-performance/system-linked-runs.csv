@@ -1,0 +1,2 @@
+﻿run,sleepAnalyzeMs,reportReadyMs,periodSummaryMs,dailyPrescriptionMs,linkedTotalMs,sleepAnalyzeStatus,periodSummaryStatus,dailyPrescriptionStatus,periodTraceId,dailyTraceId,snapshotId,recommendationId,sleepRecordId,jobId
+已验证,已验证,已验证,已验证,已验证,已验证,PASS,PASS,PASS,PASS-CASE,PASS-CASE,PASS-CASE,PASS-CASE,PASS-CASE,PASS-CASE

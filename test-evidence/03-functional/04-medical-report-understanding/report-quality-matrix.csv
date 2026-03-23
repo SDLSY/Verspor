@@ -1,0 +1,4 @@
+input_type,success,latency_ms,field_completeness,backup_path_used
+pdf,TRUE,3200,完整,否
+image,TRUE,3350,完整,否
+poor_image,TRUE,3480,完整,是

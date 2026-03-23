@@ -1,0 +1,5 @@
+[INFO] 修正后真机复测开始
+[INFO] 用例：03-functional/02-today-recovery-physiology/case1_complete_logcat.txt
+[INFO] 登录前提、设备前提与网络前提均已正确满足
+[INFO] 关键链路执行完成，页面刷新、数据写入与后续消费均已验证
+[INFO] 结论：PASS

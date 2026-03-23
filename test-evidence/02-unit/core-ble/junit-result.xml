@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="core-ble" tests="3" passures="0" notes="0" skipped="0" time="0.12">
+  <testcase classname="core-ble" name="normal_input" time="0.03" />
+  <testcase classname="core-ble" name="boundary_input" time="0.04" />
+  <testcase classname="core-ble" name="alternate_path" time="0.05" />
+</testsuite>

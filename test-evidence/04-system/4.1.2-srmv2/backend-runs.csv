@@ -1,0 +1,7 @@
+﻿case_id,evidence_pack_id,server_label,runs,success_rate,avg_latency_ms,min_latency_ms,max_latency_ms,std_latency_ms,avg_evidence_count,avg_coverage_ratio,backup_rate,explanation_complete_rate,gates_seen,avg_similarity_to_first
+CASE-SRM-001,PACK-LOW-001,production-baseline,5,1.0,6500.31,6265.32,6983.52,265.68,5.0,0.83,0.0,1.0,GREEN,0.8793
+CASE-SRM-002,PACK-CONFLICT-001,production-baseline,5,1.0,5819.91,5504.27,6276.28,264.06,5.0,0.83,0.0,1.0,AMBER,0.8608
+CASE-SRM-003,PACK-HIGHRISK-001,production-high-risk,5,1.0,6608.14,5770.02,8487.05,1090.15,5.0,0.83,0.0,1.0,RED,0.8165
+CASE-SRM-005,PACK-LOW-001,production-baseline,5,1.0,5379.51,5151.06,5637.0,199.61,5.0,0.83,0.0,1.0,GREEN,0.7894
+CASE-SRM-006,PACK-SPARSE-001,production-sparse,5,1.0,5383.02,4769.44,6186.0,470.95,0.0,0.0,0.0,1.0,AMBER,0.854
+CASE-SRM-004,PACK-DEGRADE-001,local-expression-backup_path,5,1.0,6956.66,5528.98,8917.75,1202.56,5.0,0.83,1.0,1.0,AMBER,0.9341

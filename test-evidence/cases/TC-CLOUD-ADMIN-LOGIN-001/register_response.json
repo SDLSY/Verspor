@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "title": "cases/TC-CLOUD-ADMIN-LOGIN-001/register_response.json",
+  "note": "修正后的真机复测已验证通过",
+  "verified": true
+}

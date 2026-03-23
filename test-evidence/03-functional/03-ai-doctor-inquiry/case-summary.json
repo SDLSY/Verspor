@@ -1,0 +1,7 @@
+{
+  "caseId": "TC-FUNC-003",
+  "title": "AI 医生问诊",
+  "status": "PASS",
+  "summary": "AI 医生问诊 闭环已通过真机复测",
+  "verified": true
+}

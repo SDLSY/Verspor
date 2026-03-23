@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "title": "03-ai-doctor-inquiry/api-captures/auth_login_request.json",
+  "note": "修正后的真机复测已验证通过",
+  "verified": true
+}

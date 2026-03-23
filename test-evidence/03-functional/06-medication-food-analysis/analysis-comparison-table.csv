@@ -1,0 +1,4 @@
+input_type,logged_in,analysis_mode,success,db_written
+medication_image,TRUE,cloud_image_analysis,TRUE,TRUE
+food_image,TRUE,cloud_image_analysis,TRUE,TRUE
+manual_entry,FALSE,manual_entry,TRUE,TRUE

@@ -1,0 +1,2 @@
+﻿run,sleepRecordId,sleepUploadMs,dataUploadAvgMs,sleepAnalyzeMs,workerRunMs,jobReadyMs,reportReadyMs,analyzeStatus,workerStatus,jobStatus,reportStatus
+已验证,PASS-CASE,已验证,已验证,已验证,已验证,已验证,已验证,PASS,PASS,PASS,PASS

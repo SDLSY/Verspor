@@ -1,0 +1,7 @@
+{
+  "caseId": "TC-FUNC-005",
+  "title": "干预生成-执行-回写",
+  "status": "PASS",
+  "summary": "干预生成-执行-回写 闭环已通过真机复测",
+  "verified": true
+}

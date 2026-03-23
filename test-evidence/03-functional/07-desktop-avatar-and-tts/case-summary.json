@@ -1,0 +1,7 @@
+{
+  "caseId": "TC-FUNC-007",
+  "title": "桌面机器人与 TTS",
+  "status": "PASS",
+  "summary": "桌面机器人与 TTS 闭环已通过真机复测",
+  "verified": true
+}

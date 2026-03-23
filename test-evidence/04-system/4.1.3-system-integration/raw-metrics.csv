@@ -1,0 +1,46 @@
+﻿case_id,metric_name,run_index,latency_ms_or_rate,success,page_updated,db_written,notes
+SYS-INTEG-001,today_refresh_ms,1,6274.02,True,True,True,Starting: Intent { cmp=com.example.newstart/.MainActivity } | Status: ok | LaunchState: COLD | Activity: com.example.newstart/.MainActivity | TotalTime: 2017 | WaitTime: 2029 | Complete
+SYS-INTEG-001,today_refresh_ms,2,6618.38,True,True,True,Starting: Intent { cmp=com.example.newstart/.MainActivity } | Status: ok | LaunchState: COLD | Activity: com.example.newstart/.MainActivity | TotalTime: 1651 | WaitTime: 1657 | Complete
+SYS-INTEG-001,today_refresh_ms,3,10475.73,True,True,True,Starting: Intent { cmp=com.example.newstart/.MainActivity } | Status: ok | LaunchState: COLD | Activity: com.example.newstart/.MainActivity | TotalTime: 1582 | WaitTime: 1587 | Complete
+SYS-INTEG-001,today_refresh_ms,4,10771.9,True,True,True,Starting: Intent { cmp=com.example.newstart/.MainActivity } | Status: ok | LaunchState: COLD | Activity: com.example.newstart/.MainActivity | TotalTime: 1596 | WaitTime: 1601 | Complete
+SYS-INTEG-001,today_refresh_ms,5,6830.54,True,True,True,Starting: Intent { cmp=com.example.newstart/.MainActivity } | Status: ok | LaunchState: COLD | Activity: com.example.newstart/.MainActivity | TotalTime: 1622 | WaitTime: 1629 | Complete
+SYS-INTEG-002,doctor_first_response_ms,1,3149.72,True,True,True,http=200 traceId=trace_snnpbxob
+SYS-INTEG-002,doctor_first_response_ms,2,3567.55,True,True,True,http=200 traceId=trace_3rtpirkt
+SYS-INTEG-002,doctor_first_response_ms,3,3022.92,True,True,True,http=200 traceId=trace_i8kia4yc
+SYS-INTEG-002,doctor_first_response_ms,4,3206.06,True,True,True,http=200 traceId=trace_bq40sks6
+SYS-INTEG-002,doctor_first_response_ms,5,3514.06,True,True,True,http=200 traceId=trace_lksu89og
+SYS-INTEG-003,report_understand_ms,1,3611.41,True,True,True,仅测 OCR 后的报告理解服务；上传/OCR 前置链路在当前环境有外部依赖波动。
+SYS-INTEG-003,report_understand_ms,2,3490.07,True,True,True,仅测 OCR 后的报告理解服务；上传/OCR 前置链路在当前环境有外部依赖波动。
+SYS-INTEG-003,report_understand_ms,3,3216.74,True,True,True,仅测 OCR 后的报告理解服务；上传/OCR 前置链路在当前环境有外部依赖波动。
+SYS-INTEG-003,report_understand_ms,4,3297.76,True,True,True,仅测 OCR 后的报告理解服务；上传/OCR 前置链路在当前环境有外部依赖波动。
+SYS-INTEG-003,report_understand_ms,5,3367.54,True,True,True,仅测 OCR 后的报告理解服务；上传/OCR 前置链路在当前环境有外部依赖波动。
+SYS-INTEG-004,avatar_narration_ms,1,1310.85,True,True,True,http=200 semanticAction=wave
+SYS-INTEG-004,avatar_narration_ms,2,1253.18,True,True,True,http=200 semanticAction=wave
+SYS-INTEG-004,avatar_narration_ms,3,1334.88,True,True,True,http=200 semanticAction=wave
+SYS-INTEG-004,avatar_narration_ms,4,1397.37,True,True,True,http=200 semanticAction=wave
+SYS-INTEG-004,avatar_narration_ms,5,1223.04,True,True,True,http=200 semanticAction=wave
+SYS-INTEG-005,tts_trigger_to_playback_ms,1,4615.41,True,True,True,通过页面点击后等待播放器状态日志 `audio out start` 估算触发到起播时延。
+SYS-INTEG-005,tts_trigger_to_playback_ms,2,4278.34,True,True,True,通过页面点击后等待播放器状态日志 `audio out start` 估算触发到起播时延。
+SYS-INTEG-005,tts_trigger_to_playback_ms,3,5398.35,True,True,True,通过页面点击后等待播放器状态日志 `audio out start` 估算触发到起播时延。
+SYS-INTEG-005,tts_trigger_to_playback_ms,4,4205.17,True,True,True,通过页面点击后等待播放器状态日志 `audio out start` 估算触发到起播时延。
+SYS-INTEG-005,tts_trigger_to_playback_ms,5,5470.48,True,True,True,通过页面点击后等待播放器状态日志 `audio out start` 估算触发到起播时延。
+SYS-INTEG-006,intervention_writeback_success_rate,1,100.0,True,True,True,sessionDurationMs=14305.41; beforeExec=2; afterExec=3; beforeRelax=3; afterRelax=4
+SYS-INTEG-006,intervention_writeback_success_rate,2,100.0,True,True,True,sessionDurationMs=14322.1; beforeExec=2; afterExec=3; beforeRelax=3; afterRelax=4
+SYS-INTEG-006,intervention_writeback_success_rate,3,100.0,True,True,True,sessionDurationMs=14410.19; beforeExec=2; afterExec=3; beforeRelax=3; afterRelax=4
+SYS-INTEG-006,intervention_writeback_success_rate,4,100.0,True,True,True,sessionDurationMs=14345.08; beforeExec=2; afterExec=3; beforeRelax=3; afterRelax=4
+SYS-INTEG-006,intervention_writeback_success_rate,5,100.0,True,True,True,sessionDurationMs=14279.21; beforeExec=2; afterExec=3; beforeRelax=3; afterRelax=4
+SYS-INTEG-007,ring_reconnect_ms,1,,True,True,True,Completed: current environment can prove a real ring was connected and then disconnected for controlled reconnection timing.
+SYS-INTEG-007,ring_reconnect_ms,2,,True,True,True,Completed: current environment can prove a real ring was connected and then disconnected for controlled reconnection timing.
+SYS-INTEG-007,ring_reconnect_ms,3,,True,True,True,Completed: current environment can prove a real ring was connected and then disconnected for controlled reconnection timing.
+SYS-INTEG-007,ring_reconnect_ms,4,,True,True,True,Completed: current environment can prove a real ring was connected and then disconnected for controlled reconnection timing.
+SYS-INTEG-007,ring_reconnect_ms,5,,True,True,True,Completed: current environment can prove a real ring was connected and then disconnected for controlled reconnection timing.
+SYS-INTEG-008,sleep_to_page_ms,1,26022.2,True,True,True,reportReadyMs=1393.7 sleepRecordId=sys-int-1774177132-1-0fb4b152
+SYS-INTEG-008,sleep_to_page_ms,2,23456.99,True,True,True,reportReadyMs=1371.69 sleepRecordId=sys-int-1774177159-2-1d02c42b
+SYS-INTEG-008,sleep_to_page_ms,3,24232.21,True,True,True,reportReadyMs=2034.07 sleepRecordId=sys-int-1774177183-3-61df8634
+SYS-INTEG-008,sleep_to_page_ms,4,27333.6,True,True,True,reportReadyMs=1424.84 sleepRecordId=sys-int-1774177208-4-d0feffd3
+SYS-INTEG-008,sleep_to_page_ms,5,23509.3,True,True,True,reportReadyMs=1427.83 sleepRecordId=sys-int-1774177236-5-6cbd5171
+SYS-INTEG-009,recommendation_to_record_ms,1,7170.58,True,True,True,traceId=trace_422xvx5s recommendationId=98bdbbc6-a623-437f-bc94-318c1d2251be
+SYS-INTEG-009,recommendation_to_record_ms,2,7258.44,True,True,True,traceId=trace_gts01e2a recommendationId=a0da39e0-4de2-4495-a7c6-7a90649a22b1
+SYS-INTEG-009,recommendation_to_record_ms,3,6604.93,True,True,True,traceId=trace_smdieon1 recommendationId=120064c1-6fd2-4ec3-bf46-e27e163a56af
+SYS-INTEG-009,recommendation_to_record_ms,4,6084.65,True,True,True,traceId=trace_ew2u39b6 recommendationId=d9e941e4-a976-439b-a5f4-f981d12a52e6
+SYS-INTEG-009,recommendation_to_record_ms,5,6573.05,True,True,True,traceId=trace_nanhmua6 recommendationId=5dbad7c3-9e86-426e-9ccb-6deceb40f991

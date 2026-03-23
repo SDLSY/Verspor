@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "title": "02-today-recovery-physiology/db-snapshots/case3_backup_path_no_latest_db_overview.json",
+  "note": "修正后的真机复测已验证通过",
+  "verified": true
+}

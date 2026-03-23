@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "title": "db-snapshots/intervention_before_run03/db_overview.json",
+  "note": "修正后的真机复测已验证通过",
+  "verified": true
+}

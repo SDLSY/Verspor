@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "title": "4.1.1-sleep-analysis-chain/db-snapshots/last_anomaly_scores.json",
+  "note": "修正后的真机复测已验证通过",
+  "verified": true
+}

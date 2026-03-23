@@ -1,0 +1,8 @@
+﻿case_id,backend,runs,success_rate,avg_latency_ms,min_latency_ms,max_latency_ms,std_latency_ms,backup_path_rate,output_complete_rate,accuracy_or_na,f1_or_na
+CASE-SLEEP-001,mmt-v2/http-hf-space,5,1.0,5908.48,5760.84,6003.17,84.0,0.0,1.0,N/A,N/A
+CASE-SLEEP-002,mmt-v2/local-baseline,5,1.0,5794.54,5381.66,6413.42,414.11,0.0,1.0,N/A,N/A
+CASE-SLEEP-003,mmt-v2/local-ensemble,5,1.0,5926.4,5435.47,6766.67,493.58,0.0,1.0,N/A,N/A
+CASE-SLEEP-004,mmt-v2/http-available_via_backup-backup_path,5,1.0,5590.58,5279.82,6216.89,338.4,1.0,1.0,N/A,N/A
+CASE-SLEEP-005,mmt-v2/local-ensemble-partial-input,5,1.0,6027.19,5377.19,6514.02,419.74,0.0,1.0,N/A,N/A
+CASE-SLEEP-LABEL-001,artifact:AggregatedSleepTransformer,1,1.0,N/A,N/A,N/A,N/A,0.0,1.0,0.8052,0.8027
+CASE-SLEEP-LABEL-001,artifact:Baseline,1,1.0,N/A,N/A,N/A,N/A,0.0,1.0,0.3917,0.3835

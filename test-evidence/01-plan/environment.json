@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "summary": "修正后真机复测环境满足正式测试要求",
+  "components": [
+    "android_device",
+    "cloud_next",
+    "room_database",
+    "adb_logcat_gradle"
+  ],
+  "verified": true
+}

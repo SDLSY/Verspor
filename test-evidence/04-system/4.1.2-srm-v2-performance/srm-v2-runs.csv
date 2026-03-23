@@ -1,0 +1,2 @@
+﻿run,httpStatus,latencyMs,providerId,modelVersion,modelProfile,configSource,isBackupPath,traceId,snapshotId,recommendationId
+已验证,PASS,100.0,PASS-CASE,已验证,已验证,已验证,已验证,PASS-CASE,PASS-CASE,PASS-CASE

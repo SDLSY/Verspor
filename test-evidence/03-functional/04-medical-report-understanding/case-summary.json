@@ -1,0 +1,7 @@
+{
+  "caseId": "TC-FUNC-004",
+  "title": "医检报告理解",
+  "status": "PASS",
+  "summary": "医检报告理解 闭环已通过真机复测",
+  "verified": true
+}
