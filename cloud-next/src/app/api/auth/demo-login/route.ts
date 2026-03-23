@@ -6,12 +6,18 @@ import { readDemoMetadata } from "@/lib/demo/bootstrap";
 import { fail, ok } from "@/lib/http";
 import { createPublicClient, createServiceClient } from "@/lib/supabase";
 
-const DEFAULT_DEMO_LOGIN_EMAIL =
-  process.env.DEMO_LOGIN_EMAIL ?? "demo_admin_console@demo.changgengring.local";
+const DEFAULT_ANDROID_DEMO_LOGIN_EMAIL =
+  process.env.DEMO_ANDROID_LOGIN_EMAIL ?? "demo_baseline_recovery@demo.changgengring.local";
+
+type DemoLoginTarget = {
+  email: string;
+  role: "demo_user" | "demo_admin" | "";
+};
 
 export async function POST() {
-  const email = await resolveDemoLoginEmail();
-  const password = resolveDemoLoginPassword();
+  const target = await resolveDemoLoginTarget();
+  const email = target?.email ?? "";
+  const password = resolveDemoLoginPassword(target?.role ?? "");
   if (!email || !password) {
     return NextResponse.json(fail(503, "demo login unavailable"), { status: 503 });
   }
@@ -70,17 +76,23 @@ export async function POST() {
   }
 }
 
-async function resolveDemoLoginEmail(): Promise<string | null> {
-  const preferredEmail = DEFAULT_DEMO_LOGIN_EMAIL.trim().toLowerCase();
+async function resolveDemoLoginTarget(): Promise<DemoLoginTarget | null> {
+  const preferredEmail = DEFAULT_ANDROID_DEMO_LOGIN_EMAIL.trim().toLowerCase();
   const serviceClient = createServiceClient();
   let page = 1;
-  let firstConfirmedDemoEmail: string | null = null;
-  let firstConfirmedEmail: string | null = null;
+  let firstConfirmedDemoUser: DemoLoginTarget | null = null;
+  let firstConfirmedAdmin: DemoLoginTarget | null = null;
+  let firstConfirmedEmail: DemoLoginTarget | null = null;
 
   while (page <= 10) {
     const { data, error } = await serviceClient.auth.admin.listUsers({ page, perPage: 200 });
     if (error) {
-      return preferredEmail || firstConfirmedDemoEmail || firstConfirmedEmail;
+      return (
+        (preferredEmail ? { email: preferredEmail, role: "demo_user" as const } : null) ??
+        firstConfirmedDemoUser ??
+        firstConfirmedAdmin ??
+        firstConfirmedEmail
+      );
     }
 
     for (const candidate of data.users) {
@@ -88,14 +100,27 @@ async function resolveDemoLoginEmail(): Promise<string | null> {
       if (!email || !candidate.email_confirmed_at) {
         continue;
       }
+      const metadata = candidate.user_metadata as Record<string, unknown> | null;
+      const demoRole =
+        typeof metadata?.demoRole === "string" ? metadata.demoRole.trim().toLowerCase() : "";
+
       if (email === preferredEmail) {
-        return email;
+        return {
+          email,
+          role: demoRole === "demo_user" || demoRole === "demo_admin" ? demoRole : "demo_user",
+        };
       }
-      if (!firstConfirmedDemoEmail && email.endsWith("@demo.changgengring.local")) {
-        firstConfirmedDemoEmail = email;
+      if (!firstConfirmedDemoUser && demoRole === "demo_user") {
+        firstConfirmedDemoUser = { email, role: "demo_user" };
+      }
+      if (!firstConfirmedAdmin && demoRole === "demo_admin") {
+        firstConfirmedAdmin = { email, role: "demo_admin" };
       }
       if (!firstConfirmedEmail) {
-        firstConfirmedEmail = email;
+        firstConfirmedEmail = {
+          email,
+          role: demoRole === "demo_user" || demoRole === "demo_admin" ? demoRole : "",
+        };
       }
     }
 
@@ -105,14 +130,28 @@ async function resolveDemoLoginEmail(): Promise<string | null> {
     page = data.nextPage;
   }
 
-  return firstConfirmedDemoEmail ?? firstConfirmedEmail ?? preferredEmail ?? null;
+  return (
+    firstConfirmedDemoUser ??
+    firstConfirmedAdmin ??
+    firstConfirmedEmail ??
+    (preferredEmail ? { email: preferredEmail, role: "demo_user" as const } : null)
+  );
 }
 
-function resolveDemoLoginPassword(): string {
+function resolveDemoLoginPassword(role: DemoLoginTarget["role"]): string {
+  if (role === "demo_admin") {
+    return (
+      process.env.DEMO_ADMIN_DEFAULT_PASSWORD?.trim() ||
+      process.env.DEMO_ACCOUNT_DEFAULT_PASSWORD?.trim() ||
+      process.env.DEMO_LOGIN_PASSWORD?.trim() ||
+      ""
+    );
+  }
+
   return (
+    process.env.DEMO_ACCOUNT_DEFAULT_PASSWORD?.trim() ||
     process.env.DEMO_LOGIN_PASSWORD?.trim() ||
     process.env.DEMO_ADMIN_DEFAULT_PASSWORD?.trim() ||
-    process.env.DEMO_ACCOUNT_DEFAULT_PASSWORD?.trim() ||
     ""
   );
 }

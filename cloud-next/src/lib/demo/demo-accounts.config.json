@@ -25,7 +25,7 @@
     {
       "role": "demo_user",
       "scenario": "demo_high_risk_ops",
-      "displayName": "演示账号 · 高风险运维"
+      "displayName": "演示账号 · 高风险运维闭环"
     },
     {
       "role": "demo_admin",

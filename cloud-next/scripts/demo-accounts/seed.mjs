@@ -46,7 +46,7 @@ function optionalEnv(name, fallback = "") {
 }
 
 function readConfig() {
-  return JSON.parse(fs.readFileSync(configPath, "utf8"));
+  return JSON.parse(fs.readFileSync(configPath, "utf8").replace(/^\uFEFF/, ""));
 }
 
 function resolveTimelineAnchor(config) {
