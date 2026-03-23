@@ -32,7 +32,7 @@ class XfyunProviderAcceptanceTest {
     @Test
     fun tts_returns_audio_data_url() = runBlocking {
         assumeTrue(XfyunConfig.ttsCredentials.isReady)
-        val result = XfyunTtsWsClient().synthesize("你好，我是 VesperO 桌面助手。")
+        val result = XfyunTtsWsClient().synthesize("你好，我是长庚环桌面助手。")
         assertTrue(result.startsWith("data:audio/mpeg;base64,"))
         assertTrue(result.length > 512)
     }

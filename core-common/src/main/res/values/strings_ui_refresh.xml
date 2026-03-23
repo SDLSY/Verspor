@@ -81,7 +81,7 @@
     <string name="profile_notification_label">通知设置</string>
     <string name="profile_privacy_label">数据与隐私</string>
     <string name="profile_personal_label">个人信息</string>
-    <string name="profile_about_text">VesperO 智能健康生态系统\n版本：1.0.0\n用于睡眠、恢复与日内干预场景。</string>
+    <string name="profile_about_text">长庚环智能健康系统\n版本：1.0.0\n用于睡眠、恢复与日内干预场景。</string>
     <string name="profile_toast_notification">通知设置正在整理中。</string>
     <string name="profile_toast_privacy">隐私与数据说明正在整理中。</string>
     <string name="profile_dialog_email_hint">邮箱</string>

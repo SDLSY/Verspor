@@ -51,7 +51,7 @@
     <string name="profile_privacy_logged_in">当前云端账户：%1$s</string>
 
     <string name="profile_about_summary_title">项目简介</string>
-    <string name="profile_about_summary_body">新启健康聚焦互联网医疗中的症状自查、AI 问诊、医检报告分析与康复辅助场景，帮助用户在一个应用里完成“自查 - 判断 - 行动”。</string>
+    <string name="profile_about_summary_body">长庚环聚焦智能感知、AI 问诊、医检报告分析与康复辅助场景，帮助用户在一个应用里完成“自查 - 判断 - 行动”。</string>
     <string name="profile_about_version_title">版本信息</string>
     <string name="profile_about_version_value">Version %1$s (%2$d)</string>
     <string name="profile_about_capability_title">核心能力</string>

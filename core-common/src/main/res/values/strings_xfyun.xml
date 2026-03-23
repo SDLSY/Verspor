@@ -21,7 +21,7 @@
     <string name="doctor_live_avatar_text_input_hint">输入问题，直接验证医生知识库命中</string>
     <string name="doctor_live_avatar_send_text">发送文本问题</string>
     <string name="doctor_live_avatar_quick_question_sleep">我连续三天凌晨易醒，你会先追问哪些信息？</string>
-    <string name="doctor_live_avatar_quick_question_navigation">VesperO 的干预中心里有哪些模块？</string>
+    <string name="doctor_live_avatar_quick_question_navigation">长庚环的干预中心里有哪些模块？</string>
     <string name="doctor_live_avatar_quick_question_report">如果体检报告提示血氧偏低，你会怎么建议？</string>
     <string name="doctor_live_avatar_text_empty">请输入要发送给数字人医生的问题</string>
     <string name="doctor_live_avatar_text_send_failed">文本问题发送失败，请稍后重试</string>
