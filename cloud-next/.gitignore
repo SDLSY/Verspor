@@ -1,2 +1,6 @@
 .vercel
 .env*.local
+.env.pulled
+.env.production-pulled
+.env.*-pulled
+.env.local.bak*

@@ -31,6 +31,10 @@ keystore.properties
 .env.test.local
 .env.production.local
 .env*.local
+.env.pulled
+.env.production-pulled
+.env.*-pulled
+.env.local.bak*
 !**/.env.example
 !**/.env.*.example
 !**/.env.template
