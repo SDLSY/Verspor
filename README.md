@@ -1,68 +1,128 @@
 # 长庚环 / VesperO
 
-长庚环是一个以智能戒指为感知入口、以 Android 应用为交互中心、以云端 AI 与后台工作台为增强能力的端云协同健康辅助系统。项目主线不是“展示更多监测图表”，而是把睡眠、恢复、生理指标、问诊、医检、药食分析与干预执行收敛成一条可验证的业务闭环：
+长庚环是一个以智能戒指为感知入口、以 Android 应用为主交互端、以 `cloud-next` 为云侧编排与管理后台的端云协同健康辅助系统。当前仓库的重点不是单点页面演示，而是把设备采集、睡眠与恢复分析、医生问诊、医检报告理解、药物与饮食图片分析、干预执行与回写、趋势复盘，以及桌面机器人讲解串成可运行的业务闭环。
 
-`感知 -> 分析 -> 解释 -> 建议 -> 执行 -> 回写 -> 趋势 / 复盘`
+## 当前事实
 
-## 当前项目状态
+- 当前唯一 Android 运行入口是 `:app-shell`，它负责 `Application`、`MainActivity`、Manifest、打包配置，以及全局桌面机器人叠层。
+- Android 已按 `core-* + feature-*` 拆分为多模块；`app/` 仍保留大量历史源码，但当前不再参与 `:app-shell` 的构建。
+- 云端主线位于 `cloud-next/`，使用 Next.js App Router + Route Handlers，配合 Supabase 提供认证、数据写入、AI 编排、演示账号 bootstrap 和管理后台。
+- `contracts/` 是跨端契约层，维护 schema、TypeScript 类型和 Kotlin DTO；接口响应遵循 `{ code, message, data, traceId }` 包装。
+- `ml/` 保存训练、导出和推理脚本；`tools/` 保存测试取证、图表生成、模型资产处理和演示辅助脚本。
+- 根目录 `README.pdf` 是 `README.md` 的分发快照，内容应与本文件保持一致。
 
-- Android 当前唯一运行入口是 `:app-shell`，不再通过 `sourceSets` 编译 `app/`。
-- Android 已按 `core-* + feature-*` 组织现行代码，`app/` 仅作为 legacy 归档保留。
-- 云端主线位于 `cloud-next/`，承载 API、管理员后台、演示账号 bootstrap、模型编排与数据写回。
-- 睡眠分析、建议生成、桌面机器人、豆包 TTS、药物/饮食分析、医生问诊、干预执行与回写链路均已接入当前主线。
-- 仓库中同时保留了训练、导出和部署相关的模型脚本，但不能把“支持能力”误写成“Android 端默认全量运行”。
+## 当前可运行能力
 
-## 核心能力
+### Android 主流程
 
-### 1. 睡眠分析链路
+- 底部导航当前包含五个一级页面：今日、医生、趋势、设备、我的。
+- 今日页由 `MorningReportFragment` 承载，展示恢复分、睡眠摘要、关键生理指标和当日建议。
+- 设备页由 `DeviceFragment` 承载，负责 BLE 扫描、连接、断开、工作参数读取和前台采集服务控制。
+- 医生页由 `DoctorChatFragment` 承载，支持文本问诊、语音输入、问诊摘要和结果落库。
+- 趋势页由 `SleepTrendFragment` 承载，展示睡眠、恢复与周期报告相关视图。
+- 我的页由 `ProfileFragment` 及其子页面承载，覆盖云端登录、个人资料、通知、隐私和关于页面。
 
-- 使用 `WAKE / N1 / N2 / N3 / REM` 五阶段标签体系。
-- 训练与研究层保留 baseline、聚合特征 Transformer、导出与推理脚本。
-- 当前系统证明的是“端云协同睡眠分析链路”可用；Android 端本地长期在线的是轻量异常检测与兜底能力，而不是完整五阶段分期主模型。
+### 放松 / 报告 / 干预链路
 
-### 2. SRM_V2 混合建议引擎
+- 症状自查入口是 `SymptomGuideFragment`，配套 2.5D 身体示意、症状选择与风险提示。
+- 医检报告理解入口是 `MedicalReportAnalyzeFragment`，支持 OCR 后的可读化整理。
+- 药物分析与饮食分析页面分别是 `MedicationAnalyzeFragment` 和 `FoodAnalyzeFragment`。
+- 干预链路包含 `InterventionCenterFragment`、`AssessmentBaselineFragment`、`InterventionProfileFragment`、`InterventionSessionFragment`、`BreathingCoachFragment`、`ZenInteractionFragment` 和 `RelaxReviewFragment`。
 
-- 证据层整合戒指数据、睡眠记录、量表、AI 问诊、医检 OCR、干预执行等结构化输入。
-- 决策层通过确定性安全门控控制高风险升级，不让 LLM 直接承担高风险判定。
-- 表达层负责证据压缩、推荐理由、执行说明与页面播报文案生成。
+### 桌面机器人与播报
 
-### 3. 业务闭环
+- `MainActivity` 挂载了全局桌面机器人叠层，支持页面进入讲解、点击讲解和音频播报控制。
+- Android 端已接入 3D 角色、桌面讲解文案生成、语音播放控制和本地预热逻辑。
+- 云端提供 `/api/avatar/narration`、`/api/ai/speech/transcribe`、`/api/ai/speech/synthesize` 等接口，为讲解和语音能力提供支持。
 
-- 戒指连接与采集 -> 今日页恢复分与生理数据 -> 趋势观察
-- 医检报告上传 -> 可读化理解 -> 医生问诊 -> 干预中心
-- 药物 / 饮食图片分析 -> 画像 / 解释 -> 建议上下文
-- 干预生成 -> 执行 -> 回写 -> 复盘 / 趋势
-- 桌面机器人 -> 页面讲解文案 -> 云端 TTS 播报
+### 云侧能力
 
-### 4. 演示与后台
+- `cloud-next` 提供用户认证、睡眠上传与分析、医生问诊、报告理解、干预建议、执行回写、多模态接口和内部 worker 路由。
+- 云端还包含演示账号 bootstrap、管理后台聚合视图，以及模型激活与任务监控相关接口。
+- 代码默认的文本 provider 顺序是 `openrouter -> vector_engine -> deepseek`，可通过环境变量覆盖。
+- `Vector Engine` 相关配置已经覆盖文本、结构化视觉、ASR、TTS、图片生成和视频生成等接口。
 
-- `cloud-next` 提供管理员后台，当前按“总览驾驶舱 / 闭环故事 / 患者工作台 / 报告与问诊 / 建议与效果 / 系统运维”组织。
-- 仓库内已补充 demo 账号 seed、云端 bootstrap 与 Android 本地灌库链路，便于比赛演示与回归测试。
+## 架构概览
+
+### Android 侧
+
+- `:app-shell`
+  - 运行宿主，负责打包、Application、MainActivity、资产挂载、AIUI/讯飞原生库引入。
+- `:core-common`
+  - 公共资源、导航、字符串、日志和通用工具。
+- `:core-model`
+  - 核心领域模型与共享业务对象。
+- `:core-data`
+  - Repository、业务编排、云端账户与演示 bootstrap 协调。
+- `:core-ble`
+  - BLE 连接、协议处理和设备通信。
+- `:core-network`
+  - Retrofit、API 模型和网络访问层。
+- `:core-db`
+  - Room 数据库、DAO、实体与迁移。
+- `:core-ml`
+  - 端侧 AI / ML 能力，包括本地模型加载、异常检测和部分推理辅助。
+- `:feature-home`
+  - 今日页与晨报主流程。
+- `:feature-device`
+  - 设备扫描、连接与采集视图。
+- `:feature-doctor`
+  - 医生问诊、摘要与语音交互。
+- `:feature-relax`
+  - 症状自查、报告理解、药物/饮食分析、干预执行、呼吸、Zen 和复盘。
+- `:feature-trend`
+  - 趋势与周期报告。
+- `:feature-profile`
+  - 我的页、账户、通知、隐私和关于页面。
+
+### Cloud 侧
+
+- Web 框架：Next.js `16.1.6`
+- 运行形态：App Router + Route Handlers
+- 数据与认证：Supabase JS `2.50.0`
+- 类型校验：Zod
+- 常见接口组：
+  - `/api/auth/*`
+  - `/api/sleep/*`
+  - `/api/report/*`
+  - `/api/doctor/*`
+  - `/api/intervention/*`
+  - `/api/ai/*`
+  - `/api/internal/*`
+  - `/api/demo/bootstrap`
+
+### 契约与模型资产
+
+- `contracts/schemas/`：JSON Schema 源。
+- `contracts/typescript/`：云侧共享类型。
+- `contracts/kotlin/`：Android / core 模块共享 DTO。
+- Android 资产目录中已包含 TFLite、GGUF、3D 人体模型、3D 角色模型与讯飞 AIUI 运行时资产。
 
 ## 仓库结构
 
-| 路径 | 作用 | 备注 |
+| 路径 | 作用 | 当前状态 |
 | --- | --- | --- |
-| `app-shell/` | Android 当前运行入口 | 当前唯一 APK 宿主 |
-| `core-common/` | 公共能力、资源、日志、工具 | 现行模块 |
-| `core-model/` | 核心领域模型与协议对象 | 现行模块 |
-| `core-data/` | Repository、业务编排、同步与 demo bootstrap | 现行模块 |
-| `core-ble/` | 戒指通信、协议与 demo 设备配置 | 现行模块 |
-| `core-network/` | Retrofit / API / 网络协议层 | 现行模块 |
-| `core-db/` | Room、DAO、实体与迁移 | 现行模块 |
-| `core-ml/` | 端侧 AI / 规则能力与解析工具 | 现行模块 |
-| `feature-home/` | 今日页、恢复分、晨报 | 现行模块 |
-| `feature-device/` | 设备页、扫描、连接、采集状态 | 现行模块 |
-| `feature-doctor/` | AI 医生、问诊、结构化结果 | 现行模块 |
-| `feature-relax/` | 医检报告、药食分析、干预中心、Zen、呼吸训练 | 现行模块 |
-| `feature-trend/` | 趋势、周 / 月报、复盘 | 现行模块 |
-| `feature-profile/` | 我的、账号、设置、云端登录 | 现行模块 |
-| `cloud-next/` | Next.js API、后台工作台、Supabase 集成、模型编排 | 云端主线 |
-| `contracts/` | 共享 schema / DTO / 契约 | 端云对齐 |
-| `ml/` | 训练、导出、推理、模型实验脚本 | 研究与部署支撑 |
-| `tools/` | 自动化测试、证据生成、原型图 / 流程图脚本 | 项目工具层 |
-| `app/` | 历史 Android 业务代码 | legacy 归档，不参与当前 APK 构建 |
-| `docs/` | 项目文档、源码对齐资料、AI 投喂资料 | 文档入口 |
+| `app-shell/` | Android 运行入口与宿主层 | 当前主入口 |
+| `core-common/` | 公共资源、导航、工具 | 活跃 |
+| `core-model/` | 核心模型 | 活跃 |
+| `core-data/` | Repository 与编排 | 活跃 |
+| `core-ble/` | BLE 协议与连接 | 活跃 |
+| `core-network/` | API 与网络层 | 活跃 |
+| `core-db/` | Room 数据层 | 活跃 |
+| `core-ml/` | 端侧 AI / ML | 活跃 |
+| `feature-home/` | 今日页 | 活跃 |
+| `feature-device/` | 设备页 | 活跃 |
+| `feature-doctor/` | 医生页 | 活跃 |
+| `feature-relax/` | 放松 / 报告 / 干预 | 活跃 |
+| `feature-trend/` | 趋势页 | 活跃 |
+| `feature-profile/` | 我的页 | 活跃 |
+| `cloud-next/` | 云端 API、AI 编排、后台 | 活跃 |
+| `contracts/` | 跨端契约 | 活跃 |
+| `ml/` | 训练、导出、推理脚本 | 辅助 |
+| `tools/` | 自动化脚本与取证工具 | 辅助 |
+| `app/` | 历史 Android 业务归档 | legacy，不参与当前宿主构建 |
+| `docs/` | 技术文档、源码映射与材料 | 文档入口 |
+| `test-evidence/` | 测试证据与导出材料 | 交付/取证，不是运行时源码事实层 |
 
 ## 快速开始
 
@@ -72,8 +132,21 @@
 .\gradlew.bat :app-shell:assembleDebug
 .\gradlew.bat :app-shell:installDebug
 .\gradlew.bat :app-shell:testDebugUnitTest
+.\gradlew.bat :app-shell:connectedDebugAndroidTest
 .\gradlew.bat :app-shell:lint
 ```
+
+发布包构建：
+
+```powershell
+.\gradlew.bat :app-shell:assembleRelease
+```
+
+说明：
+
+- Release 构建依赖根目录 `keystore.properties`。
+- API 基地址通过 `DEBUG_API_BASE_URL` 和 `RELEASE_API_BASE_URL` 注入 `BuildConfig`。
+- `app-shell` 会挂载 `Android_aiui_soft_6.7.0001.0007/` 下的讯飞 AIUI 资产与原生库。
 
 ### Cloud
 
@@ -85,7 +158,7 @@ npm run build
 npm run lint
 ```
 
-### 核心模块单元测试
+### 核心模块单测
 
 ```powershell
 .\gradlew.bat :core-ble:testDebugUnitTest
@@ -95,40 +168,56 @@ npm run lint
 .\gradlew.bat :core-ml:testDebugUnitTest
 ```
 
-## 测试与取证
+## 配置说明
 
-- `tools/` 下已经补充了一批自动化脚本，用于：
-  - 单元测试证据整理
-  - 功能闭环取证
-  - 第 4 章系统 / 模型性能测试数据采集
-  - 原型图与流程图生成
-- `test-evidence/` 为本地产生的测试证据目录，默认作为交付 / 取证产物使用，不作为仓库核心源码事实层。
+### Android 侧
 
-## 文档入口
+- `local.properties` 与 Gradle properties 会为 `app-shell` 注入 API 地址、OpenRouter 模型配置以及讯飞相关密钥。
+- 代码里保留了大量 `XFYUN_*` 构建字段，用于 IAT、RTASR、RAASR、TTS、OCR、Spark、AIUI 和虚拟人相关能力。
+- Debug 与 Release 的 OpenRouter 模型默认值是 `google/gemini-2.5-flash`，但可以通过属性覆盖。
 
-建议优先从以下入口理解项目，而不是从历史比赛材料或零散截图开始：
+### Cloud 侧
+
+请基于 `cloud-next/.env.example` 配置环境变量。常见分组如下：
+
+- Supabase:
+  - `NEXT_PUBLIC_SUPABASE_URL`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - `SUPABASE_SERVICE_ROLE_KEY`
+- 内部任务与安全：
+  - `INTERNAL_WORKER_TOKEN`
+  - `CRON_SECRET`
+  - `CLOUDFLARE_ORIGIN_SECRET`
+- AI provider 顺序：
+  - `PRESCRIPTION_PROVIDER_PRIMARY`
+  - `PRESCRIPTION_PROVIDER_SECONDARY`
+  - `PRESCRIPTION_PROVIDER_TERTIARY`
+- Provider 关键项：
+  - `VECTOR_ENGINE_*`
+  - `OPENROUTER_*`
+  - `DEEPSEEK_*`
+  - `DOUBAO_TTS_*`
+
+## 推荐阅读入口
+
+按这个顺序理解项目，通常比直接翻历史材料更有效：
 
 1. `README.md`
-2. `cloud-next/README.md`
-3. `app-shell/README.md`
-4. `docs/` 下的源码对齐资料与项目总览
+2. `app-shell/README.md`
+3. `cloud-next/README.md`
+4. `contracts/README.md`
+5. `docs/06_技术文档基线_2026-03-05.md`
+6. `docs/00_项目总览与使用指南.md`
 
-说明：
+## 能力边界
 
-- `docs/` 是当前文档入口；历史提交模板、材料目录、截图与本地证据不作为源码事实入口。
-- 如果需要比赛材料、开发文档或测试文档，建议基于 `docs/` 与 `test-evidence/` 的最新结果单独导出。
+- 当前能证明的是“端云协同睡眠与恢复分析链路可运行”，不是“Android 端已经稳定部署完整五阶段睡眠分期主模型”。
+- 当前的 SRM_V2 和干预建议链路是“多源证据整合 + 安全门控 + 表达层生成”的混合建议系统，不应表述为“AI 自动诊断”或“自动处方”。
+- `app/`、`test-evidence/`、比赛材料目录和导出快照不是当前运行时真相来源；运行事实应以 `:app-shell`、`cloud-next`、`contracts` 和代码实现为准。
+- `README.pdf` 只是本文件的可分发快照。若 README 发生实质更新，PDF 应同步重新生成，而不是继续保留旧快照。
 
 ## 维护约定
 
-- 根 README 只保留项目定位、主能力、仓库结构、运行方式和文档入口。
-- 详细设计、ER 图、原型图、测试反填材料和 AI 投喂资料进入 `docs/` 或 `test-evidence/`。
-- 当前源码事实优先于历史材料；不要把 legacy `app/`、本地生成文件或截图误写成当前主链。
-- 不要把睡眠分析链路夸大为“Android 本地完整五阶段分期稳定部署”。
-- 不要把 SRM_V2 写成“AI 自动诊断 / 自动处方 / 完全自主决策”。
-
-## 相关说明
-
-- 云端说明：`cloud-next/README.md`
-- Android 宿主说明：`app-shell/README.md`
-- 契约说明：`contracts/README.md`
-- 文档维护说明：`docs/DOC_MAINTENANCE.md`
+- 根 README 只承担仓库入口职责：说明项目是什么、如何运行、当前边界是什么、应该先看哪些目录。
+- 详细技术说明进入 `app-shell/README.md`、`cloud-next/README.md` 和 `docs/`。
+- 演示材料、测试证据、截图和取证导出不应继续混入根 README。
