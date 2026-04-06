@@ -85,8 +85,16 @@ replay_pid*
 
 # Local reference materials
 /_oss_refs/
+/AGENTS.md
 /CLAUDE.md
 /docs/
+/tmp_notice_pages/
+/tmp_avatar_narration_payload.json
+/tmp_virtual_dump.txt
+/undraw_medical_care.html
+/undraw_search_medical.html
+/undraw_search_medical_next.json
+/undraw_slug_chunk.js
 /相关资料/
 /*通讯协议*.docx
 

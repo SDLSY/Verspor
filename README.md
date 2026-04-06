@@ -109,10 +109,9 @@ npm run lint
 建议优先从以下入口理解项目，而不是从历史比赛材料或零散截图开始：
 
 1. `README.md`
-2. `AGENTS.md`
-3. `cloud-next/README.md`
-4. `app-shell/README.md`
-5. `docs/` 下的源码对齐资料与项目总览
+2. `cloud-next/README.md`
+3. `app-shell/README.md`
+4. `docs/` 下的源码对齐资料与项目总览
 
 说明：
 
@@ -132,4 +131,4 @@ npm run lint
 - 云端说明：`cloud-next/README.md`
 - Android 宿主说明：`app-shell/README.md`
 - 契约说明：`contracts/README.md`
-- 代理协作规范：`AGENTS.md`
+- 文档维护说明：`docs/DOC_MAINTENANCE.md`
