@@ -42,9 +42,10 @@
 
 - `core-data` 优先承载接口、聚合逻辑和稳定实现边界。
 - 不要把页面状态或 Fragment 级逻辑迁进来。
-- 每迁入一块真实仓库，都应同步更新 `docs/MODULE_MAP.md` 和相关技术基线文档。
+- 每迁入一块真实仓库，都应同步更新 `docs/10_项目事实与架构/MODULE_MAP.md` 和相关技术基线文档。
 
 相关文档：
 
-- `docs/MODULE_MAP.md`
-- `docs/TECH_REFACTOR_STATUS.md`
+- `docs/10_项目事实与架构/MODULE_MAP.md`
+- `docs/10_项目事实与架构/TECH_REFACTOR_STATUS.md`
+

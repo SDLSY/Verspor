@@ -1,4 +1,4 @@
-# app-shell
+﻿# app-shell
 
 `app-shell` 是当前 Android 的唯一运行入口。
 
@@ -71,5 +71,6 @@ gradlew.bat :app-shell:connectedDebugAndroidTest
 
 相关文档：
 
-- `docs/MODULE_MAP.md`
-- `docs/TECH_REFACTOR_STATUS.md`
+- `docs/10_项目事实与架构/MODULE_MAP.md`
+- `docs/10_项目事实与架构/TECH_REFACTOR_STATUS.md`
+

@@ -67,7 +67,12 @@ venv/
 /ml/artifacts/
 /ml/data/
 /ml/models/
-/artifacts/
+!/artifacts/
+/artifacts/*
+!/artifacts/README.md
+!/output/
+/output/*
+!/output/README.md
 /assets_tmp/
 /tmp/
 /_tmp/
@@ -87,7 +92,8 @@ replay_pid*
 /_oss_refs/
 /AGENTS.md
 /CLAUDE.md
-/docs/
+/docs/90_*/**/*.docx
+/docs/90_*/**/*.txt
 /tmp_notice_pages/
 /tmp_avatar_narration_payload.json
 /tmp_virtual_dump.txt
@@ -95,11 +101,8 @@ replay_pid*
 /undraw_search_medical.html
 /undraw_search_medical_next.json
 /undraw_slug_chunk.js
-/相关资料/
-/*通讯协议*.docx
 
 # Patch leftovers
 *.orig
 *.rej
 .gitnexus
-/附件6：第十九届全国大学生软件创新大赛-参赛作品提交材料参考模板/

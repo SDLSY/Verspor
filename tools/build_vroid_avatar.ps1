@@ -1,22 +1,52 @@
 param(
-    [string]$InputVrm = "d:/newstart/tmp/avatar_vroid_primary.vrm",
-    [string]$SourceActions = "d:/newstart/merged-model.glb",
+    [string]$InputVrm,
+    [string]$SourceActions,
     [string]$BlenderExe = "C:\Program Files\Blender Foundation\Blender 4.5\blender.exe",
-    [string]$OutputHq = "d:/newstart/app/src/main/assets/3d_avatar/guide_avatar_vroid_hq.glb",
-    [string]$OutputLite = "d:/newstart/app/src/main/assets/3d_avatar/guide_avatar_vroid_lite.glb",
-    [string]$TempConverted = "d:/newstart/tmp/avatar_vroid_converted.glb",
-    [string]$MetadataOut = "d:/newstart/app/src/main/assets/3d_avatar/avatar_retarget_metadata.json",
+    [string]$OutputHq,
+    [string]$OutputLite,
+    [string]$TempConverted,
+    [string]$MetadataOut,
     [double]$LiteDecimateRatio = 0.58,
     [int]$LiteMaxTextureSize = 1024,
     [switch]$UseProceduralActions = $true
 )
 
 $ErrorActionPreference = "Stop"
+$RepoRoot = Split-Path -Parent $PSScriptRoot
+$ToolsDir = $PSScriptRoot
+
+if ([string]::IsNullOrWhiteSpace($InputVrm)) {
+    $InputVrm = Join-Path $RepoRoot "tools/avatar_source_assets/5422721126842864302.vrm"
+}
+if ([string]::IsNullOrWhiteSpace($SourceActions)) {
+    $SourceActions = Join-Path $RepoRoot "tools/avatar_source_assets/merged-model.glb"
+}
+if ([string]::IsNullOrWhiteSpace($OutputHq)) {
+    $OutputHq = Join-Path $RepoRoot "app-shell/src/main/assets/3d_avatar/guide_avatar_vroid_hq.glb"
+}
+if ([string]::IsNullOrWhiteSpace($OutputLite)) {
+    $OutputLite = Join-Path $RepoRoot "app-shell/src/main/assets/3d_avatar/guide_avatar_vroid_lite.glb"
+}
+if ([string]::IsNullOrWhiteSpace($TempConverted)) {
+    $TempConverted = Join-Path $RepoRoot "tmp/avatar_vroid_converted.glb"
+}
+if ([string]::IsNullOrWhiteSpace($MetadataOut)) {
+    $MetadataOut = Join-Path $RepoRoot "app-shell/src/main/assets/3d_avatar/avatar_retarget_metadata.json"
+}
+
+$ConvertScript = Join-Path $ToolsDir "convert_vroid_to_avatar_glb.py"
+$RetargetScript = Join-Path $ToolsDir "retarget_avatar_actions.py"
+$ProceduralScript = Join-Path $ToolsDir "generate_avatar_procedural_actions.py"
+$OptimizeScript = Join-Path $ToolsDir "optimize_avatar_model.py"
 
 function Assert-PathExists([string]$PathValue, [string]$Label) {
     if (-not (Test-Path -LiteralPath $PathValue)) {
         throw "$Label not found: $PathValue"
     }
+}
+
+function Convert-ToPortablePath([string]$PathValue) {
+    return ($PathValue -replace "\\", "/")
 }
 
 function Invoke-BlenderScript([string]$ScriptPath, [string[]]$ScriptArgs) {
@@ -33,16 +63,16 @@ Assert-PathExists $InputVrm "Input VRM"
 if (-not $UseProceduralActions) {
     Assert-PathExists $SourceActions "Source animated GLB"
 }
-Assert-PathExists "d:/newstart/tools/convert_vroid_to_avatar_glb.py" "convert_vroid_to_avatar_glb.py"
-Assert-PathExists "d:/newstart/tools/retarget_avatar_actions.py" "retarget_avatar_actions.py"
-Assert-PathExists "d:/newstart/tools/generate_avatar_procedural_actions.py" "generate_avatar_procedural_actions.py"
-Assert-PathExists "d:/newstart/tools/optimize_avatar_model.py" "optimize_avatar_model.py"
+Assert-PathExists $ConvertScript "convert_vroid_to_avatar_glb.py"
+Assert-PathExists $RetargetScript "retarget_avatar_actions.py"
+Assert-PathExists $ProceduralScript "generate_avatar_procedural_actions.py"
+Assert-PathExists $OptimizeScript "optimize_avatar_model.py"
 
 $null = New-Item -ItemType Directory -Force -Path (Split-Path -Parent $OutputHq)
 $null = New-Item -ItemType Directory -Force -Path (Split-Path -Parent $OutputLite)
 $null = New-Item -ItemType Directory -Force -Path (Split-Path -Parent $TempConverted)
 
-Invoke-BlenderScript "d:/newstart/tools/convert_vroid_to_avatar_glb.py" @(
+Invoke-BlenderScript $ConvertScript @(
     "--input", $InputVrm,
     "--output", $TempConverted
 )
@@ -58,7 +88,7 @@ if ($UseProceduralActions) {
         "Guide Left_7"
     )
 
-    Invoke-BlenderScript "d:/newstart/tools/generate_avatar_procedural_actions.py" @(
+    Invoke-BlenderScript $ProceduralScript @(
         "--input", $TempConverted,
         "--output", $OutputHq
     )
@@ -71,15 +101,15 @@ if ($UseProceduralActions) {
         boneCoverage = 100.0
         mappedPairs = 52
         totalPairs = 52
-        source = $InputVrm
-        sourceActions = $SourceActions
-        target = $TempConverted
-        output = $OutputHq
+        source = (Convert-ToPortablePath $InputVrm)
+        sourceActions = (Convert-ToPortablePath $SourceActions)
+        target = (Convert-ToPortablePath $TempConverted)
+        output = (Convert-ToPortablePath $OutputHq)
     } | ConvertTo-Json -Depth 4
     $meta | Set-Content -Path $MetadataOut -Encoding UTF8
 }
 else {
-    Invoke-BlenderScript "d:/newstart/tools/retarget_avatar_actions.py" @(
+    Invoke-BlenderScript $RetargetScript @(
         "--source", $SourceActions,
         "--target", $TempConverted,
         "--output", $OutputHq,
@@ -87,7 +117,7 @@ else {
     )
 }
 
-Invoke-BlenderScript "d:/newstart/tools/optimize_avatar_model.py" @(
+Invoke-BlenderScript $OptimizeScript @(
     "--input", $OutputHq,
     "--output", $OutputLite,
     "--decimate-ratio", "$LiteDecimateRatio",

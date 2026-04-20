@@ -1,7 +1,7 @@
 {
-    "source":  "D:/newstart/5422721126842864302.vrm",
+    "source":  "D:/newstart/tools/avatar_source_assets/5422721126842864302.vrm",
     "method":  "procedural_actions",
-    "sourceActions":  "d:/newstart/merged-model.glb",
+    "sourceActions":  "D:/newstart/tools/avatar_source_assets/merged-model.glb",
     "requestedActions":  [
                              "Pointing Forward_1",
                              "Waving Gesture_2",

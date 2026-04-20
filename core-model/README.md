@@ -55,5 +55,6 @@
 相关文档：
 
 - `contracts/README.md`
-- `docs/MODULE_MAP.md`
-- `docs/06_技术文档基线_2026-03-05.md`
+- `docs/10_项目事实与架构/MODULE_MAP.md`
+- `docs/10_项目事实与架构/06_技术文档基线_2026-03-05.md`
+

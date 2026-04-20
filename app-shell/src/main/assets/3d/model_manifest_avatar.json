@@ -4,7 +4,7 @@
     "name": "Relax Avatar Normal View",
     "version": "avatar-v1",
     "license": "demo",
-    "source": "5422721126842864302.vrm -> guide_avatar_vroid_hq.glb",
+    "source": "tools/avatar_source_assets/5422721126842864302.vrm -> guide_avatar_vroid_hq.glb",
     "unitCubeOffset": [0.0, -0.14, -2.62],
     "defaultScale": 0.98,
     "defaultYawDeg": 166.0,

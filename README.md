@@ -1,4 +1,4 @@
-# 长庚环 / VesperO
+﻿# 长庚环 / VesperO
 
 长庚环是一个以智能戒指为感知入口、以 Android 应用为主交互端、以 `cloud-next` 为云侧编排与管理后台的端云协同健康辅助系统。当前仓库的重点不是单点页面演示，而是把设备采集、睡眠与恢复分析、医生问诊、医检报告理解、药物与饮食图片分析、干预执行与回写、趋势复盘，以及桌面机器人讲解串成可运行的业务闭环。
 
@@ -9,7 +9,7 @@
 - 云端主线位于 `cloud-next/`，使用 Next.js App Router + Route Handlers，配合 Supabase 提供认证、数据写入、AI 编排、演示账号 bootstrap 和管理后台。
 - `contracts/` 是跨端契约层，维护 schema、TypeScript 类型和 Kotlin DTO；接口响应遵循 `{ code, message, data, traceId }` 包装。
 - `ml/` 保存训练、导出和推理脚本；`tools/` 保存测试取证、图表生成、模型资产处理和演示辅助脚本。
-- 根目录 `README.pdf` 是 `README.md` 的分发快照，内容应与本文件保持一致。
+- `最终材料/参考快照/README.pdf` 是 `README.md` 的分发快照，内容应与本文件保持一致。
 
 ## 当前可运行能力
 
@@ -206,18 +206,19 @@ npm run lint
 2. `app-shell/README.md`
 3. `cloud-next/README.md`
 4. `contracts/README.md`
-5. `docs/06_技术文档基线_2026-03-05.md`
-6. `docs/00_项目总览与使用指南.md`
+5. `docs/10_项目事实与架构/06_技术文档基线_2026-03-05.md`
+6. `docs/00_入口与维护/00_项目总览与使用指南.md`
 
 ## 能力边界
 
 - 当前能证明的是“端云协同睡眠与恢复分析链路可运行”，不是“Android 端已经稳定部署完整五阶段睡眠分期主模型”。
 - 当前的 SRM_V2 和干预建议链路是“多源证据整合 + 安全门控 + 表达层生成”的混合建议系统，不应表述为“AI 自动诊断”或“自动处方”。
 - `app/`、`test-evidence/`、比赛材料目录和导出快照不是当前运行时真相来源；运行事实应以 `:app-shell`、`cloud-next`、`contracts` 和代码实现为准。
-- `README.pdf` 只是本文件的可分发快照。若 README 发生实质更新，PDF 应同步重新生成，而不是继续保留旧快照。
+- `最终材料/参考快照/README.pdf` 只是本文件的可分发快照。若 README 发生实质更新，PDF 应同步重新生成，而不是继续保留旧快照。
 
 ## 维护约定
 
 - 根 README 只承担仓库入口职责：说明项目是什么、如何运行、当前边界是什么、应该先看哪些目录。
 - 详细技术说明进入 `app-shell/README.md`、`cloud-next/README.md` 和 `docs/`。
 - 演示材料、测试证据、截图和取证导出不应继续混入根 README。
+

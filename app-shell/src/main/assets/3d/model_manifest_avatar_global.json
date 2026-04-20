@@ -4,7 +4,7 @@
     "name": "Global Avatar Overlay View",
     "version": "avatar-global-v1",
     "license": "demo",
-    "source": "5422721126842864302.vrm -> guide_avatar_vroid_hq.glb",
+    "source": "tools/avatar_source_assets/5422721126842864302.vrm -> guide_avatar_vroid_hq.glb",
     "unitCubeOffset": [0.0, -0.08, -2.70],
     "defaultScale": 0.88,
     "defaultYawDeg": 166.0,
