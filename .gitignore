@@ -90,6 +90,11 @@ replay_pid*
 
 # Local reference materials
 /_oss_refs/
+/docs/
+/最终材料/
+/材料提交版-不可以删除/
+/附件_评委增强理解包_完整版/
+/附件_评委增强理解包完整版/
 /AGENTS.md
 /CLAUDE.md
 /docs/90_*/**/*.docx

@@ -1,164 +1,175 @@
-﻿# 长庚环 / VesperO
+# 长庚环 VesperO
 
-长庚环是一个以智能戒指为感知入口、以 Android 应用为主交互端、以 `cloud-next` 为云侧编排与管理后台的端云协同健康辅助系统。当前仓库的重点不是单点页面演示，而是把设备采集、睡眠与恢复分析、医生问诊、医检报告理解、药物与饮食图片分析、干预执行与回写、趋势复盘，以及桌面机器人讲解串成可运行的业务闭环。
+长庚环是一套围绕智能戒指构建的端云协同健康辅助作品。它把 Android App、云端服务、睡眠分期模型、AI 问诊与干预反馈连接在一起，面向睡眠恢复、日常健康管理和居家康复辅助场景，提供从数据采集到建议执行的完整体验。
 
-## 当前事实
+项目的核心想法很直接：让智能戒指持续记录睡眠、心率、血氧、体温、运动和 PPG 等信号，由手机端完成交互、展示和本地分析，再由云端补充模型推理、报告理解、问诊增强和管理后台能力。用户看到的是一个健康助手，开发侧则由多模块 Android、Next.js 云服务、Supabase 数据底座和模型服务共同支撑。
 
-- 当前唯一 Android 运行入口是 `:app-shell`，它负责 `Application`、`MainActivity`、Manifest、打包配置，以及全局桌面机器人叠层。
-- Android 已按 `core-* + feature-*` 拆分为多模块；`app/` 仍保留大量历史源码，但当前不再参与 `:app-shell` 的构建。
-- 云端主线位于 `cloud-next/`，使用 Next.js App Router + Route Handlers，配合 Supabase 提供认证、数据写入、AI 编排、演示账号 bootstrap 和管理后台。
-- `contracts/` 是跨端契约层，维护 schema、TypeScript 类型和 Kotlin DTO；接口响应遵循 `{ code, message, data, traceId }` 包装。
-- `ml/` 保存训练、导出和推理脚本；`tools/` 保存测试取证、图表生成、模型资产处理和演示辅助脚本。
-- `最终材料/参考快照/README.pdf` 是 `README.md` 的分发快照，内容应与本文件保持一致。
+## 项目亮点
 
-## 当前可运行能力
+- 智能戒指接入：支持 BLE 扫描、连接、工作参数读取、实时波形和后台采集。
+- 睡眠与恢复分析：展示睡眠摘要、恢复分、生理指标、异常波动和趋势复盘。
+- AI 医生问诊：支持文本输入、语音输入、风险提示、问诊摘要和结构化结果保存。
+- 医检报告理解：支持 OCR 后的报告整理、指标解释和风险提示。
+- 药物与饮食分析：面向药品图片和饮食图片提供辅助识别、风险提示和记录回写。
+- 个性化干预：包含症状自查、呼吸训练、干预任务、执行记录和复盘反馈。
+- 桌面机器人讲解：Android 端提供页面讲解、点击讲解和语音播报体验。
+- 云端管理后台：提供患者概览、睡眠报告、模型任务、审计日志和系统管理页面。
 
-### Android 主流程
+## 系统组成
 
-- 底部导航当前包含五个一级页面：今日、医生、趋势、设备、我的。
-- 今日页由 `MorningReportFragment` 承载，展示恢复分、睡眠摘要、关键生理指标和当日建议。
-- 设备页由 `DeviceFragment` 承载，负责 BLE 扫描、连接、断开、工作参数读取和前台采集服务控制。
-- 医生页由 `DoctorChatFragment` 承载，支持文本问诊、语音输入、问诊摘要和结果落库。
-- 趋势页由 `SleepTrendFragment` 承载，展示睡眠、恢复与周期报告相关视图。
-- 我的页由 `ProfileFragment` 及其子页面承载，覆盖云端登录、个人资料、通知、隐私和关于页面。
+| 模块 | 说明 |
+| --- | --- |
+| `app-shell/` | Android 应用入口，负责打包、全局导航、桌面机器人叠层和应用级配置 |
+| `core-common/` | 公共资源、导航、主题、日志和通用 UI 支撑 |
+| `core-model/` | 睡眠、恢复、设备、问诊、报告、干预等领域模型 |
+| `core-data/` | Repository、云端同步、画像、处方、演示数据协调 |
+| `core-ble/` | BLE 连接、Hi90B 协议、命令构帧和采样解析 |
+| `core-network/` | Retrofit 接口、API DTO、隐私裁剪、讯飞与云端能力接入 |
+| `core-db/` | Room 数据库、实体、DAO 和迁移 |
+| `core-ml/` | 本地异常检测、PPG/HRV/体温分析、报告解析和边缘推理辅助 |
+| `feature-home/` | 今日状态、晨报、恢复分和建议展示 |
+| `feature-device/` | 设备扫描、连接、实时数据和采集控制 |
+| `feature-doctor/` | 医生问诊、语音交互、风险评估和问诊记录 |
+| `feature-relax/` | 症状自查、报告理解、药物饮食分析、干预、呼吸和复盘 |
+| `feature-trend/` | 睡眠趋势、恢复趋势和周期报告 |
+| `feature-profile/` | 我的页面、账户、个人资料、隐私和通知 |
+| `cloud-next/` | Next.js 云端 API、Web 展示页、管理后台、AI provider 编排 |
+| `contracts/` | Android 与云端共享的数据契约 |
+| `ml/` | 模型训练、导出、推理实验和边缘演示脚本 |
+| `hf-inference/` | 睡眠分期 ONNX 推理服务，可部署到 Hugging Face Space |
+| `tools/` | 图表生成、证据整理、模型资产处理和演示辅助脚本 |
 
-### 放松 / 报告 / 干预链路
+## 功能体验
 
-- 症状自查入口是 `SymptomGuideFragment`，配套 2.5D 身体示意、症状选择与风险提示。
-- 医检报告理解入口是 `MedicalReportAnalyzeFragment`，支持 OCR 后的可读化整理。
-- 药物分析与饮食分析页面分别是 `MedicationAnalyzeFragment` 和 `FoodAnalyzeFragment`。
-- 干预链路包含 `InterventionCenterFragment`、`AssessmentBaselineFragment`、`InterventionProfileFragment`、`InterventionSessionFragment`、`BreathingCoachFragment`、`ZenInteractionFragment` 和 `RelaxReviewFragment`。
+### Android App
 
-### 桌面机器人与播报
+App 以五个一级页面组织主要体验：
 
-- `MainActivity` 挂载了全局桌面机器人叠层，支持页面进入讲解、点击讲解和音频播报控制。
-- Android 端已接入 3D 角色、桌面讲解文案生成、语音播放控制和本地预热逻辑。
-- 云端提供 `/api/avatar/narration`、`/api/ai/speech/transcribe`、`/api/ai/speech/synthesize` 等接口，为讲解和语音能力提供支持。
+- 今日：睡眠摘要、恢复分、生理指标、异常波动和建议。
+- 医生：文本/语音问诊、红旗风险提示、结构化建议和历史会话。
+- 趋势：睡眠、恢复、生理指标和周期报告。
+- 设备：智能戒指扫描、连接、断开、参数读取和采集服务控制。
+- 我的：登录、个人资料、通知、隐私、关于和云端账户入口。
 
-### 云侧能力
+此外，App 还提供症状自查、医检报告分析、药物分析、饮食分析、呼吸训练、干预执行、放松复盘和 3D 人体交互等扩展页面。
 
-- `cloud-next` 提供用户认证、睡眠上传与分析、医生问诊、报告理解、干预建议、执行回写、多模态接口和内部 worker 路由。
-- 云端还包含演示账号 bootstrap、管理后台聚合视图，以及模型激活与任务监控相关接口。
-- 代码默认的文本 provider 顺序是 `openrouter -> vector_engine -> deepseek`，可通过环境变量覆盖。
-- `Vector Engine` 相关配置已经覆盖文本、结构化视觉、ASR、TTS、图片生成和视频生成等接口。
+### Web 与云服务
 
-## 架构概览
+Web 端访问地址：
 
-### Android 侧
+```text
+https://cloud.changgengring.cyou/
+```
 
-- `:app-shell`
-  - 运行宿主，负责打包、Application、MainActivity、资产挂载、AIUI/讯飞原生库引入。
-- `:core-common`
-  - 公共资源、导航、字符串、日志和通用工具。
-- `:core-model`
-  - 核心领域模型与共享业务对象。
-- `:core-data`
-  - Repository、业务编排、云端账户与演示 bootstrap 协调。
-- `:core-ble`
-  - BLE 连接、协议处理和设备通信。
-- `:core-network`
-  - Retrofit、API 模型和网络访问层。
-- `:core-db`
-  - Room 数据库、DAO、实体与迁移。
-- `:core-ml`
-  - 端侧 AI / ML 能力，包括本地模型加载、异常检测和部分推理辅助。
-- `:feature-home`
-  - 今日页与晨报主流程。
-- `:feature-device`
-  - 设备扫描、连接与采集视图。
-- `:feature-doctor`
-  - 医生问诊、摘要与语音交互。
-- `:feature-relax`
-  - 症状自查、报告理解、药物/饮食分析、干预执行、呼吸、Zen 和复盘。
-- `:feature-trend`
-  - 趋势与周期报告。
-- `:feature-profile`
-  - 我的页、账户、通知、隐私和关于页面。
+云端工程位于 `cloud-next/`，基于 Next.js App Router 和 Route Handlers 构建，承担以下职责：
 
-### Cloud 侧
+- 用户注册、登录、刷新和密码重置。
+- 睡眠数据上传、分析任务入队和报告查询。
+- 医生问诊、报告理解、建议生成和干预回写。
+- 多模态 AI 能力，包括语音转写、语音合成、图片生成和视频任务。
+- 管理后台页面，包括患者概览、任务队列、模型配置和审计日志。
 
-- Web 框架：Next.js `16.1.6`
-- 运行形态：App Router + Route Handlers
-- 数据与认证：Supabase JS `2.50.0`
-- 类型校验：Zod
-- 常见接口组：
-  - `/api/auth/*`
-  - `/api/sleep/*`
-  - `/api/report/*`
-  - `/api/doctor/*`
-  - `/api/intervention/*`
-  - `/api/ai/*`
-  - `/api/internal/*`
-  - `/api/demo/bootstrap`
+### 睡眠分期模型服务
 
-### 契约与模型资产
+模型服务页面：
 
-- `contracts/schemas/`：JSON Schema 源。
-- `contracts/typescript/`：云侧共享类型。
-- `contracts/kotlin/`：Android / core 模块共享 DTO。
-- Android 资产目录中已包含 TFLite、GGUF、3D 人体模型、3D 角色模型与讯飞 AIUI 运行时资产。
+```text
+https://huggingface.co/spaces/1new/sleep-transformer-v2
+```
 
-## 仓库结构
+健康检查：
 
-| 路径 | 作用 | 当前状态 |
-| --- | --- | --- |
-| `app-shell/` | Android 运行入口与宿主层 | 当前主入口 |
-| `core-common/` | 公共资源、导航、工具 | 活跃 |
-| `core-model/` | 核心模型 | 活跃 |
-| `core-data/` | Repository 与编排 | 活跃 |
-| `core-ble/` | BLE 协议与连接 | 活跃 |
-| `core-network/` | API 与网络层 | 活跃 |
-| `core-db/` | Room 数据层 | 活跃 |
-| `core-ml/` | 端侧 AI / ML | 活跃 |
-| `feature-home/` | 今日页 | 活跃 |
-| `feature-device/` | 设备页 | 活跃 |
-| `feature-doctor/` | 医生页 | 活跃 |
-| `feature-relax/` | 放松 / 报告 / 干预 | 活跃 |
-| `feature-trend/` | 趋势页 | 活跃 |
-| `feature-profile/` | 我的页 | 活跃 |
-| `cloud-next/` | 云端 API、AI 编排、后台 | 活跃 |
-| `contracts/` | 跨端契约 | 活跃 |
-| `ml/` | 训练、导出、推理脚本 | 辅助 |
-| `tools/` | 自动化脚本与取证工具 | 辅助 |
-| `app/` | 历史 Android 业务归档 | legacy，不参与当前宿主构建 |
-| `docs/` | 技术文档、源码映射与材料 | 文档入口 |
-| `test-evidence/` | 测试证据与导出材料 | 交付/取证，不是运行时源码事实层 |
+```text
+https://1new-sleep-transformer-v2.hf.space/health
+```
 
-## 快速开始
+推理接口：
 
-### Android
+```text
+POST https://1new-sleep-transformer-v2.hf.space/
+```
+
+该服务使用 ONNX Runtime 运行 `sleep-transformer-v2.onnx`，输入为按睡眠窗口聚合后的 17 维生理特征，输出 WAKE、N1、N2、N3、REM 五类睡眠阶段、置信度和异常分数。若服务端开启了 `API_TOKEN`，调用时需要携带：
+
+```text
+Authorization: Bearer <评审或部署环境提供的 Token>
+```
+
+## 作品安装说明
+
+### Android 安装包
+
+方式一：使用比赛提交材料中的 APK。
+
+1. 将 `app-release.apk` 复制到 Android 手机。
+2. 在系统设置中允许“安装未知来源应用”。
+3. 点击 APK 完成安装。
+4. 打开应用后，可进入设备页连接智能戒指；没有实物设备时，可使用演示数据体验主要页面。
+
+方式二：从源码构建安装包。
 
 ```powershell
 .\gradlew.bat :app-shell:assembleDebug
-.\gradlew.bat :app-shell:installDebug
-.\gradlew.bat :app-shell:testDebugUnitTest
-.\gradlew.bat :app-shell:connectedDebugAndroidTest
-.\gradlew.bat :app-shell:lint
 ```
 
-发布包构建：
+Debug APK 生成后通常位于：
+
+```text
+app-shell/build/outputs/apk/debug/app-shell-debug.apk
+```
+
+安装到已连接的 Android 设备：
+
+```powershell
+.\gradlew.bat :app-shell:installDebug
+```
+
+Release 包构建命令：
 
 ```powershell
 .\gradlew.bat :app-shell:assembleRelease
 ```
 
-说明：
+Release 构建需要根目录提供 `keystore.properties` 和对应签名文件。没有签名配置时，请使用 Debug 包进行本地体验。
 
-- Release 构建依赖根目录 `keystore.properties`。
-- API 基地址通过 `DEBUG_API_BASE_URL` 和 `RELEASE_API_BASE_URL` 注入 `BuildConfig`。
-- `app-shell` 会挂载 `Android_aiui_soft_6.7.0001.0007/` 下的讯飞 AIUI 资产与原生库。
+### Web 端访问
 
-### Cloud
+浏览器打开：
 
-```powershell
-cd cloud-next
-npm install
-npm run dev
-npm run build
-npm run lint
+```text
+https://cloud.changgengring.cyou/
 ```
 
-### 核心模块单测
+部分后台页面需要登录账号和云端环境配置。公开展示页可直接访问。
+
+### 模型服务访问
+
+浏览器打开健康检查地址：
+
+```text
+https://1new-sleep-transformer-v2.hf.space/health
+```
+
+如果返回类似内容，说明模型服务已加载：
+
+```json
+{"status":"ok","model_loaded":true}
+```
+
+## 开发运行
+
+### Android
+
+常用命令：
+
+```powershell
+.\gradlew.bat :app-shell:assembleDebug
+.\gradlew.bat :app-shell:installDebug
+.\gradlew.bat :app-shell:testDebugUnitTest
+.\gradlew.bat :app-shell:lint
+```
+
+核心模块单测：
 
 ```powershell
 .\gradlew.bat :core-ble:testDebugUnitTest
@@ -168,57 +179,71 @@ npm run lint
 .\gradlew.bat :core-ml:testDebugUnitTest
 ```
 
-## 配置说明
+Android 端常用配置来自 `local.properties`、Gradle properties 和构建字段。涉及云端 API、OpenRouter、讯飞能力和签名文件的配置不应提交到公开仓库。
 
-### Android 侧
+### Cloud
 
-- `local.properties` 与 Gradle properties 会为 `app-shell` 注入 API 地址、OpenRouter 模型配置以及讯飞相关密钥。
-- 代码里保留了大量 `XFYUN_*` 构建字段，用于 IAT、RTASR、RAASR、TTS、OCR、Spark、AIUI 和虚拟人相关能力。
-- Debug 与 Release 的 OpenRouter 模型默认值是 `google/gemini-2.5-flash`，但可以通过属性覆盖。
+```powershell
+cd cloud-next
+npm install
+npm run dev
+npm run lint
+npm run build
+```
 
-### Cloud 侧
+生产部署使用 Vercel。项目已包含 `vercel.json`，并配置了内部 worker 的定时任务。
 
-请基于 `cloud-next/.env.example` 配置环境变量。常见分组如下：
+### ONNX 推理服务
 
-- Supabase:
-  - `NEXT_PUBLIC_SUPABASE_URL`
-  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-  - `SUPABASE_SERVICE_ROLE_KEY`
-- 内部任务与安全：
-  - `INTERNAL_WORKER_TOKEN`
-  - `CRON_SECRET`
-  - `CLOUDFLARE_ORIGIN_SECRET`
-- AI provider 顺序：
-  - `PRESCRIPTION_PROVIDER_PRIMARY`
-  - `PRESCRIPTION_PROVIDER_SECONDARY`
-  - `PRESCRIPTION_PROVIDER_TERTIARY`
-- Provider 关键项：
-  - `VECTOR_ENGINE_*`
-  - `OPENROUTER_*`
-  - `DEEPSEEK_*`
-  - `DOUBAO_TTS_*`
+```powershell
+cd hf-inference
+uvicorn app:app --host 0.0.0.0 --port 7860
+```
 
-## 推荐阅读入口
+本地健康检查：
 
-按这个顺序理解项目，通常比直接翻历史材料更有效：
+```text
+http://127.0.0.1:7860/health
+```
 
-1. `README.md`
-2. `app-shell/README.md`
-3. `cloud-next/README.md`
-4. `contracts/README.md`
-5. `docs/10_项目事实与架构/06_技术文档基线_2026-03-05.md`
-6. `docs/00_入口与维护/00_项目总览与使用指南.md`
+Docker 部署可直接使用 `hf-inference/Dockerfile`。
 
-## 能力边界
+## 环境配置
 
-- 当前能证明的是“端云协同睡眠与恢复分析链路可运行”，不是“Android 端已经稳定部署完整五阶段睡眠分期主模型”。
-- 当前的 SRM_V2 和干预建议链路是“多源证据整合 + 安全门控 + 表达层生成”的混合建议系统，不应表述为“AI 自动诊断”或“自动处方”。
-- `app/`、`test-evidence/`、比赛材料目录和导出快照不是当前运行时真相来源；运行事实应以 `:app-shell`、`cloud-next`、`contracts` 和代码实现为准。
-- `最终材料/参考快照/README.pdf` 只是本文件的可分发快照。若 README 发生实质更新，PDF 应同步重新生成，而不是继续保留旧快照。
+### Android
 
-## 维护约定
+常见配置项包括：
 
-- 根 README 只承担仓库入口职责：说明项目是什么、如何运行、当前边界是什么、应该先看哪些目录。
-- 详细技术说明进入 `app-shell/README.md`、`cloud-next/README.md` 和 `docs/`。
-- 演示材料、测试证据、截图和取证导出不应继续混入根 README。
+- API 基地址：`DEBUG_API_BASE_URL`、`RELEASE_API_BASE_URL`
+- OpenRouter 模型配置
+- 讯飞 IAT、RTASR、RAASR、TTS、OCR、Spark、AIUI 和虚拟人相关密钥
+- Release 签名配置：`keystore.properties`
 
+### Cloud
+
+请基于 `cloud-next/.env.example` 准备环境变量，常见分组如下：
+
+- Supabase：`NEXT_PUBLIC_SUPABASE_URL`、`NEXT_PUBLIC_SUPABASE_ANON_KEY`、`SUPABASE_SERVICE_ROLE_KEY`
+- 内部任务：`INTERNAL_WORKER_TOKEN`、`CRON_SECRET`
+- AI provider：`OPENROUTER_*`、`VECTOR_ENGINE_*`、`DEEPSEEK_*`、`DOUBAO_TTS_*`
+- 模型服务：`MODEL_INFERENCE_TOKEN`
+
+## 目录说明
+
+```text
+app-shell/        Android 应用宿主
+core-*/           Android 公共能力与数据层
+feature-*/        Android 业务页面
+cloud-next/       云端 API、Web 页面和管理后台
+contracts/        跨端数据契约
+ml/               训练、导出和实验脚本
+hf-inference/     ONNX 睡眠分期服务
+tools/            工程辅助脚本
+app/              早期 Android 代码归档
+```
+
+## 使用提示
+
+长庚环提供的是健康辅助和信息整理能力，不替代医生诊断，也不自动开具医疗处方。涉及胸痛、呼吸困难、持续高热、严重过敏、意识异常等紧急症状时，应优先线下就医。
+
+仓库中包含 Android、云端、模型和工具脚本。首次阅读时建议先运行 Android 或打开 Web 展示页，再按需要进入具体模块源码。
