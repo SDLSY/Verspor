@@ -99,14 +99,26 @@ Authorization: Bearer <评审或部署环境提供的 Token>
 
 ### Android 安装包
 
-GitHub 仓库不直接分发 APK。若评审包、发布页或项目负责人另行提供了 `app-release.apk`，可按以下步骤安装：
+GitHub 仓库提供 Android 安装包：
+
+```text
+releases/android/app-release.apk
+```
+
+该 APK 通过 Git LFS 存储。如果直接在 GitHub 页面下载，请打开文件后点击 Download；如果通过 Git 克隆仓库，请先安装 Git LFS 并执行：
+
+```powershell
+git lfs pull
+```
+
+安装步骤：
 
 1. 将 `app-release.apk` 复制到 Android 手机。
 2. 在系统设置中允许“安装未知来源应用”。
 3. 点击 APK 完成安装。
 4. 打开应用后，可进入设备页连接智能戒指；没有实物设备时，可使用演示数据体验主要页面。
 
-如果没有现成 APK，可以从源码构建 Debug 安装包：
+也可以从源码构建 Debug 安装包：
 
 ```powershell
 .\gradlew.bat :app-shell:assembleDebug

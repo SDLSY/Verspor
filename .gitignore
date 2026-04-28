@@ -19,6 +19,9 @@ local.properties
 /captures/
 *.apk
 *.aab
+!/releases/
+!/releases/android/
+!/releases/android/app-release.apk
 
 # Signing files and secrets
 keystore.properties
