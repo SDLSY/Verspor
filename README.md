@@ -99,14 +99,14 @@ Authorization: Bearer <评审或部署环境提供的 Token>
 
 ### Android 安装包
 
-方式一：使用比赛提交材料中的 APK。
+GitHub 仓库不直接分发 APK。若评审包、发布页或项目负责人另行提供了 `app-release.apk`，可按以下步骤安装：
 
 1. 将 `app-release.apk` 复制到 Android 手机。
 2. 在系统设置中允许“安装未知来源应用”。
 3. 点击 APK 完成安装。
 4. 打开应用后，可进入设备页连接智能戒指；没有实物设备时，可使用演示数据体验主要页面。
 
-方式二：从源码构建安装包。
+如果没有现成 APK，可以从源码构建 Debug 安装包：
 
 ```powershell
 .\gradlew.bat :app-shell:assembleDebug
