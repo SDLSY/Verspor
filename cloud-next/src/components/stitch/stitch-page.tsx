@@ -148,8 +148,6 @@ const TEAM_STYLE = [
   ".stitch-team-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(29,32,39,0.65);border:1px solid rgba(194,198,219,0.15);color:#E0E2ED;font-size:11px;letter-spacing:.4em;text-transform:uppercase;}",
   ".stitch-team-chip::before{content:\"\";width:6px;height:6px;border-radius:999px;background:#4DE082;box-shadow:0 0 12px rgba(77,224,130,.6);}",
   ".stitch-team-row{display:flex;justify-content:flex-start;}",
-  ".stitch-hero-badge{margin-top:12px;display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border-radius:999px;background:rgba(29,32,39,0.7);border:1px solid rgba(194,198,219,0.2);color:#C2C6DB;font-size:11px;letter-spacing:.3em;text-transform:uppercase;box-shadow:0 18px 40px rgba(0,0,0,0.35);}",
-  ".stitch-hero-badge::before{content:\"\";width:6px;height:6px;border-radius:999px;background:#4DE082;box-shadow:0 0 10px rgba(77,224,130,.6);}",
 ].join(" ");
 
 function stripTags(html: string) {
@@ -328,13 +326,7 @@ function tweakHomeHeroCopy(html: string, template: StitchTemplate) {
   }
   const heroCopy =
     "\u878d\u5408\u7cbe\u5bc6\u4f20\u611f AI \u6df1\u5ea6\u7406\u89e3 \u4e0e\u4e34\u5e8a\u7ea7\u5e72\u9884 \u4e3a\u60a8\u6784\u5efa\u6c38\u4e0d\u505c\u6b47\u7684\u5065\u5eb7\u8fdb\u5316\u95ed\u73af";
-  const badgeCopy =
-    "\u591c\u5de1\u8005 \u00b7 \u7b2c\u5341\u4e5d\u5c4a\u5168\u56fd\u5927\u5b66\u751f\u8f6f\u4ef6\u521b\u65b0\u5927\u8d5b";
-  const withBadge = html.replace(
-    /<div class="flex justify-center gap-6">[\s\S]*?<\/div>/i,
-    (match) => `${match}<div class="stitch-hero-badge">${badgeCopy}</div>`,
-  );
-  return withBadge.replace(
+  return html.replace(
     /<p class="font-manrope[^"]*mb-12">[\s\S]*?<\/p>/i,
     `<p class="font-manrope font-light text-lg md:text-xl text-on-surface-variant max-w-3xl mx-auto leading-relaxed mb-12 tracking-wide whitespace-nowrap">${heroCopy}</p>`,
   );
